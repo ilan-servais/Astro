@@ -1,0 +1,3 @@
+[build]
+  command = "npm run build"  # Remplace par "yarn build" si tu utilises Yarn
+  publish = "dist"
