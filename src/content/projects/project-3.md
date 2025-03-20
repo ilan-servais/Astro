@@ -1,8 +1,8 @@
 ---
 inProgress: false
-title: Project title
-description: Project description
-img_alt: project image alt text
-link: https://github.com/veranikabarel?tab=repositories
-tags: ['React', 'CSS', 'Typescript']
+title: Cinetech
+description: Plateforme interactive permettant de rechercher et sauvegarder des films et séries grâce à une API
+img_alt: Aperçu de Cinetech
+link: https://github.com/ilan-servais/cinetech
+tags: ['HTML5', 'CSS3', 'JavaScript']
 ---

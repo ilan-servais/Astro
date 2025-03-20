@@ -1,8 +1,8 @@
 ---
 inProgress: false
-title: Project title
-description: Project description
+title: Memory Game
+description: Classic memory game with flipped cards
 img_alt: project image alt text
-link: https://github.com/veranikabarel?tab=repositories
-tags: ['React', 'CSS', 'Typescript']
+link: https://ilan-servais-rick-et-morty-memory.netlify.app/
+tags: ['React', 'CSS', 'JavaScript']
 ---
