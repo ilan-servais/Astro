@@ -1,8 +1,8 @@
 ---
 inProgress: false
-title: Project title
-description: Project description
+title: Intranet for Training Center/School
+description: Project currently under development
 img_alt: project image alt text
-link: https://github.com/veranikabarel?tab=repositories
-tags: ['React', 'CSS', 'Typescript']
+link: https://github.com/ilan-servais?tab=repositories
+tags: ['Symfony', 'ReactJs', 'Tailwind CSS']
 ---
