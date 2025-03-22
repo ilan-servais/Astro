@@ -1,6 +1,6 @@
 ---
 inProgress: false
-title: Intranet for training Center/School
+title: Intranet for schools & training centers
 description: Collaborative project carried out in 5 groups, with each team developing specific functionalities (user management, educational content, internal communication, etc.)
 img_alt: project image alt text
 link: https://github.com/ilan-servais
