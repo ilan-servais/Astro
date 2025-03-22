@@ -1,9 +1,9 @@
 ---
 inProgress: false
 title: Intranet for training Center/School
-description: Project currently under development
+description: Collaborative project carried out in 5 groups, with each team developing specific functionalities (user management, educational content, internal communication, etc.)
 img_alt: project image alt text
-link: https://github.com/ilan-servais?tab=repositories
-tags: ['Symfony', 'ReactJs', 'PHP']
+link: https://github.com/ilan-servais
+tags: ['Symfony', 'ReactJs', 'PHP', 'Docker']
 image: '@assets/images/project-1.png'
 ---
