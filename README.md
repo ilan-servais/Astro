@@ -1,47 +1,28 @@
-💫 This is a free template to make your portfolio website using **[Astro 4.0](https://astro.build/) + [Tailwind CSS](https://tailwindcss.com/)**.
+Portfolio personnel optimisé créé avec **[Astro 4.0](https://astro.build/)** et **[Tailwind CSS](https://tailwindcss.com/)**, offrant d'excellentes performances et une expérience visuelle attrayante.
 
-### Dark mode
-![Dark mode](https://github.com/veranikabarel/astro-portfolio/assets/48052206/240ab82d-8896-412e-8f52-5cf10d42b1db)
-### Light mode
-![Light mode](https://github.com/veranikabarel/astro-portfolio/assets/48052206/bfa88b30-6dcf-4d5f-bf28-efc3caa27d0f)
-### Lighthouse report
-![Lighthouse report](https://github.com/veranikabarel/astro-portfolio/assets/48052206/e7ad23a4-1a9b-477e-a13e-a321ce6bd3d6)
+## Caractéristiques principales
 
-## Table of Contents
+✅ **Optimisé pour les performances** - Score Lighthouse élevé grâce à l'optimisation des images et au chargement efficace des ressources
 
-- [Demo](#demo)
-- [Features](#features)
-- [Project structure](#project-structure)
-- [Commands](#commands)
-- [Contributing](#contributing)
-- [Credits](#credits)
+✅ **Mode jour/nuit** - Thème personnalisé avec couleur sombre `#120D16` et fonctionnalité de bascule automatique
 
-## Demo
+✅ **Responsive Design** - Adapté à tous les appareils, du mobile aux grands écrans
 
-📌 [https://astro-fe-portfolio.netlify.app/](https://astro-fe-portfolio.netlify.app/)
+✅ **Techniquement avancé** - Utilisation des formats SVG et WebP pour des images légères et parfaitement nettes
 
-## Features
+## Technologies et intégrations
 
-✔️ Integration with **Tailwind CSS** ([@astrojs/tailwind](https://docs.astro.build/en/guides/integrations-guide/tailwind/)) supporting **Dark mode**.
+Ce projet utilise les intégrations suivantes :
 
-✔️ Uses the following integrations:
+- **@astrojs/mdx** - Pour le contenu structuré des projets
+- **@astrojs/tailwind** - Pour le style avec organisation des classes
+- **astro-icon** - Pour les icônes optimisées
+- **astro-seo** - Pour l'optimisation du référencement
+- **astro-navbar** - Pour la navigation responsive
 
-- @astrojs/mdx
-- @astrojs/image
-- @astrojs/tailwind - with prettier class sorting plugin
-- @astro-icon
-- @astro-seo
-- @astro-navbar
+## Structure du projet
 
-✔️([@Playwright](https://github.com/microsoft/playwright)) e2e tests are setted up.
-
-🔜 Blog with frontmatter (title, description, author, date, image, tags) and RSS feed, sitemap and robots.txt
-
-🔜 404 error page
-
-## Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+Dans ce projet Astro, vous trouverez les dossiers et fichiers suivants :
 
 ```
 /
@@ -78,35 +59,35 @@ Inside of your Astro project, you'll see the following folders and files:
 └── ...
 ```
 
-Astro looks for `.astro`, `.md` or `.mdx` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Astro recherche des fichiers `.astro`, `.md` ou `.mdx` dans le répertoire `src/pages/`. Chaque page est exposée comme une route basée sur son nom de fichier.
 
-`src/components/` is where we put any Astro components and similarly `src/layouts/` for layouts.
+`src/components/` est l'endroit où nous mettons tous les composants Astro et de même `src/layouts/` pour les mises en page.
 
-Images can be placed in `src/images/`.
+Les images peuvent être placées dans `src/images/`.
 
-Blog and documentation content are created as collections of Markdown or MDX files in `src/content`.
+Le contenu du blog et de la documentation est créé sous forme de collections de fichiers Markdown ou MDX dans `src/content`.
 
-Any static assets, eg. images, can be placed in the `public/` directory.
+Tous les fichiers statiques, par exemple les images, peuvent être placés dans le répertoire `public/`.
 
-## Commands
+## Commandes
 
-All commands are run from the root of the project, from a terminal:
+Toutes les commandes sont exécutées depuis la racine du projet, depuis un terminal :
 
-| Command             | Action                                             |
+| Commande            | Action                                             |
 | :------------------ | :------------------------------------------------- |
-| `yarn`              | Installs dependencies                              |
-| `yarn dev`          | Starts local dev server at `localhost:3000`        |
-| `yarn build`        | Build your production site to `./dist/`            |
-| `yarn preview`      | Preview your build locally, before deploying       |
-| `yarn astro ...`    | Run CLI commands like `astro add`, `astro preview` |
-| `yarn astro --help` | Get help using the Astro CLI                       |
-| `yarn test:e2e`     | Run Playwright tests                               |
+| `npm install`       | Installe les dépendances                           |
+| `npm run dev`       | Démarre le serveur de développement local à `localhost:3000` |
+| `npm run build`     | Construisez votre site de production dans `./dist/` |
+| `npm run preview`   | Prévisualisez votre build localement, avant de déployer |
+| `npm run astro ...` | Exécutez des commandes CLI comme `astro add`, `astro preview` |
+| `npm run astro --help` | Obtenez de l'aide pour utiliser l'interface de ligne de commande Astro |
+| `npm run test:e2e`  | Exécutez les tests Playwright                      |
 
-## Contributing
+## Contribuer
 
-If you have any idea, suggestions or find any bugs, feel free to open a discussion, an issue or create a pull request.
-That would be very useful for all of us and we would be happy to listen and take action.
+Si vous avez des idées, des suggestions ou trouvez des bugs, n'hésitez pas à ouvrir une discussion, un problème ou à créer une demande de tirage.
+Cela serait très utile pour nous tous et nous serions heureux d'écouter et d'agir.
 
-## Credits
+## Crédits
 
-Assets designed by (Freepik)[www.freepik.com].
+Les ressources sont conçues par (Freepik)[www.freepik.com].
