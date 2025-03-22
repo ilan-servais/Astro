@@ -5,5 +5,5 @@ description: Collaborative project carried out in 5 groups, with each team devel
 img_alt: project image alt text
 link: https://github.com/ilan-servais
 tags: ['Symfony', 'ReactJs', 'PHP', 'Docker']
-image: '@assets/images/project-1.png'
+image: '@assets/images/project-1.svg'
 ---

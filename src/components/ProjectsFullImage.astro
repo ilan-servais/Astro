@@ -1,9 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
-import project1Image from '@assets/images/project-1.png';
-import project2Image from '@assets/images/project-2.png';
-import project3Image from '@assets/images/project-3.png';
+import project1Image from '@assets/images/project-1.svg';
+import project2Image from '@assets/images/project-2.svg';
+import project3Image from '@assets/images/project-3.svg';
 import Tags from '@components/ui/Tags.astro';
 
 const projects = await getCollection('projects', ({ data }) => !data.inProgress);

@@ -10,6 +10,11 @@ export default defineConfig({
     }
   })],
   image: {
-    service: squooshImageService()
+    service: squooshImageService(),
+    // Configuration globale pour les images
+    defaultOptions: {
+      format: 'webp',
+      quality: 80,
+    }
   }
 });
