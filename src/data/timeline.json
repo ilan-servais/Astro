@@ -1,121 +1,157 @@
 {
-  "experiences": [
-    {
-      "id": 1,
-      "year": 2025,
-      "period": "2021-2025",
-      "periodName": "Carrière en développement web",
-      "company": "Future Tech Inc.",
-      "title": "Senior Web Developer",
-      "description": "Leading advanced web development projects using cutting-edge technologies. Responsible for architecture decisions and mentoring junior developers.",
-      "iconPath": "@assets/images/project-1.svg"
-    },
-    {
-      "id": 2,
-      "year": 2024,
-      "period": "2021-2025",
-      "periodName": "Carrière en développement web",
-      "company": "Digital Solutions",
-      "title": "Full Stack Developer",
-      "description": "Developed scalable web applications using React, Node.js and GraphQL. Implemented CI/CD pipelines and optimized application performance.",
-      "iconPath": "@assets/images/project-2.svg"
-    },
-    {
-      "id": 3,
-      "year": 2023,
-      "period": "2021-2025",
-      "periodName": "Carrière en développement web",
-      "company": "Tech Innovators",
-      "title": "Frontend Developer",
-      "description": "Created responsive and accessible user interfaces using modern JavaScript frameworks. Collaborated closely with UX designers to implement pixel-perfect designs.",
-      "iconPath": "@assets/images/project-3.svg"
-    },
-    {
-      "id": 4,
-      "year": 2022,
-      "period": "2021-2025",
-      "periodName": "Carrière en développement web",
-      "company": "WebCraft Studio",
-      "title": "Junior Developer",
-      "description": "Worked on various client projects developing websites and web applications. Gained experience with JavaScript, CSS frameworks and version control systems.",
-      "iconPath": "@assets/images/project-1.svg"
-    },
-    {
-      "id": 5,
-      "year": 2021,
-      "period": "2021-2025",
-      "periodName": "Carrière en développement web",
-      "company": "Code Academy",
-      "title": "Intensive Web Development Course",
-      "description": "Completed an intensive 6-month bootcamp focused on web technologies, including HTML, CSS, JavaScript, and various frameworks and libraries.",
-      "iconPath": "@assets/images/project-2.svg"
-    },
-    {
-      "id": 6,
-      "year": 2018,
-      "period": "2004-2020",
-      "periodName": "Premières expériences professionnelles",
-      "company": "Marketing Agency",
-      "title": "Digital Marketing Specialist",
-      "description": "Managed digital marketing campaigns and social media presence for various clients. Developed content strategies and analyzed performance metrics.",
-      "iconPath": "@assets/images/project-3.svg"
-    },
-    {
-      "id": 7,
-      "year": 2015,
-      "period": "2004-2020",
-      "periodName": "Premières expériences professionnelles",
-      "company": "Retail Company",
-      "title": "Store Manager",
-      "description": "Oversaw daily operations, managed a team of 10 employees, and ensured excellent customer service. Implemented new sales strategies that increased revenue by 15%.",
-      "iconPath": "@assets/images/project-1.svg"
-    },
-    {
-      "id": 8,
-      "year": 2010,
-      "period": "2004-2020",
-      "periodName": "Premières expériences professionnelles",
-      "company": "Customer Service",
-      "title": "Team Lead",
-      "description": "Led a team of customer service representatives, resolving complex customer issues and training new staff members. Implemented improved customer service protocols.",
-      "iconPath": "@assets/images/project-2.svg"
-    },
-    {
-      "id": 9,
-      "year": 2004,
-      "period": "2004-2020",
-      "periodName": "Premières expériences professionnelles",
-      "company": "First Job",
-      "title": "Sales Associate",
-      "description": "First professional experience working as a part-time sales associate while studying. Developed strong interpersonal skills and customer service abilities.",
-      "iconPath": "@assets/images/project-3.svg"
-    },
-    {
-      "id": 10,
-      "year": 1992,
-      "period": "1992-2004",
-      "periodName": "Enfance et éducation",
-      "company": "Birth",
-      "title": "Beginning of Life Journey",
-      "description": "Born in 1992, beginning a life journey that would eventually lead to a successful career in web development and technology.",
-      "iconPath": "@assets/images/project-1.svg"
-    }
-  ],
-  "periods": [
-    {
-      "id": 1,
-      "years": "2021-2025",
-      "name": "Carrière en développement web"
-    },
-    {
-      "id": 2,
-      "years": "2004-2020",
-      "name": "Premières expériences professionnelles"
-    },
-    {
-      "id": 3,
-      "years": "1992-2004",
-      "name": "Enfance et éducation"
-    }
-  ]
-}
+    "experiences": [
+      {
+        "id": 1,
+        "year": "2025 - Present",
+        "period": "février 2025 - Present",
+        "periodName": "Expérience",
+        "company": "La Plateforme_",
+        "title": "Développeur web",
+        "description": "Contrat de Développement Professionnel Intérimaire (CDPI). Se former dans le domaine du Développement Web en travaillant sur des projets concrets.",
+        "iconPath": "@assets/images/project-1.svg"
+      },
+      {
+        "id": 2,
+        "year": "2023 - 2024",
+        "period": "septembre 2023 - juillet 2024",
+        "periodName": "Expérience",
+        "company": "La Plateforme_",
+        "title": "RNCP Concepteur Développeur d'applications Web",
+        "description": "Réalisation de projets variés, incluant le montage et le démontage de PC, ainsi que le développement de sites web et de jeux. Acquisition de compétences en Bachelor Prépa.",
+        "iconPath": "@assets/images/project-2.svg"
+      },
+      {
+        "id": 3,
+        "year": "2022",
+        "period": "janvier 2022 - avril 2022",
+        "periodName": "Expérience",
+        "company": "Exit Café",
+        "title": "Responsable - Barman - Serveur",
+        "description": "Responsable de l'accueil, du service et de la gestion du bar dans un environnement dynamique à Marseille.",
+        "iconPath": "@assets/images/project-2.svg"
+      },
+      {
+        "id": 4,
+        "year": "2022",
+        "period": "janvier 2022 - juillet 2022",
+        "periodName": "Expérience",
+        "company": "LE BEAU RIVAGE",
+        "title": "Barman en chef",
+        "description": "Dirigé les opérations du bar, création de cocktails élaborés et coordination d'équipe pour offrir un service de qualité.",
+        "iconPath": "@assets/images/project-1.svg"
+      },
+      {
+        "id": 5,
+        "year": "2022",
+        "period": "juillet 2022 - décembre 2022",
+        "periodName": "Expérience",
+        "company": "La Cabane des Amis / Barta Club",
+        "title": "Barman",
+        "description": "Expérience en tant que barman dans un établissement à Marseille.",
+        "iconPath": "@assets/images/project-3.svg"
+      },
+      {
+        "id": 6,
+        "year": "2021",
+        "period": "mai 2021 - décembre 2021",
+        "periodName": "Expérience",
+        "company": "Yoj",
+        "title": "Responsable - Chef de rang",
+        "description": "Gestion de l'accueil, prise de commandes et service dans un bistrot japonais, incluant la gestion des stocks et de la caisse.",
+        "iconPath": "@assets/images/project-3.svg"
+      },
+      {
+        "id": 7,
+        "year": "2014",
+        "period": "septembre 2014 - septembre 2014",
+        "periodName": "Expérience",
+        "company": "École 42",
+        "title": "Étudiant en Code",
+        "description": "Participation à la piscine intensive de l'École 42 axée sur le codage en C++, mais des circonstances ont empêché la poursuite à Paris.",
+        "iconPath": "@assets/images/project-3.svg"
+      },
+      {
+        "id": 8,
+        "year": "2013 - 2020",
+        "period": "mai 2013 - décembre 2020",
+        "periodName": "Expérience",
+        "company": "Exit Café",
+        "title": "Responsable - Barman - Serveur",
+        "description": "Supervision et direction d'une équipe pour assurer un service de qualité.",
+        "iconPath": "@assets/images/project-1.svg"
+      },
+      {
+        "id": 9,
+        "year": "2011 - 2012",
+        "period": "juin 2011 - août 2012",
+        "periodName": "Expérience",
+        "company": "Boosting PvP | World of Warcraft",
+        "title": "Co-fondateur & Responsable opérationnel",
+        "description": "Création et gestion d'une micro-entreprise spécialisée dans le Boosting PvP sur World of Warcraft, assurant un service haut de gamme et une gestion opérationnelle complète.",
+        "iconPath": "@assets/images/project-1.svg"
+      },
+      {
+        "id": 10,
+        "year": "2011",
+        "period": "janvier 2011 - juin 2011",
+        "periodName": "Expérience",
+        "company": "World of Warcraft PvP - RBG",
+        "title": "Leader d'équipe RBG | Première place au classement européen",
+        "description": "Dirigé une équipe vers la première place au classement européen en Rated BattleGrounds, démontrant leadership, stratégie et gestion en situation de compétition.",
+        "iconPath": "@assets/images/project-2.svg"
+      },
+      {
+        "id": 11,
+        "year": "2009 - 2010",
+        "period": "août 2009 - juin 2010",
+        "periodName": "Expérience",
+        "company": "Les Danaïdes",
+        "title": "CAP Hôtellerie Restauration",
+        "description": "Contrat en alternance dans la brasserie emblématique de Marseille, polyvalence en tant que barman, serveur et commis de salle.",
+        "iconPath": "@assets/images/project-3.svg"
+      },
+      {
+        "id": 12,
+        "year": "2008 - 2009",
+        "period": "août 2008 - juin 2009",
+        "periodName": "Expérience",
+        "company": "Bastide de la Salette",
+        "title": "CAP Hôtellerie Restauration",
+        "description": "Alternance de 11 mois dans un restaurant à Marseille, impliquant prise de commandes, service, préparation et envoi des boissons, et préparation de sandwiches.",
+        "iconPath": "@assets/images/project-1.svg"
+      },
+      {
+        "id": 13,
+        "year": "2008",
+        "period": "janvier 2008 - janvier 2008",
+        "periodName": "Expérience",
+        "company": "La Brasserie Jules",
+        "title": "Barman",
+        "description": "Stage d'un mois en tant que barman dans une brasserie élégante aux accents Art déco, inspirée par Jules Verne.",
+        "iconPath": "@assets/images/project-2.svg"
+      },
+      {
+        "id": 14,
+        "year": "2006 - 2007",
+        "period": "août 2006 - juin 2007",
+        "periodName": "Expérience",
+        "company": "Auberge du Moulin Vert",
+        "title": "Pré-apprentissage | Serveur - Barman",
+        "description": "Première expérience professionnelle en tant que serveur et barman dans un restaurant gastronomique français, avec une capacité d'accueil de 250 personnes.",
+        "iconPath": "@assets/images/project-3.svg"
+      }
+    ],
+    "formations": [
+      {
+        "id": 1,
+        "year": "2023 - 2024",
+        "period": "septembre 2023 - juillet 2024",
+        "periodName": "Formation",
+        "company": "La Plateforme_",
+        "title": "Formation en développement web",
+        "description": "Formation dispensée à La Plateforme_ axée sur le développement web.",
+        "iconPath": "@assets/images/formation.svg"
+      }
+    ]
+  }
+  
