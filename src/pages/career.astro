@@ -1,0 +1,155 @@
+---
+import Layout from '@layouts/Layout.astro';
+import TimelineExperience from '@components/TimelineExperience.astro';
+import timelineData from '../data/timeline.json';
+
+// Tri des expériences par année du plus récent au plus ancien
+const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - a.year);
+---
+
+<Layout title="Ilan Servais | Professional Journey">
+  <main class="relative min-h-screen overflow-hidden">
+    <!-- Titre de la fresque uniquement -->
+    <div class="text-center py-8">
+      <h1 class="font-monospace text-3xl text-orange lg:text-4xl">Mon Parcours Professionnel</h1>
+    </div>
+
+    <!-- Timeline Verticale -->
+    <div class="timeline-container pb-20"
+      x-data="{ 
+        activeIndex: 0,
+        experiences: JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(sortedExperiences))}')),
+        init() {
+          this.setupScrollObserver();
+          window.addEventListener('scroll', () => this.checkScroll());
+        },
+        checkScroll() {
+          // Détecter la position de défilement pour activer les cartes
+          const scrollPosition = window.scrollY + window.innerHeight / 2;
+          const cardElements = document.querySelectorAll('.modal-card');
+          
+          cardElements.forEach((card, index) => {
+            const rect = card.getBoundingClientRect();
+            const cardMiddle = rect.top + rect.height / 2;
+            
+            if (cardMiddle > 0 && cardMiddle < window.innerHeight) {
+              this.activeIndex = index;
+            }
+          });
+        },
+        setupScrollObserver() {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                const index = parseInt(entry.target.dataset.index);
+                this.activeIndex = index;
+              }
+            });
+          }, {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.5
+          });
+          
+          // Observer toutes les cartes
+          document.querySelectorAll('.modal-card').forEach(item => {
+            observer.observe(item);
+          });
+        }
+      }"
+    >
+      <div class="relative max-w-5xl mx-auto">
+        <!-- Ligne verticale de la timeline en arrière-plan -->
+        <div class="absolute left-1/6 top-0 bottom-0 w-1 bg-orange/30"></div>
+        
+        <!-- Contenu des expériences sans les points cliquables -->
+        <div class="relative z-10">
+          {sortedExperiences.map((exp, index) => (
+            <div 
+              class="modal-card w-full max-w-2xl mx-auto mb-32 pl-12 transition-all duration-500 transform"
+              data-index={index}
+              x-bind:class="activeIndex === {index} ? 'opacity-100 translate-x-0' : 'opacity-50 translate-x-8'"
+            >
+              <TimelineExperience 
+                id={exp.id}
+                year={exp.year}
+                company={exp.company}
+                title={exp.title}
+                description={exp.description}
+                iconPath={exp.iconPath}
+              />
+            </div>
+          ))}
+        </div>
+        
+        <!-- Indicateur de défilement vers le bas -->
+        <div class="sticky bottom-4 left-1/2 transform -translate-x-1/2 text-center animate-bounce text-orange opacity-80 z-30">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  /* Style pour la ligne de temps */
+  .timeline-container {
+    overscroll-behavior: none;
+  }
+  
+  /* Position de la ligne verticale */
+  .left-1/6 {
+    left: 16.666667%;
+  }
+  
+  /* Style pour les cartes de timeline */
+  .modal-card {
+    transition-property: transform, opacity;
+    transition-duration: 500ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  
+  /* Ajout d'un cercle stylisé pour chaque carte */
+  .modal-card::before {
+    content: "";
+    position: absolute;
+    left: 16.666667%;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    background-color: var(--orange-color, #E06330);
+    border-radius: 50%;
+    border: 3px solid white;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+  }
+  
+  .dark .modal-card::before {
+    border-color: var(--dark-bg-color, #120D16);
+  }
+  
+  /* Responsive design pour mobile */
+  @media (max-width: 768px) {
+    .modal-card {
+      width: 85%;
+      padding-left: 2rem;
+    }
+    
+    .left-1/6 {
+      left: 1rem;
+    }
+    
+    .modal-card::before {
+      left: 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Définir des variables CSS pour les couleurs
+  document.documentElement.style.setProperty('--orange-color', '#E06330');
+  document.documentElement.style.setProperty('--dark-bg-color', '#120D16');
+</script>

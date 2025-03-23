@@ -1,0 +1,121 @@
+{
+  "experiences": [
+    {
+      "id": 1,
+      "year": 2025,
+      "period": "2021-2025",
+      "periodName": "Carrière en développement web",
+      "company": "Future Tech Inc.",
+      "title": "Senior Web Developer",
+      "description": "Leading advanced web development projects using cutting-edge technologies. Responsible for architecture decisions and mentoring junior developers.",
+      "iconPath": "@assets/images/project-1.svg"
+    },
+    {
+      "id": 2,
+      "year": 2024,
+      "period": "2021-2025",
+      "periodName": "Carrière en développement web",
+      "company": "Digital Solutions",
+      "title": "Full Stack Developer",
+      "description": "Developed scalable web applications using React, Node.js and GraphQL. Implemented CI/CD pipelines and optimized application performance.",
+      "iconPath": "@assets/images/project-2.svg"
+    },
+    {
+      "id": 3,
+      "year": 2023,
+      "period": "2021-2025",
+      "periodName": "Carrière en développement web",
+      "company": "Tech Innovators",
+      "title": "Frontend Developer",
+      "description": "Created responsive and accessible user interfaces using modern JavaScript frameworks. Collaborated closely with UX designers to implement pixel-perfect designs.",
+      "iconPath": "@assets/images/project-3.svg"
+    },
+    {
+      "id": 4,
+      "year": 2022,
+      "period": "2021-2025",
+      "periodName": "Carrière en développement web",
+      "company": "WebCraft Studio",
+      "title": "Junior Developer",
+      "description": "Worked on various client projects developing websites and web applications. Gained experience with JavaScript, CSS frameworks and version control systems.",
+      "iconPath": "@assets/images/project-1.svg"
+    },
+    {
+      "id": 5,
+      "year": 2021,
+      "period": "2021-2025",
+      "periodName": "Carrière en développement web",
+      "company": "Code Academy",
+      "title": "Intensive Web Development Course",
+      "description": "Completed an intensive 6-month bootcamp focused on web technologies, including HTML, CSS, JavaScript, and various frameworks and libraries.",
+      "iconPath": "@assets/images/project-2.svg"
+    },
+    {
+      "id": 6,
+      "year": 2018,
+      "period": "2004-2020",
+      "periodName": "Premières expériences professionnelles",
+      "company": "Marketing Agency",
+      "title": "Digital Marketing Specialist",
+      "description": "Managed digital marketing campaigns and social media presence for various clients. Developed content strategies and analyzed performance metrics.",
+      "iconPath": "@assets/images/project-3.svg"
+    },
+    {
+      "id": 7,
+      "year": 2015,
+      "period": "2004-2020",
+      "periodName": "Premières expériences professionnelles",
+      "company": "Retail Company",
+      "title": "Store Manager",
+      "description": "Oversaw daily operations, managed a team of 10 employees, and ensured excellent customer service. Implemented new sales strategies that increased revenue by 15%.",
+      "iconPath": "@assets/images/project-1.svg"
+    },
+    {
+      "id": 8,
+      "year": 2010,
+      "period": "2004-2020",
+      "periodName": "Premières expériences professionnelles",
+      "company": "Customer Service",
+      "title": "Team Lead",
+      "description": "Led a team of customer service representatives, resolving complex customer issues and training new staff members. Implemented improved customer service protocols.",
+      "iconPath": "@assets/images/project-2.svg"
+    },
+    {
+      "id": 9,
+      "year": 2004,
+      "period": "2004-2020",
+      "periodName": "Premières expériences professionnelles",
+      "company": "First Job",
+      "title": "Sales Associate",
+      "description": "First professional experience working as a part-time sales associate while studying. Developed strong interpersonal skills and customer service abilities.",
+      "iconPath": "@assets/images/project-3.svg"
+    },
+    {
+      "id": 10,
+      "year": 1992,
+      "period": "1992-2004",
+      "periodName": "Enfance et éducation",
+      "company": "Birth",
+      "title": "Beginning of Life Journey",
+      "description": "Born in 1992, beginning a life journey that would eventually lead to a successful career in web development and technology.",
+      "iconPath": "@assets/images/project-1.svg"
+    }
+  ],
+  "periods": [
+    {
+      "id": 1,
+      "years": "2021-2025",
+      "name": "Carrière en développement web"
+    },
+    {
+      "id": 2,
+      "years": "2004-2020",
+      "name": "Premières expériences professionnelles"
+    },
+    {
+      "id": 3,
+      "years": "1992-2004",
+      "name": "Enfance et éducation"
+    }
+  ]
+}

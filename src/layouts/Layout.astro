@@ -14,7 +14,7 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 <html lang="en" class="scroll-smooth" data-testid="html">
 	<head>
 		<SEO
-			title="Ilan Servais | Homepage"
+			title={title}
 			description="A heavily optimized description full of well-researched keywords."
 		/>
 		<meta charset="UTF-8" />
@@ -22,6 +22,9 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		
+		<!-- Chargement d'Alpine.js depuis un CDN fiable -->
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.3/dist/cdn.min.js"></script>
 
 		<title>{title}</title>
 	</head>
@@ -36,6 +39,28 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 			/* https://css-tricks.com/almanac/properties/c/content-visibility/ */
 			img {
 				content-visibility: auto;
+			}
+			
+			/* Pour la page de timeline, réduire la hauteur du footer */
+			body:has(.timeline-container) footer {
+				padding: 0.5rem;
+				margin-top: 0;
+			}
+			
+			/* Pour la page de timeline, réduire la hauteur de la barre de navigation */
+			body:has(.timeline-container) header {
+				margin: 0.25rem 0;
+			}
+			
+			/* Pour l'expérience immersive */
+			body:has(.timeline-container) {
+				scroll-behavior: smooth;
+				overflow-x: hidden;
+			}
+			
+			/* Animation fluide pour les transitions */
+			.timeline-point, .modal-card {
+				will-change: transform, opacity;
 			}
 		</style>
 	</body>

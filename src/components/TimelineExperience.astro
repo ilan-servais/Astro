@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+import project1Image from '@assets/images/project-1.svg';
+import project2Image from '@assets/images/project-2.svg';
+import project3Image from '@assets/images/project-3.svg';
+
+interface Props {
+  id: number;
+  year: number;
+  company: string;
+  title: string;
+  description: string;
+  iconPath: string;
+}
+
+const { id, year, company, title, description, iconPath } = Astro.props;
+
+// Déterminer quelle image utiliser
+const getImage = (path) => {
+  if (path.includes('project-1')) return project1Image;
+  if (path.includes('project-2')) return project2Image;
+  if (path.includes('project-3')) return project3Image;
+  return project1Image; // Image par défaut
+};
+
+const image = getImage(iconPath);
+---
+
+<div class="timeline-experience bg-white dark:bg-darkBg rounded-xl overflow-hidden shadow-xl">
+  <div class="flex flex-col md:flex-row">
+    <div class="relative bg-gray-100 dark:bg-gray-800 p-4 md:w-1/3">
+      <Image 
+        src={image} 
+        alt={`${company} illustration`} 
+        width={400}
+        height={300}
+        class="w-full h-auto object-contain max-h-[200px]"
+      />
+      <div class="absolute top-2 right-2 bg-orange text-white text-xs font-bold px-2 py-1 rounded-full">
+        {year}
+      </div>
+    </div>
+    
+    <div class="p-5 md:w-2/3">
+      <h3 class="text-xl font-bold text-orange mb-2">{company}</h3>
+      <h4 class="text-lg font-medium text-black dark:text-white mb-3">{title}</h4>
+      <p class="text-sm text-gray-700 dark:text-gray-300">{description}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .timeline-experience {
+    transform-origin: center left;
+    transition: all 0.3s ease;
+  }
+  
+  .timeline-experience:hover {
+    transform: translateX(5px) scale(1.01);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+</style>
