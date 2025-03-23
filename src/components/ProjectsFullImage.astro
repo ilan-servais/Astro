@@ -20,7 +20,7 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
                     target="_blank" 
                     rel="noopener" 
                     aria-label="lien vers le projet"
-                    class="block"
+                    class="block h-full flex flex-col"
                 >
                     {project.data.image ? (
                         project.slug === 'project-1' ? (
@@ -29,7 +29,7 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
                                 alt={project.data.img_alt || 'Image du projet'} 
                                 width={400}
                                 height={400}
-                                class="w-full h-auto object-cover"
+                                class="w-full object-cover"
                             />
                         ) : project.slug === 'project-2' ? (
                             <Image 
@@ -61,15 +61,18 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
                             class="w-full h-auto object-cover"
                         />
                     )}
-                    <div class="mt-1 p-4">
+                    <div class="p-4 flex flex-col flex-grow justify-end">
                         <h3 class="text-xl text-orange lg:text-2xl">{project.data.title}</h3>
-                        <p class="text-s text-black">{project.data.description}</p>
-                        <Tags tags={project.data.tags} />
+                        <p class="text-s text-black mt-2">{project.data.description}</p>
+                        <div class="mt-4">
+                            <Tags tags={project.data.tags} />
+                        </div>
                     </div>
                 </a>
             </div>
         ))}
     </div>
+    
     <a
         href="https://github.com/ilan-servais"
         target="_blank"
@@ -93,3 +96,30 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
         </svg>
     </a>
 </section>
+
+<style>
+    /* Alignement du contenu vers le bas */
+    .rounded-xl a {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Expansion pour pousser le contenu vers le bas */
+    .flex-grow {
+        flex-grow: 1;
+    }
+    
+    /* Positionnement du contenu textuel vers le bas */
+    .justify-end {
+        justify-content: flex-end;
+    }
+    
+    /* Espacement entre les éléments */
+    .mt-2 {
+        margin-top: 0.5rem;
+    }
+    
+    .mt-4 {
+        margin-top: 1rem;
+    }
+</style>
