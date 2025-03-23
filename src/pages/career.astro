@@ -30,47 +30,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     </div>
 
     <!-- Timeline Verticale -->
-    <div class="timeline-container pb-20"
-      x-data="{ 
-        activeIndex: 0,
-        init() {
-          this.setupScrollObserver();
-          window.addEventListener('scroll', () => this.checkScroll());
-        },
-        checkScroll() {
-          // Détecter la position de défilement pour activer les cartes
-          const cardElements = document.querySelectorAll('.modal-card');
-          
-          cardElements.forEach((card, index) => {
-            const rect = card.getBoundingClientRect();
-            const cardMiddle = rect.top + rect.height / 2;
-            
-            if (cardMiddle > 0 && cardMiddle < window.innerHeight) {
-              this.activeIndex = index;
-            }
-          });
-        },
-        setupScrollObserver() {
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                const index = parseInt(entry.target.dataset.index);
-                this.activeIndex = index;
-              }
-            });
-          }, {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.5
-          });
-          
-          // Observer toutes les cartes
-          document.querySelectorAll('.modal-card').forEach(item => {
-            observer.observe(item);
-          });
-        }
-      }"
-    >
+    <div class="timeline-container pb-20">
       <div class="relative max-w-5xl mx-auto">
         <!-- Ligne verticale de la timeline en arrière-plan (cachée sur mobile) -->
         <div class="absolute left-1/6 top-0 bottom-0 w-1 bg-orange/30 hidden md:block"></div>
@@ -79,9 +39,9 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
         <div class="relative z-10">
           {sortedExperiences.map((exp, index) => (
             <div 
-              class="modal-card w-full max-w-2xl mx-auto mb-32 md:pl-12 transition-all duration-500 transform"
+              class={`modal-card w-full max-w-2xl mx-auto mb-32 md:pl-12 transition-all duration-500 transform ${index === 0 ? 'initial-active' : ''}`}
               data-index={index}
-              data-target={`card-${index}`}
+              data-id={exp.id}
             >
               <TimelineExperience 
                 id={exp.id}
@@ -98,7 +58,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     </div>
     
     <!-- Bouton retour en haut avec un z-index plus élevé pour s'assurer qu'il soit toujours visible -->
-    <div class="fixed bottom-5 right-5 z-50">
+    <div class="fixed bottom-5 right-5 z-50 back-to-top-container">
       <BackToTop />
     </div>
   </main>
@@ -121,6 +81,14 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     transition-duration: 500ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    opacity: 0.5;
+    transform: translateX(2rem);
+  }
+  
+  /* Premier élément visible immédiatement */
+  .modal-card.initial-active {
+    opacity: 1;
+    transform: translateX(0);
   }
   
   /* Ajout d'un cercle stylisé pour chaque carte - visible uniquement sur desktop */
@@ -173,9 +141,13 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     transform: translateX(0);
   }
   
-  .modal-card.inactive {
-    opacity: 0.5;
-    transform: translateX(2rem);
+  .back-to-top-container {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .back-to-top-container.visible {
+    opacity: 1;
   }
 </style>
 
@@ -184,38 +156,47 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
   document.documentElement.style.setProperty('--orange-color', '#E06330');
   document.documentElement.style.setProperty('--dark-bg-color', '#120D16');
   
-  // Alternative à Alpine.js pour l'animation des cartes
+  // Gestion des cartes et du bouton back-to-top
   document.addEventListener('DOMContentLoaded', function() {
     const cards = document.querySelectorAll('.modal-card');
+    const backToTopButton = document.querySelector('.back-to-top-container');
     let activeIndex = 0;
+    
+    // Identifier la carte avec l'ID 1 et la rendre active initialement
+    cards.forEach((card, index) => {
+      const cardId = parseInt(card.dataset.id);
+      if (cardId === 1) {
+        activeIndex = index;
+        card.classList.add('active');
+      } else if (index === 0) {
+        // Si aucune carte n'a l'ID 1, activer la première carte
+        card.classList.add('active');
+      }
+    });
     
     function updateCardStyles() {
       cards.forEach((card, index) => {
         if (index === activeIndex) {
           card.classList.add('active');
-          card.classList.remove('inactive');
         } else {
-          card.classList.add('inactive');
           card.classList.remove('active');
         }
       });
     }
     
-    // Initialisation des styles
-    updateCardStyles();
-    
     // Observer l'intersection des cartes
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          activeIndex = parseInt(entry.target.dataset.index);
+          const index = parseInt(entry.target.dataset.index);
+          activeIndex = index;
           updateCardStyles();
         }
       });
     }, {
       root: null,
-      rootMargin: '0px',
-      threshold: 0.5
+      rootMargin: '-10% 0px -40% 0px',
+      threshold: 0.3
     });
     
     // Observer toutes les cartes
@@ -223,19 +204,35 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
       observer.observe(card);
     });
     
-    // Vérifier aussi au défilement
+    // Gérer l'affichage du bouton back-to-top et la détection du scroll
     window.addEventListener('scroll', () => {
+      // Afficher le bouton back-to-top après un certain scroll
+      if (window.scrollY > 300) {
+        backToTopButton.classList.add('visible');
+      } else {
+        backToTopButton.classList.remove('visible');
+      }
+      
+      // Mettre à jour les cartes actives lors du défilement
+      let visibleCardIndex = null;
+      let closestDistance = Infinity;
+      
       cards.forEach((card, index) => {
         const rect = card.getBoundingClientRect();
         const cardMiddle = rect.top + rect.height / 2;
+        const distanceFromCenter = Math.abs(cardMiddle - window.innerHeight / 2);
         
-        if (cardMiddle > 0 && cardMiddle < window.innerHeight) {
-          if (activeIndex !== index) {
-            activeIndex = index;
-            updateCardStyles();
-          }
+        // Trouver la carte la plus proche du centre de l'écran
+        if (distanceFromCenter < closestDistance && rect.top < window.innerHeight && rect.bottom > 0) {
+          closestDistance = distanceFromCenter;
+          visibleCardIndex = index;
         }
       });
+      
+      if (visibleCardIndex !== null && visibleCardIndex !== activeIndex) {
+        activeIndex = visibleCardIndex;
+        updateCardStyles();
+      }
     });
   });
 </script>
