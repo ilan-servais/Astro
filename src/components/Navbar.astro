@@ -3,14 +3,24 @@ import Button from '@components/ui/Button.astro';
 import ToggleTheme from '@components/ui/ToggleTheme.astro';
 import { Astronav, MenuIcon, MenuItems } from 'astro-navbar';
 
+// Obtenir le chemin actuel de la page
+const currentPath = Astro.url.pathname;
+const isHomePage = currentPath === '/' || currentPath === '';
+
+// Adapter les liens en fonction de la page actuelle
 const menuitems = [
 	{
+		title: 'Home',
+		path: '/',
+		showOnlyOnCareer: true
+	},
+	{
 		title: 'About',
-		path: '#about',
+		path: isHomePage ? '#about' : '/#about',
 	},
 	{
 		title: 'Projects',
-		path: '#projects',
+		path: isHomePage ? '#projects' : '/#projects',
 	},
 	{
 		title: 'Career',
@@ -18,9 +28,14 @@ const menuitems = [
 	},
 	{
 		title: 'Contact',
-		path: '#contact',
+		path: isHomePage ? '#contact' : '/#contact',
 	},
 ];
+
+// Filtrer les éléments à afficher
+const filteredItems = isHomePage 
+  ? menuitems.filter(item => !item.showOnlyOnCareer)
+  : menuitems;
 ---
 
 <header data-testId="header" class="my-5 flex flex-col items-center justify-between lg:flex-row">
@@ -36,7 +51,7 @@ const menuitems = [
 		<MenuItems class="mt-2 hidden w-full lg:mt-0 lg:flex lg:w-auto">
 			<ul class="flex flex-col lg:flex-row lg:gap-3">
 				{
-					menuitems.map((item) => (
+					filteredItems.map((item) => (
 						<li>
 							<a
 								aria-label="navigation link"
