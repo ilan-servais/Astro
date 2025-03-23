@@ -20,6 +20,12 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
   
   return yearB - yearA;
 });
+
+// Création d'un mappage entre ID et index pour faciliter la recherche
+const idToIndexMap = {};
+sortedExperiences.forEach((exp, index) => {
+  idToIndexMap[exp.id] = index;
+});
 ---
 
 <Layout title="Ilan Servais | Professional Journey">
@@ -42,6 +48,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
               class={`modal-card w-full max-w-2xl mx-auto mb-32 md:pl-12 transition-all duration-500 transform ${index === 0 ? 'initial-active' : ''}`}
               data-index={index}
               data-id={exp.id}
+              id={`card-${exp.id}`}
             >
               <TimelineExperience 
                 id={exp.id}
@@ -151,10 +158,44 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
   }
 </style>
 
-<script>
+<script define:vars={{ idToIndexMap }}>
   // Définir des variables CSS pour les couleurs
   document.documentElement.style.setProperty('--orange-color', '#E06330');
   document.documentElement.style.setProperty('--dark-bg-color', '#120D16');
+  
+  // Fonction pour extraire l'ID de l'URL
+  function getIdFromUrl() {
+    // Vérifier s'il y a un hash dans l'URL (ex: /career#4)
+    if (window.location.hash) {
+      const hash = window.location.hash.substring(1);
+      if (!isNaN(parseInt(hash))) {
+        return parseInt(hash);
+      }
+    }
+    
+    // Vérifier si l'URL est de la forme /career/4
+    const pathParts = window.location.pathname.split('/');
+    const lastPart = pathParts[pathParts.length - 1];
+    if (!isNaN(parseInt(lastPart))) {
+      return parseInt(lastPart);
+    }
+    
+    return null;
+  }
+  
+  // Fonction pour scroller vers une carte spécifique
+  function scrollToCard(cardElement) {
+    if (cardElement) {
+      const offset = 100; // Offset pour ne pas coller la carte tout en haut
+      const elementPosition = cardElement.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  }
   
   // Gestion des cartes et du bouton back-to-top
   document.addEventListener('DOMContentLoaded', function() {
@@ -162,17 +203,33 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     const backToTopButton = document.querySelector('.back-to-top-container');
     let activeIndex = 0;
     
-    // Identifier la carte avec l'ID 1 et la rendre active initialement
-    cards.forEach((card, index) => {
-      const cardId = parseInt(card.dataset.id);
-      if (cardId === 1) {
-        activeIndex = index;
-        card.classList.add('active');
-      } else if (index === 0) {
-        // Si aucune carte n'a l'ID 1, activer la première carte
-        card.classList.add('active');
+    // Récupérer l'ID depuis l'URL
+    const targetId = getIdFromUrl();
+    
+    // Si un ID est spécifié dans l'URL, définir l'index actif correspondant
+    if (targetId !== null && targetId in idToIndexMap) {
+      activeIndex = idToIndexMap[targetId];
+      
+      // Trouver la carte correspondante
+      const targetCard = document.querySelector(`#card-${targetId}`);
+      if (targetCard) {
+        // Attendre un peu pour que la page soit complètement chargée
+        setTimeout(() => {
+          scrollToCard(targetCard);
+        }, 300);
       }
-    });
+    } else {
+      // Comportement par défaut : activer la carte avec ID 1 si elle existe
+      cards.forEach((card, index) => {
+        const cardId = parseInt(card.dataset.id);
+        if (cardId === 1) {
+          activeIndex = index;
+        }
+      });
+    }
+    
+    // Mettre à jour les styles initiaux
+    updateCardStyles();
     
     function updateCardStyles() {
       cards.forEach((card, index) => {
@@ -191,6 +248,12 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
           const index = parseInt(entry.target.dataset.index);
           activeIndex = index;
           updateCardStyles();
+          
+          // Mise à jour de l'URL en fonction de la carte visible (navigation par historique)
+          const cardId = entry.target.dataset.id;
+          const newUrl = new URL(window.location);
+          newUrl.hash = cardId;
+          window.history.replaceState({}, '', newUrl);
         }
       });
     }, {

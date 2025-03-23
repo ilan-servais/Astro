@@ -1,0 +1,18 @@
+---
+import { redirect } from 'astro/server';
+import timelineData from '../../data/timeline.json';
+
+const { id } = Astro.params;
+const numericId = parseInt(id);
+
+// Vérifier si l'ID existe dans les données
+const experienceExists = timelineData.experiences.some(exp => exp.id === numericId);
+
+// Si l'ID n'existe pas, rediriger vers la page career générale
+if (!experienceExists) {
+  return redirect('/career');
+}
+
+// Si l'ID existe, rediriger vers la page career avec le fragment
+return redirect(`/career#${id}`);
+---
