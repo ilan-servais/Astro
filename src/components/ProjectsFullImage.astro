@@ -10,67 +10,74 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
 ---
 
 <section data-testid="projects" id="projects" class="mb-10 flex flex-col items-center justify-center md:mb-0 md:h-screen">
-    <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Projects</h2>
-    <span class="mb-10 h-1 w-10 bg-orange"></span>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
-        {projects.map((project) => (
-            <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white">
-                <a 
-                    href={project.data.link} 
-                    target="_blank" 
-                    rel="noopener" 
-                    aria-label="lien vers le projet"
-                    class="block h-full flex flex-col"
-                >
-                    {project.data.image ? (
-                        project.slug === 'project-1' ? (
-                            <Image 
-                                src={project1Image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
-                                width={400}
-                                height={400}
-                                class="w-full object-cover"
-                            />
-                        ) : project.slug === 'project-2' ? (
-                            <Image 
-                                src={project2Image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
-                                width={400}
-                                height={400}
-                                class="w-full h-auto object-cover"
-                            />
-                        ) : project.slug === 'project-3' ? (
-                            <Image 
-                                src={project3Image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
-                                width={400}
-                                height={400}
-                                class="w-full h-auto object-cover"
-                            />
-                        ) : (
-                            <img 
-                                src={project.data.image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
-                                class="w-full h-auto object-cover"
-                            />
-                        )
-                    ) : (
-                        <img 
-                            src="/default-image.png" 
-                            alt="Image par défaut" 
-                            class="w-full h-auto object-cover"
-                        />
-                    )}
-                    <div class="p-4 flex flex-col flex-grow justify-end">
-                        <h3 class="text-xl text-orange lg:text-2xl">{project.data.title}</h3>
-                        <p class="text-s text-black mt-2">{project.data.description}</p>
-                        <div class="mt-4">
-                            <Tags tags={project.data.tags} />
+    <div class="w-full text-center">
+        <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Projects</h2>
+        <span class="mt-2 mb-10 inline-block h-1 w-10 bg-orange"></span>
+    </div>
+    
+    <div class="w-full max-w-full overflow-hidden">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
+            {projects.map((project) => (
+                <div class="card rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white">
+                    <a 
+                        href={project.data.link} 
+                        target="_blank" 
+                        rel="noopener" 
+                        aria-label="lien vers le projet"
+                        class="block h-full flex flex-col"
+                    >
+                        <div class="card-image-container">
+                            {project.data.image ? (
+                                project.slug === 'project-1' ? (
+                                    <Image 
+                                        src={project1Image} 
+                                        alt={project.data.img_alt || 'Image du projet'} 
+                                        width={400}
+                                        height={400}
+                                        class="w-full object-cover"
+                                    />
+                                ) : project.slug === 'project-2' ? (
+                                    <Image 
+                                        src={project2Image} 
+                                        alt={project.data.img_alt || 'Image du projet'} 
+                                        width={400}
+                                        height={400}
+                                        class="w-full h-auto object-cover"
+                                    />
+                                ) : project.slug === 'project-3' ? (
+                                    <Image 
+                                        src={project3Image} 
+                                        alt={project.data.img_alt || 'Image du projet'} 
+                                        width={400}
+                                        height={400}
+                                        class="w-full h-auto object-cover"
+                                    />
+                                ) : (
+                                    <img 
+                                        src={project.data.image} 
+                                        alt={project.data.img_alt || 'Image du projet'} 
+                                        class="w-full h-auto object-cover"
+                                    />
+                                )
+                            ) : (
+                                <img 
+                                    src="/default-image.png" 
+                                    alt="Image par défaut" 
+                                    class="w-full h-auto object-cover"
+                                />
+                            )}
                         </div>
-                    </div>
-                </a>
-            </div>
-        ))}
+                        <div class="card-content p-4 flex flex-col flex-grow justify-end">
+                            <h3 class="text-xl text-orange lg:text-2xl">{project.data.title}</h3>
+                            <p class="text-s text-black mt-2">{project.data.description}</p>
+                            <div class="mt-4">
+                                <Tags tags={project.data.tags} />
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            ))}
+        </div>
     </div>
     
     <a
@@ -98,28 +105,49 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
 </section>
 
 <style>
+    /* Structure plus stable pour éviter les clignotements et les déplacements */
+    section {
+        contain: content;
+        will-change: transform; /* Améliore la stabilité pendant le défilement */
+    }
+    
+    /* Conteneur de titre en position fixe pour éviter les décalages */
+    h2, span {
+        transform: translateZ(0); /* Force l'accélération GPU */
+    }
+    
+    /* Conteneurs avec des dimensions fixes pour éviter les redimensionnements */
+    .card {
+        height: 100%;
+        contain: layout style paint;
+        backface-visibility: hidden; /* Évite les clignotements */
+    }
+    
+    .card-image-container {
+        height: auto;
+        overflow: hidden;
+        transform: translateZ(0);
+    }
+    
+    .card-image-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transform: translateZ(0);
+    }
+    
     /* Alignement du contenu vers le bas */
-    .rounded-xl a {
+    .card-content {
         display: flex;
         flex-direction: column;
-    }
-    
-    /* Expansion pour pousser le contenu vers le bas */
-    .flex-grow {
         flex-grow: 1;
-    }
-    
-    /* Positionnement du contenu textuel vers le bas */
-    .justify-end {
         justify-content: flex-end;
     }
     
-    /* Espacement entre les éléments */
-    .mt-2 {
-        margin-top: 0.5rem;
-    }
-    
-    .mt-4 {
-        margin-top: 1rem;
+    /* Grille stabilisée */
+    .grid {
+        transform: translateZ(0);
+        will-change: transform;
+        contain: layout;
     }
 </style>
