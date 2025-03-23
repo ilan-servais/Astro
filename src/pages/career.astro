@@ -6,22 +6,20 @@ import BackToTop from '@components/ui/BackToTop.astro';
 
 // Tri des expériences par année du plus récent au plus ancien
 const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
-  // Convertir les années en nombres si ce sont des chaînes
-  const yearA = typeof a.year === 'string' ? parseInt(a.year) : a.year;
-  const yearB = typeof b.year === 'string' ? parseInt(b.year) : b.year;
+  // Extraire les années numériques des chaînes de caractères (ex: "2025 - Present" → 2025)
+  const extractYear = (yearStr) => {
+    if (typeof yearStr === 'string') {
+      const match = yearStr.match(/^\d{4}/);
+      return match ? parseInt(match[0]) : 0;
+    }
+    return yearStr;
+  };
+  
+  const yearA = extractYear(a.year);
+  const yearB = extractYear(b.year);
+  
   return yearB - yearA;
 });
-
-// Préparer les données pour Alpine.js
-const expData = sortedExperiences.map((exp, index) => ({
-  id: exp.id,
-  index: index,
-  year: exp.year,
-  company: exp.company,
-  title: exp.title,
-  description: exp.description,
-  iconPath: exp.iconPath
-}));
 ---
 
 <Layout title="Ilan Servais | Professional Journey">
@@ -83,7 +81,7 @@ const expData = sortedExperiences.map((exp, index) => ({
             <div 
               class="modal-card w-full max-w-2xl mx-auto mb-32 md:pl-12 transition-all duration-500 transform"
               data-index={index}
-              x-bind:class="activeIndex === {index} ? 'opacity-100 translate-x-0' : 'opacity-50 translate-x-8'"
+              data-target={`card-${index}`}
             >
               <TimelineExperience 
                 id={exp.id}
@@ -168,6 +166,17 @@ const expData = sortedExperiences.map((exp, index) => ({
       align-items: center;
     }
   }
+  
+  /* Classes pour l'animation des cartes */
+  .modal-card.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .modal-card.inactive {
+    opacity: 0.5;
+    transform: translateX(2rem);
+  }
 </style>
 
 <script>
@@ -175,17 +184,58 @@ const expData = sortedExperiences.map((exp, index) => ({
   document.documentElement.style.setProperty('--orange-color', '#E06330');
   document.documentElement.style.setProperty('--dark-bg-color', '#120D16');
   
-  // Correction des expressions Alpine.js
+  // Alternative à Alpine.js pour l'animation des cartes
   document.addEventListener('DOMContentLoaded', function() {
     const cards = document.querySelectorAll('.modal-card');
-    cards.forEach((card) => {
-      const index = card.dataset.index;
-      // Remplacer les expressions problématiques
-      const binding = card.getAttribute('x-bind:class');
-      if (binding && binding.includes('activeIndex === {')) {
-        const correctedBinding = `activeIndex === ${index} ? 'opacity-100 translate-x-0' : 'opacity-50 translate-x-8'`;
-        card.setAttribute('x-bind:class', correctedBinding);
-      }
+    let activeIndex = 0;
+    
+    function updateCardStyles() {
+      cards.forEach((card, index) => {
+        if (index === activeIndex) {
+          card.classList.add('active');
+          card.classList.remove('inactive');
+        } else {
+          card.classList.add('inactive');
+          card.classList.remove('active');
+        }
+      });
+    }
+    
+    // Initialisation des styles
+    updateCardStyles();
+    
+    // Observer l'intersection des cartes
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          activeIndex = parseInt(entry.target.dataset.index);
+          updateCardStyles();
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.5
+    });
+    
+    // Observer toutes les cartes
+    cards.forEach(card => {
+      observer.observe(card);
+    });
+    
+    // Vérifier aussi au défilement
+    window.addEventListener('scroll', () => {
+      cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        const cardMiddle = rect.top + rect.height / 2;
+        
+        if (cardMiddle > 0 && cardMiddle < window.innerHeight) {
+          if (activeIndex !== index) {
+            activeIndex = index;
+            updateCardStyles();
+          }
+        }
+      });
     });
   });
 </script>
