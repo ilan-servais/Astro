@@ -2,6 +2,7 @@
 import Layout from '@layouts/Layout.astro';
 import TimelineExperience from '@components/TimelineExperience.astro';
 import timelineData from '../data/timeline.json';
+import BackToTop from '@components/ui/BackToTop.astro';
 
 // Tri des expériences par année du plus récent au plus ancien
 const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - a.year);
@@ -81,15 +82,11 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - 
             </div>
           ))}
         </div>
-        
-        <!-- Indicateur de défilement vers le bas -->
-        <div class="sticky bottom-4 left-1/2 transform -translate-x-1/2 text-center animate-bounce text-orange opacity-80 z-30">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </div>
       </div>
     </div>
+    
+    <!-- Bouton retour en haut -->
+    <BackToTop />
   </main>
 </Layout>
 
