@@ -60,14 +60,14 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - 
       }"
     >
       <div class="relative max-w-5xl mx-auto">
-        <!-- Ligne verticale de la timeline en arrière-plan -->
-        <div class="absolute left-1/6 top-0 bottom-0 w-1 bg-orange/30"></div>
+        <!-- Ligne verticale de la timeline en arrière-plan (cachée sur mobile) -->
+        <div class="absolute left-1/6 top-0 bottom-0 w-1 bg-orange/30 hidden md:block"></div>
         
         <!-- Contenu des expériences sans les points cliquables -->
         <div class="relative z-10">
           {sortedExperiences.map((exp, index) => (
             <div 
-              class="modal-card w-full max-w-2xl mx-auto mb-32 pl-12 transition-all duration-500 transform"
+              class="modal-card w-full max-w-2xl mx-auto mb-32 md:pl-12 transition-all duration-500 transform"
               data-index={index}
               x-bind:class="activeIndex === {index} ? 'opacity-100 translate-x-0' : 'opacity-50 translate-x-8'"
             >
@@ -85,8 +85,10 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - 
       </div>
     </div>
     
-    <!-- Bouton retour en haut -->
-    <BackToTop />
+    <!-- Bouton retour en haut avec un z-index plus élevé pour s'assurer qu'il soit toujours visible -->
+    <div class="fixed bottom-5 right-5 z-50">
+      <BackToTop />
+    </div>
   </main>
 </Layout>
 
@@ -109,7 +111,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - 
     position: relative;
   }
   
-  /* Ajout d'un cercle stylisé pour chaque carte */
+  /* Ajout d'un cercle stylisé pour chaque carte - visible uniquement sur desktop */
   .modal-card::before {
     content: "";
     position: absolute;
@@ -122,6 +124,13 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - 
     border: 3px solid white;
     transform: translate(-50%, -50%);
     z-index: 5;
+    display: none;
+  }
+  
+  @media (min-width: 768px) {
+    .modal-card::before {
+      display: block;
+    }
   }
   
   .dark .modal-card::before {
@@ -131,16 +140,18 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => b.year - 
   /* Responsive design pour mobile */
   @media (max-width: 768px) {
     .modal-card {
-      width: 85%;
-      padding-left: 2rem;
+      width: 90%;
+      padding-left: 0;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
     }
     
-    .left-1/6 {
-      left: 1rem;
-    }
-    
-    .modal-card::before {
-      left: 1rem;
+    /* Sur mobile, la fresque est supprimée et les cartes sont centrées */
+    .timeline-container .relative {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   }
 </style>
