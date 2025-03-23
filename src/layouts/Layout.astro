@@ -41,17 +41,6 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 				content-visibility: auto;
 			}
 			
-			/* Pour la page de timeline, réduire la hauteur du footer */
-			body:has(.timeline-container) footer {
-				padding: 0.5rem;
-				margin-top: 0;
-			}
-			
-			/* Pour la page de timeline, réduire la hauteur de la barre de navigation */
-			body:has(.timeline-container) header {
-				margin: 0.25rem 0;
-			}
-			
 			/* Pour l'expérience immersive */
 			body:has(.timeline-container) {
 				scroll-behavior: smooth;
@@ -61,6 +50,17 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 			/* Animation fluide pour les transitions */
 			.timeline-point, .modal-card {
 				will-change: transform, opacity;
+			}
+			
+			/* Consistance de position pour la navbar à travers les pages */
+			header {
+				margin-top: 1.25rem !important;
+				margin-bottom: 1.25rem !important;
+			}
+			
+			/* Consistance pour le footer à travers les pages */
+			footer {
+				padding: 1.5rem;
 			}
 		</style>
 	</body>

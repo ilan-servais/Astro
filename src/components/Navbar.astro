@@ -42,7 +42,7 @@ const filteredItems = menuitems.filter(item => {
 });
 ---
 
-<header data-testId="header" class="my-5 flex flex-col items-center justify-between lg:flex-row">
+<header data-testId="header" class="flex flex-col items-center justify-between lg:flex-row">
 	<Astronav>
 		<div class="flex w-full items-center justify-between lg:w-auto">
 			<a href="/CV.pdf" target="_blank" rel="noopener noreferrer">
@@ -74,20 +74,6 @@ const filteredItems = menuitems.filter(item => {
 </header>
 
 <style>
-	/* Styles spécifiques pour assurer la cohérence entre les pages */
-	header {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	@media (min-width: 1024px) {
-		header {
-			flex-direction: row;
-		}
-	}
-	
 	/* Style pour le bouton Download CV */
 	:global(header a button) {
 		font-weight: 500;
