@@ -20,12 +20,12 @@ export default defineConfig({
   },
   // Suppressing the server import issues by using output: 'static'
   output: 'static',
+  // Configuration pour le déploiement sur Netlify
+  site: process.env.NETLIFY ? process.env.URL : 'http://localhost:3000',
+  base: '/',
   vite: {
     ssr: {
       noExternal: ['astro-navbar'],
-    },
-    resolve: {
-      // Removed problematic alias that's causing the error
     },
     optimizeDeps: {
       exclude: ['astro-icon']
