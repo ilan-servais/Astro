@@ -1,18 +1,26 @@
 ---
 import { Image } from 'astro:assets';
 
-// Import des images existantes pour compatibilité (à conserver jusqu'à ce que les nouvelles fonctionnent)
+// Import des images existantes pour compatibilité
 import project1Image from '../assets/images/project-1.svg';
 import project2Image from '../assets/images/project-2.svg';
 import project3Image from '../assets/images/project-3.svg';
 
-// Import des nouvelles images avec chemins relatifs
+// Import des images déjà configurées
 import barman1Image from '../assets/images/barman1.svg';
 import barman2Image from '../assets/images/barman2.svg';
 import school1Image from '../assets/images/school1.svg';
 import school2Image from '../assets/images/school2.svg';
 import restaurant1Image from '../assets/images/restaurant1.svg';
 import restaurant2Image from '../assets/images/restaurant2.svg';
+
+// Import des nouvelles images
+import golfImage from '../assets/images/golf.svg';
+import restaurant3Image from '../assets/images/restaurant3.svg';
+import school3Image from '../assets/images/school3.svg';
+import school42Image from '../assets/images/school42.svg';
+import game1Image from '../assets/images/game1.svg';
+import game2Image from '../assets/images/game2.svg';
 
 interface Props {
   id: number;
@@ -21,19 +29,28 @@ interface Props {
   title: string;
   description: string;
   iconPath: string;
+  city?: string; // Ajout du champ city optionnel
 }
 
-const { id, year, company, title, description, iconPath } = Astro.props;
+const { id, year, company, title, description, iconPath, city } = Astro.props;
 
 // Fonction qui détermine quelle image utiliser
 const getImage = (path) => {
-  // Pour les nouvelles images
+  // Pour les images existantes
   if (path.includes('barman1')) return barman1Image;
   if (path.includes('barman2')) return barman2Image;
   if (path.includes('school1')) return school1Image;
   if (path.includes('school2')) return school2Image;
   if (path.includes('restaurant1')) return restaurant1Image;
   if (path.includes('restaurant2')) return restaurant2Image;
+  
+  // Pour les nouvelles images
+  if (path.includes('golf')) return golfImage;
+  if (path.includes('restaurant3')) return restaurant3Image;
+  if (path.includes('school3')) return school3Image;
+  if (path.includes('school42')) return school42Image;
+  if (path.includes('game1')) return game1Image;
+  if (path.includes('game2')) return game2Image;
   
   // Fallback pour les anciennes images si nécessaire
   if (path.includes('project-1')) return project1Image;
@@ -76,7 +93,18 @@ const image = getImage(iconPath);
     
     <div class="p-5 md:w-2/3 relative">
       <h3 class="text-xl font-bold text-orange mb-2">{company}</h3>
-      <h4 class="text-lg font-medium text-black dark:text-white mb-3">{title}</h4>
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <h4 class="text-lg font-medium text-black dark:text-white">{title}</h4>
+        {city && (
+          <div class="flex items-center text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {city}
+          </div>
+        )}
+      </div>
       <p class="text-sm text-gray-700 dark:text-gray-300">{description}</p>
       
       <!-- Bouton de partage sur desktop - Rendu plus visible -->

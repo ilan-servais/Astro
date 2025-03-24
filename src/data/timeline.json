@@ -1,157 +1,171 @@
 {
-    "experiences": [
-      {
-        "id": 1,
-        "year": "2025 - Present",
-        "period": "février 2025 - Present",
-        "periodName": "Expérience",
-        "company": "La Plateforme_",
-        "title": "Développeur web",
-        "description": "Contrat de Développement Professionnel Intérimaire (CDPI). Se former dans le domaine du Développement Web en travaillant sur des projets concrets.",
-        "iconPath": "../assets/images/school2.svg"
-      },
-      {
-        "id": 2,
-        "year": "2023 - 2024",
-        "period": "septembre 2023 - juillet 2024",
-        "periodName": "Expérience",
-        "company": "La Plateforme_",
-        "title": "RNCP Concepteur Développeur d'applications Web",
-        "description": "Réalisation de projets variés, incluant le montage et le démontage de PC, ainsi que le développement de sites web et de jeux. Acquisition de compétences en Bachelor Prépa.",
-        "iconPath": "../assets/images/school1.svg"
-      },
-      {
-        "id": 3,
-        "year": "2022",
-        "period": "janvier 2022 - avril 2022",
-        "periodName": "Expérience",
-        "company": "Exit Café",
-        "title": "Responsable - Barman - Serveur",
-        "description": "Responsable de l'accueil, du service et de la gestion du bar dans un environnement dynamique à Marseille.",
-        "iconPath": "../assets/images/barman1.svg"
-      },
-      {
-        "id": 4,
-        "year": "2022",
-        "period": "janvier 2022 - juillet 2022",
-        "periodName": "Expérience",
-        "company": "LE BEAU RIVAGE",
-        "title": "Barman en chef",
-        "description": "Dirigé les opérations du bar, création de cocktails élaborés et coordination d'équipe pour offrir un service de qualité.",
-        "iconPath": "../assets/images/barman2.svg"
-      },
-      {
-        "id": 5,
-        "year": "2022",
-        "period": "juillet 2022 - décembre 2022",
-        "periodName": "Expérience",
-        "company": "La Cabane des Amis / Barta Club",
-        "title": "Barman",
-        "description": "Expérience en tant que barman dans un établissement à Marseille.",
-        "iconPath": "../assets/images/barman1.svg"
-      },
-      {
-        "id": 6,
-        "year": "2021",
-        "period": "mai 2021 - décembre 2021",
-        "periodName": "Expérience",
-        "company": "Yoj",
-        "title": "Responsable - Chef de rang",
-        "description": "Gestion de l'accueil, prise de commandes et service dans un bistrot japonais, incluant la gestion des stocks et de la caisse.",
-        "iconPath": "../assets/images/restaurant2.svg"
-      },
-      {
-        "id": 7,
-        "year": "2014",
-        "period": "septembre 2014 - septembre 2014",
-        "periodName": "Expérience",
-        "company": "École 42",
-        "title": "Étudiant en Code",
-        "description": "Participation à la piscine intensive de l'École 42 axée sur le codage en C++, mais des circonstances ont empêché la poursuite à Paris.",
-        "iconPath": "../assets/images/school2.svg"
-      },
-      {
-        "id": 8,
-        "year": "2013 - 2020",
-        "period": "mai 2013 - décembre 2020",
-        "periodName": "Expérience",
-        "company": "Exit Café",
-        "title": "Responsable - Barman - Serveur",
-        "description": "Supervision et direction d'une équipe pour assurer un service de qualité.",
-        "iconPath": "../assets/images/barman2.svg"
-      },
-      {
-        "id": 9,
-        "year": "2011 - 2012",
-        "period": "juin 2011 - août 2012",
-        "periodName": "Expérience",
-        "company": "Boosting PvP | World of Warcraft",
-        "title": "Co-fondateur & Responsable opérationnel",
-        "description": "Création et gestion d'une micro-entreprise spécialisée dans le Boosting PvP sur World of Warcraft, assurant un service haut de gamme et une gestion opérationnelle complète.",
-        "iconPath": "../assets/images/school1.svg"
-      },
-      {
-        "id": 10,
-        "year": "2011",
-        "period": "janvier 2011 - juin 2011",
-        "periodName": "Expérience",
-        "company": "World of Warcraft PvP - RBG",
-        "title": "Leader d'équipe RBG | Première place au classement européen",
-        "description": "Dirigé une équipe vers la première place au classement européen en Rated BattleGrounds, démontrant leadership, stratégie et gestion en situation de compétition.",
-        "iconPath": "../assets/images/school2.svg"
-      },
-      {
-        "id": 11,
-        "year": "2009 - 2010",
-        "period": "août 2009 - juin 2010",
-        "periodName": "Expérience",
-        "company": "Les Danaïdes",
-        "title": "CAP Hôtellerie Restauration",
-        "description": "Contrat en alternance dans la brasserie emblématique de Marseille, polyvalence en tant que barman, serveur et commis de salle.",
-        "iconPath": "../assets/images/restaurant1.svg"
-      },
-      {
-        "id": 12,
-        "year": "2008 - 2009",
-        "period": "août 2008 - juin 2009",
-        "periodName": "Expérience",
-        "company": "Bastide de la Salette",
-        "title": "CAP Hôtellerie Restauration",
-        "description": "Alternance de 11 mois dans un restaurant à Marseille, impliquant prise de commandes, service, préparation et envoi des boissons, et préparation de sandwiches.",
-        "iconPath": "../assets/images/restaurant1.svg"
-      },
-      {
-        "id": 13,
-        "year": "2008",
-        "period": "janvier 2008 - janvier 2008",
-        "periodName": "Expérience",
-        "company": "La Brasserie Jules",
-        "title": "Barman",
-        "description": "Stage d'un mois en tant que barman dans une brasserie élégante aux accents Art déco, inspirée par Jules Verne.",
-        "iconPath": "../assets/images/barman1.svg"
-      },
-      {
-        "id": 14,
-        "year": "2006 - 2007",
-        "period": "août 2006 - juin 2007",
-        "periodName": "Expérience",
-        "company": "Auberge du Moulin Vert",
-        "title": "Pré-apprentissage | Serveur - Barman",
-        "description": "Première expérience professionnelle en tant que serveur et barman dans un restaurant gastronomique français, avec une capacité d'accueil de 250 personnes.",
-        "iconPath": "../assets/images/restaurant1.svg"
-      }
-    ],
-    "formations": [
-      {
-        "id": 1,
-        "year": "2023 - 2024",
-        "period": "septembre 2023 - juillet 2024",
-        "periodName": "Formation",
-        "company": "La Plateforme_",
-        "title": "Formation en développement web",
-        "description": "Formation dispensée à La Plateforme_ axée sur le développement web.",
-        "iconPath": "../assets/images/school1.svg"
-      }
-    ]
-  }
-
+  "experiences": [
+    {
+      "id": 1,
+      "year": "2025 - Present",
+      "period": "février 2025 - Present",
+      "periodName": "Expérience",
+      "company": "La Plateforme_",
+      "title": "Web Developer",
+      "description": "Temporary Professional Development Contract (CDPI). Training in the field of Web Development by working on real projects.",
+      "iconPath": "../assets/images/school3.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 2,
+      "year": "2023 - 2024",
+      "period": "septembre 2023 - juillet 2024",
+      "periodName": "Expérience",
+      "company": "La Plateforme_",
+      "title": "Foundations in IT & web technologies",
+      "description": "Project-based introduction to IT fundamentals: hardware assembly, basic programming (HTML/CSS, Python, SQL, Shell) and networking, with an introduction to core web development skills.",
+      "iconPath": "../assets/images/school1.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 3,
+      "year": "2022",
+      "period": "janvier 2022 - avril 2022",
+      "periodName": "Expérience",
+      "company": "Exit Café",
+      "title": "Manager | Bartender | Server",
+      "description": "Responsible for welcoming, service, and bar management in a dynamic environment in Marseille.",
+      "iconPath": "../assets/images/barman1.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 4,
+      "year": "2022",
+      "period": "janvier 2022 - juillet 2022",
+      "periodName": "Expérience",
+      "company": "LE BEAU RIVAGE",
+      "title": "Head Bartender",
+      "description": "Led bar operations, created sophisticated cocktails, and coordinated the team to provide high-quality service.",
+      "iconPath": "../assets/images/barman2.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 5,
+      "year": "2022",
+      "period": "juillet 2022 - décembre 2022",
+      "periodName": "Expérience",
+      "company": "La Cabane des Amis & Barta Club",
+      "title": "Interim Bartender",
+      "description": "Experience working as a bartender in an establishment in Marseille.",
+      "iconPath": "../assets/images/barman1.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 6,
+      "year": "2021",
+      "period": "mai 2021 - décembre 2021",
+      "periodName": "Expérience",
+      "company": "Yoj",
+      "title": "Manager | Head Waiter",
+      "description": "Managed guest reception, order taking, and service in a Japanese bistro, including inventory and cash register management.",
+      "iconPath": "../assets/images/restaurant2.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 7,
+      "year": "2014",
+      "period": "septembre 2014 - septembre 2014",
+      "periodName": "Expérience",
+      "company": "École 42",
+      "title": "Coding Student",
+      "description": "Introduction to programming and participation in École 42's intensive coding bootcamp, focused on C++ development.",
+      "iconPath": "../assets/images/school42.svg",
+      "city": "Paris"
+    },
+    {
+      "id": 8,
+      "year": "2013 - 2020",
+      "period": "mai 2013 - décembre 2020",
+      "periodName": "Expérience",
+      "company": "Exit Café",
+      "title": "Manager - Bartender - Server",
+      "description": "Supervised and directed a team to ensure quality service.",
+      "iconPath": "../assets/images/barman2.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 9,
+      "year": "2011 - 2012",
+      "period": "juin 2011 - août 2012",
+      "periodName": "Expérience",
+      "company": "Boosting PvP | World of Warcraft",
+      "title": "Co-founder & Operations Manager",
+      "description": "Founded and managed a micro-enterprise specialized in PvP boosting on World of Warcraft, providing premium service and comprehensive operational management.",
+      "iconPath": "../assets/images/game1.svg",
+      "city": "Online"
+    },
+    {
+      "id": 10,
+      "year": "2011",
+      "period": "janvier 2011 - juin 2011",
+      "periodName": "Expérience",
+      "company": "World of Warcraft PvP | RBG",
+      "title": "RBG Team Leader | First Place in the European Ranking",
+      "description": "By default, I was appointed and coordinated the team that secured first place in the European Rated Battlegrounds ranking, thanks to a pragmatic approach to strategy and management.",
+      "iconPath": "../assets/images/game2.svg",
+      "city": "Online"
+    },
+    {
+      "id": 11,
+      "year": "2009 - 2010",
+      "period": "août 2009 - juin 2010",
+      "periodName": "Expérience",
+      "company": "Les Danaïdes",
+      "title": "CAP in Hospitality and Catering",
+      "description": "Work-study contract at an iconic brasserie in the 1st arrondissement, showcasing versatility as a bartender, server, and dining room assistant.",
+      "iconPath": "../assets/images/restaurant3.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 12,
+      "year": "2008 - 2009",
+      "period": "août 2008 - juin 2009",
+      "periodName": "Expérience",
+      "company": "Bastide de la Salette",
+      "title": "CAP in Hospitality and Catering",
+      "description": "Work-study program at the restaurant of the Bastide de la Salette golf course, located in the heart of the verdant hills above Marseille.",
+      "iconPath": "../assets/images/golf.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 13,
+      "year": "2008",
+      "period": "janvier 2008 - janvier 2008",
+      "periodName": "Expérience",
+      "company": "La Brasserie Jules",
+      "title": "Bartender",
+      "description": "One-month internship as a bartender in an elegant Art Deco brasserie inspired by Jules Verne.",
+      "iconPath": "../assets/images/barman1.svg",
+      "city": "Amiens"
+    },
+    {
+      "id": 14,
+      "year": "2006 - 2007",
+      "period": "août 2006 - juin 2007",
+      "periodName": "Expérience",
+      "company": "Auberge du Moulin Vert",
+      "title": "Pre-apprenticeship | Waiter & Bartender",
+      "description": "First professional experience as a server and bartender in a French gastronomic restaurant with a capacity of 250 guests.",
+      "iconPath": "../assets/images/restaurant1.svg",
+      "city": "Paris"
+    }
+  ],
+  "formations": [
+    {
+      "id": 1,
+      "year": "2023 - 2024",
+      "period": "septembre 2023 - juillet 2024",
+      "periodName": "Formation",
+      "company": "La Plateforme_",
+      "title": "Web Development Training",
+      "description": "Training provided at La Plateforme_ focused on web development.",
+      "iconPath": "../assets/images/school3.svg",
+      "city": "Marseille"
+    }
+  ]
+}
