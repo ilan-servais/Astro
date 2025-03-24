@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+import timelineData from '../../../data/timeline.json';
+
+// Définir les chemins statiques pour toutes les expériences
+export function getStaticPaths() {
+  return timelineData.experiences.map(exp => ({
+    params: { id: exp.id.toString() }
+  }));
+}
+
+const { id } = Astro.params;
+const redirectUrl = `/career#${id}`;
+---
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content={`0;url=${redirectUrl}`}>
+  <title>Redirection vers l'expérience</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      padding: 20px;
+    }
+    .loading {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(224, 99, 48, 0.3);
+      border-radius: 50%;
+      border-top-color: #E06330;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="loading"></div>
+    <p>Redirection vers l'expérience professionnelle...</p>
+    <p>Si vous n'êtes pas redirigé automatiquement, <a href={redirectUrl}>cliquez ici</a>.</p>
+  </div>
+  
+  <script>
+    window.location.href = `${window.location.origin}/career#${id}`;
+  </script>
+</body>
+</html>

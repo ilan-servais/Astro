@@ -7,7 +7,14 @@
   NPM_FLAGS = "--legacy-peer-deps --force"
   ASTRO_TELEMETRY_DISABLED = "1"
 
-# Redirection pour l'URL career
+# Redirection pour les URLs direct vers les fragments
+[[redirects]]
+  from = "/career/share/:id"
+  to = "/career#:id"
+  status = 302
+  force = true
+
+# Redirection pour l'URL career principale
 [[redirects]]
   from = "/career"
   to = "/career/index.html"

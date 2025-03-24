@@ -34,6 +34,12 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 		<Navbar />
 		<slot />
 		<Footer />
+		
+		<!-- Notification de copie pour les liens partagés -->
+		<div id="copy-notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-black dark:bg-white text-white dark:text-black py-2 px-4 rounded-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+		  Lien copié dans le presse-papier !
+		</div>
+		
 		<style is:global>
 			/* Improve Page speed */
 			/* https://css-tricks.com/almanac/properties/c/content-visibility/ */
@@ -62,6 +68,37 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 			footer {
 				padding: 1.5rem;
 			}
+			
+			/* Style pour les notifications */
+			#copy-notification.show {
+			  opacity: 1;
+			}
 		</style>
+		
+		<script>
+			// Gestionnaire global de partage
+			document.addEventListener('DOMContentLoaded', function() {
+				// Rechercher tous les boutons de partage
+				document.addEventListener('click', function(e) {
+					if (e.target.closest('.share-button')) {
+						const shareButton = e.target.closest('.share-button');
+						const id = shareButton.dataset.id;
+						const url = `${window.location.origin}/career#${id}`;
+						
+						// Essayer de copier l'URL
+						navigator.clipboard.writeText(url).then(() => {
+							// Afficher la notification
+							const notification = document.getElementById('copy-notification');
+							notification.classList.add('show');
+							
+							// Masquer après 2 secondes
+							setTimeout(() => {
+								notification.classList.remove('show');
+							}, 2000);
+						});
+					}
+				});
+			});
+		</script>
 	</body>
 </html>

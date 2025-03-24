@@ -39,12 +39,41 @@ const image = getImage(iconPath);
       <div class="absolute top-2 right-2 bg-orange text-white text-xs font-bold px-2 py-1 rounded-full">
         {year}
       </div>
+      <!-- Bouton de partage sur mobile -->
+      <button 
+        class="share-button absolute bottom-2 right-2 bg-black dark:bg-white text-white dark:text-black p-1.5 rounded-full md:hidden" 
+        data-id={id}
+        aria-label="Partager cette expérience"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+      </button>
     </div>
     
-    <div class="p-5 md:w-2/3">
+    <div class="p-5 md:w-2/3 relative">
       <h3 class="text-xl font-bold text-orange mb-2">{company}</h3>
       <h4 class="text-lg font-medium text-black dark:text-white mb-3">{title}</h4>
       <p class="text-sm text-gray-700 dark:text-gray-300">{description}</p>
+      
+      <!-- Bouton de partage sur desktop -->
+      <button 
+        class="share-button absolute top-2 right-2 bg-black dark:bg-white text-white dark:text-black p-1.5 rounded-full hidden md:block opacity-0 group-hover:opacity-100 transition-opacity" 
+        data-id={id}
+        aria-label="Partager cette expérience"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+      </button>
     </div>
   </div>
 </div>
@@ -58,5 +87,14 @@ const image = getImage(iconPath);
   .timeline-experience:hover {
     transform: translateX(5px) scale(1.01);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .share-button {
+    transition: all 0.2s ease;
+  }
+
+  .share-button:hover {
+    background-color: #E06330;
+    transform: scale(1.1);
   }
 </style>
