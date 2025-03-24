@@ -8,6 +8,10 @@ export default defineConfig({
     exclude: ['astro-icon']
   },
   build: {
+    // Important: Externaliser astro/server pour éviter les erreurs
+    rollupOptions: {
+      external: ['astro/server']
+    },
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true

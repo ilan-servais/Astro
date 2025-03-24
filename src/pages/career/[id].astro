@@ -1,5 +1,4 @@
 ---
-import { redirect } from 'astro/server';
 import timelineData from '../../data/timeline.json';
 
 const { id } = Astro.params;
@@ -8,11 +7,11 @@ const numericId = parseInt(id);
 // Vérifier si l'ID existe dans les données
 const experienceExists = timelineData.experiences.some(exp => exp.id === numericId);
 
-// Si l'ID n'existe pas, rediriger vers la page career générale
-if (!experienceExists) {
-  return redirect('/career');
-}
-
-// Correction du chemin pour assurer que la redirection fonctionne sur le domaine racine
-return redirect(`${import.meta.env.BASE_URL || '/'}career#${id}`);
+// Construire l'URL de redirection
+const redirectUrl = experienceExists ? `/career#${id}` : '/career';
 ---
+
+<meta http-equiv="refresh" content={`0;url=${redirectUrl}`} />
+<script define:vars={{ redirectUrl }}>
+  window.location.href = redirectUrl;
+</script>

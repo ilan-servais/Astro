@@ -18,20 +18,25 @@ export default defineConfig({
       quality: 80,
     }
   },
-  // Suppressing the server import issues by using output: 'static'
+  // Important: Explicitement spécifier static comme output
   output: 'static',
-  // Configuration pour le déploiement sur Netlify
-  site: process.env.NETLIFY ? process.env.URL : 'http://localhost:3000',
-  base: '/',
+  // Éviter d'utiliser site sur Netlify pour éviter des problèmes de chemin
   vite: {
+    // Ne pas traiter astro-navbar comme un module externe
     ssr: {
-      noExternal: ['astro-navbar'],
+      noExternal: ['astro-navbar']
     },
+    // Résoudre les problèmes de compilation en désactivant l'optimisation pour certains packages
     optimizeDeps: {
       exclude: ['astro-icon']
     },
+    // Configuration pour éviter les erreurs d'importation
     build: {
-      // Ensure commonjs modules are properly handled
+      // Ignorer les erreurs d'importation pour astro/server
+      rollupOptions: {
+        external: ['astro/server']
+      },
+      // Assurer que les modules CommonJS sont correctement traités
       commonjsOptions: {
         include: [/node_modules/],
         transformMixedEsModules: true
