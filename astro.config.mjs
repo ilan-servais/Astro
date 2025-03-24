@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   integrations: [
-    tailwind(), 
+    tailwind(),
     mdx()
   ],
   image: {
@@ -15,6 +15,10 @@ export default defineConfig({
     }
   },
   output: 'static',
+  build: {
+    // Assurer la génération de tous les fichiers HTML, y compris pour les routes dynamiques
+    format: 'directory'
+  },
   vite: {
     ssr: {
       noExternal: ['astro-navbar']

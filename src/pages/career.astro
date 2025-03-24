@@ -72,14 +72,14 @@ sortedExperiences.forEach((exp, index) => {
 </Layout>
 
 <style>
+  /* Position de la ligne verticale */
+  .left-1\/6 {
+    left: 16.666667%;
+  }
+  
   /* Style pour la ligne de temps */
   .timeline-container {
     overscroll-behavior: none;
-  }
-  
-  /* Position de la ligne verticale */
-  .left-1/6 {
-    left: 16.666667%;
   }
   
   /* Style pour les cartes de timeline */
@@ -158,7 +158,7 @@ sortedExperiences.forEach((exp, index) => {
   }
 </style>
 
-<script define:vars={{ idToIndexMap }}>
+<script>
   // Définir des variables CSS pour les couleurs
   document.documentElement.style.setProperty('--orange-color', '#E06330');
   document.documentElement.style.setProperty('--dark-bg-color', '#120D16');
@@ -171,13 +171,6 @@ sortedExperiences.forEach((exp, index) => {
       if (!isNaN(parseInt(hash))) {
         return parseInt(hash);
       }
-    }
-    
-    // Vérifier si l'URL est de la forme /career/4
-    const pathParts = window.location.pathname.split('/');
-    const lastPart = pathParts[pathParts.length - 1];
-    if (!isNaN(parseInt(lastPart))) {
-      return parseInt(lastPart);
     }
     
     return null;
@@ -203,11 +196,18 @@ sortedExperiences.forEach((exp, index) => {
     const backToTopButton = document.querySelector('.back-to-top-container');
     let activeIndex = 0;
     
+    // Mappage des IDs aux indices
+    const idToIndexMap = {};
+    cards.forEach((card, index) => {
+      const id = parseInt(card.dataset.id);
+      idToIndexMap[id] = index;
+    });
+    
     // Récupérer l'ID depuis l'URL
     const targetId = getIdFromUrl();
     
     // Si un ID est spécifié dans l'URL, définir l'index actif correspondant
-    if (targetId !== null && targetId in idToIndexMap) {
+    if (targetId !== null && idToIndexMap[targetId] !== undefined) {
       activeIndex = idToIndexMap[targetId];
       
       // Trouver la carte correspondante
@@ -219,13 +219,8 @@ sortedExperiences.forEach((exp, index) => {
         }, 300);
       }
     } else {
-      // Comportement par défaut : activer la carte avec ID 1 si elle existe
-      cards.forEach((card, index) => {
-        const cardId = parseInt(card.dataset.id);
-        if (cardId === 1) {
-          activeIndex = index;
-        }
-      });
+      // Comportement par défaut : activer la première carte
+      activeIndex = 0;
     }
     
     // Mettre à jour les styles initiaux
