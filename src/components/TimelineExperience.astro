@@ -1,8 +1,18 @@
 ---
 import { Image } from 'astro:assets';
-import project1Image from '@assets/images/project-1.svg';
-import project2Image from '@assets/images/project-2.svg';
-import project3Image from '@assets/images/project-3.svg';
+
+// Import des images existantes pour compatibilité (à conserver jusqu'à ce que les nouvelles fonctionnent)
+import project1Image from '../assets/images/project-1.svg';
+import project2Image from '../assets/images/project-2.svg';
+import project3Image from '../assets/images/project-3.svg';
+
+// Import des nouvelles images avec chemins relatifs
+import barman1Image from '../assets/images/barman1.svg';
+import barman2Image from '../assets/images/barman2.svg';
+import school1Image from '../assets/images/school1.svg';
+import school2Image from '../assets/images/school2.svg';
+import restaurant1Image from '../assets/images/restaurant1.svg';
+import restaurant2Image from '../assets/images/restaurant2.svg';
 
 interface Props {
   id: number;
@@ -15,12 +25,23 @@ interface Props {
 
 const { id, year, company, title, description, iconPath } = Astro.props;
 
-// Déterminer quelle image utiliser
+// Fonction qui détermine quelle image utiliser
 const getImage = (path) => {
+  // Pour les nouvelles images
+  if (path.includes('barman1')) return barman1Image;
+  if (path.includes('barman2')) return barman2Image;
+  if (path.includes('school1')) return school1Image;
+  if (path.includes('school2')) return school2Image;
+  if (path.includes('restaurant1')) return restaurant1Image;
+  if (path.includes('restaurant2')) return restaurant2Image;
+  
+  // Fallback pour les anciennes images si nécessaire
   if (path.includes('project-1')) return project1Image;
   if (path.includes('project-2')) return project2Image;
   if (path.includes('project-3')) return project3Image;
-  return project1Image; // Image par défaut
+  
+  // Image par défaut
+  return project1Image;
 };
 
 const image = getImage(iconPath);

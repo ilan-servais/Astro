@@ -8,7 +8,7 @@
         "company": "La Plateforme_",
         "title": "Développeur web",
         "description": "Contrat de Développement Professionnel Intérimaire (CDPI). Se former dans le domaine du Développement Web en travaillant sur des projets concrets.",
-        "iconPath": "@assets/images/project-1.svg"
+        "iconPath": "../assets/images/school2.svg"
       },
       {
         "id": 2,
@@ -18,7 +18,7 @@
         "company": "La Plateforme_",
         "title": "RNCP Concepteur Développeur d'applications Web",
         "description": "Réalisation de projets variés, incluant le montage et le démontage de PC, ainsi que le développement de sites web et de jeux. Acquisition de compétences en Bachelor Prépa.",
-        "iconPath": "@assets/images/project-2.svg"
+        "iconPath": "../assets/images/school1.svg"
       },
       {
         "id": 3,
@@ -28,7 +28,7 @@
         "company": "Exit Café",
         "title": "Responsable - Barman - Serveur",
         "description": "Responsable de l'accueil, du service et de la gestion du bar dans un environnement dynamique à Marseille.",
-        "iconPath": "@assets/images/project-2.svg"
+        "iconPath": "../assets/images/barman1.svg"
       },
       {
         "id": 4,
@@ -38,7 +38,7 @@
         "company": "LE BEAU RIVAGE",
         "title": "Barman en chef",
         "description": "Dirigé les opérations du bar, création de cocktails élaborés et coordination d'équipe pour offrir un service de qualité.",
-        "iconPath": "@assets/images/project-1.svg"
+        "iconPath": "../assets/images/barman2.svg"
       },
       {
         "id": 5,
@@ -48,7 +48,7 @@
         "company": "La Cabane des Amis / Barta Club",
         "title": "Barman",
         "description": "Expérience en tant que barman dans un établissement à Marseille.",
-        "iconPath": "@assets/images/project-3.svg"
+        "iconPath": "../assets/images/barman1.svg"
       },
       {
         "id": 6,
@@ -58,7 +58,7 @@
         "company": "Yoj",
         "title": "Responsable - Chef de rang",
         "description": "Gestion de l'accueil, prise de commandes et service dans un bistrot japonais, incluant la gestion des stocks et de la caisse.",
-        "iconPath": "@assets/images/project-3.svg"
+        "iconPath": "../assets/images/restaurant2.svg"
       },
       {
         "id": 7,
@@ -68,7 +68,7 @@
         "company": "École 42",
         "title": "Étudiant en Code",
         "description": "Participation à la piscine intensive de l'École 42 axée sur le codage en C++, mais des circonstances ont empêché la poursuite à Paris.",
-        "iconPath": "@assets/images/project-3.svg"
+        "iconPath": "../assets/images/school2.svg"
       },
       {
         "id": 8,
@@ -78,7 +78,7 @@
         "company": "Exit Café",
         "title": "Responsable - Barman - Serveur",
         "description": "Supervision et direction d'une équipe pour assurer un service de qualité.",
-        "iconPath": "@assets/images/project-1.svg"
+        "iconPath": "../assets/images/barman2.svg"
       },
       {
         "id": 9,
@@ -88,7 +88,7 @@
         "company": "Boosting PvP | World of Warcraft",
         "title": "Co-fondateur & Responsable opérationnel",
         "description": "Création et gestion d'une micro-entreprise spécialisée dans le Boosting PvP sur World of Warcraft, assurant un service haut de gamme et une gestion opérationnelle complète.",
-        "iconPath": "@assets/images/project-1.svg"
+        "iconPath": "../assets/images/school1.svg"
       },
       {
         "id": 10,
@@ -98,7 +98,7 @@
         "company": "World of Warcraft PvP - RBG",
         "title": "Leader d'équipe RBG | Première place au classement européen",
         "description": "Dirigé une équipe vers la première place au classement européen en Rated BattleGrounds, démontrant leadership, stratégie et gestion en situation de compétition.",
-        "iconPath": "@assets/images/project-2.svg"
+        "iconPath": "../assets/images/school2.svg"
       },
       {
         "id": 11,
@@ -108,7 +108,7 @@
         "company": "Les Danaïdes",
         "title": "CAP Hôtellerie Restauration",
         "description": "Contrat en alternance dans la brasserie emblématique de Marseille, polyvalence en tant que barman, serveur et commis de salle.",
-        "iconPath": "@assets/images/project-3.svg"
+        "iconPath": "../assets/images/restaurant1.svg"
       },
       {
         "id": 12,
@@ -118,7 +118,7 @@
         "company": "Bastide de la Salette",
         "title": "CAP Hôtellerie Restauration",
         "description": "Alternance de 11 mois dans un restaurant à Marseille, impliquant prise de commandes, service, préparation et envoi des boissons, et préparation de sandwiches.",
-        "iconPath": "@assets/images/project-1.svg"
+        "iconPath": "../assets/images/restaurant1.svg"
       },
       {
         "id": 13,
@@ -128,7 +128,7 @@
         "company": "La Brasserie Jules",
         "title": "Barman",
         "description": "Stage d'un mois en tant que barman dans une brasserie élégante aux accents Art déco, inspirée par Jules Verne.",
-        "iconPath": "@assets/images/project-2.svg"
+        "iconPath": "../assets/images/barman1.svg"
       },
       {
         "id": 14,
@@ -138,7 +138,7 @@
         "company": "Auberge du Moulin Vert",
         "title": "Pré-apprentissage | Serveur - Barman",
         "description": "Première expérience professionnelle en tant que serveur et barman dans un restaurant gastronomique français, avec une capacité d'accueil de 250 personnes.",
-        "iconPath": "@assets/images/project-3.svg"
+        "iconPath": "../assets/images/restaurant1.svg"
       }
     ],
     "formations": [
@@ -150,8 +150,8 @@
         "company": "La Plateforme_",
         "title": "Formation en développement web",
         "description": "Formation dispensée à La Plateforme_ axée sur le développement web.",
-        "iconPath": "@assets/images/formation.svg"
+        "iconPath": "../assets/images/school1.svg"
       }
     ]
   }
-  
+
