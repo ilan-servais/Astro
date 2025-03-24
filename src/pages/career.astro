@@ -27,19 +27,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     <div class="space-y-12 pb-20">
       {sortedExperiences.map((exp) => (
         <div id={exp.id.toString()} class="card-container group relative">
-          <!-- Lien d'ancre visible au survol -->
-          <a 
-            href={`/career#${exp.id}`} 
-            class="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-            aria-label={`Lien vers ${exp.company}`}
-            title="Copier le lien vers cette expérience"
-            onclick="navigator.clipboard.writeText(window.location.origin + '/career#' + ${exp.id}); return false;"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-          </a>
+          <!-- Suppression du lien d'ancre à gauche, on garde uniquement le bouton dans la carte -->
           <TimelineExperience 
             id={exp.id}
             year={exp.year}
@@ -74,30 +62,6 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
         }, 300);
       }
     }
-    
-    // Ajouter un message de confirmation lors de la copie d'un lien
-    document.querySelectorAll('.card-container a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const id = this.closest('.card-container').id;
-        const url = window.location.origin + '/career#' + id;
-        
-        // Copier l'URL dans le presse-papier
-        navigator.clipboard.writeText(url)
-          .then(() => {
-            // Créer une notification temporaire
-            const notification = document.createElement('div');
-            notification.textContent = 'Lien copié !';
-            notification.className = 'copy-notification';
-            document.body.appendChild(notification);
-            
-            // Supprimer la notification après 2 secondes
-            setTimeout(() => {
-              notification.remove();
-            }, 2000);
-          });
-      });
-    });
   });
 </script>
 

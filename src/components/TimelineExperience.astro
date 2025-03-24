@@ -39,18 +39,16 @@ const image = getImage(iconPath);
       <div class="absolute top-2 right-2 bg-orange text-white text-xs font-bold px-2 py-1 rounded-full">
         {year}
       </div>
-      <!-- Bouton de partage sur mobile -->
+      <!-- Bouton de partage sur mobile - Rendu plus visible -->
       <button 
-        class="share-button absolute bottom-2 right-2 bg-black dark:bg-white text-white dark:text-black p-1.5 rounded-full md:hidden" 
+        class="share-button absolute bottom-2 right-2 bg-black dark:bg-white text-white dark:text-black p-2 rounded-full md:hidden hover:bg-orange dark:hover:bg-orange dark:hover:text-white" 
         data-id={id}
         aria-label="Partager cette expérience"
+        title="Copier le lien vers cette expérience"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"></circle>
-          <circle cx="6" cy="12" r="3"></circle>
-          <circle cx="18" cy="19" r="3"></circle>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
         </svg>
       </button>
     </div>
@@ -60,18 +58,16 @@ const image = getImage(iconPath);
       <h4 class="text-lg font-medium text-black dark:text-white mb-3">{title}</h4>
       <p class="text-sm text-gray-700 dark:text-gray-300">{description}</p>
       
-      <!-- Bouton de partage sur desktop -->
+      <!-- Bouton de partage sur desktop - Rendu plus visible -->
       <button 
-        class="share-button absolute top-2 right-2 bg-black dark:bg-white text-white dark:text-black p-1.5 rounded-full hidden md:block opacity-0 group-hover:opacity-100 transition-opacity" 
+        class="share-button absolute top-4 right-4 bg-black dark:bg-white text-white dark:text-black p-2 rounded-full hidden md:block hover:bg-orange dark:hover:bg-orange dark:hover:text-white" 
         data-id={id}
         aria-label="Partager cette expérience"
+        title="Copier le lien vers cette expérience"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"></circle>
-          <circle cx="6" cy="12" r="3"></circle>
-          <circle cx="18" cy="19" r="3"></circle>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
         </svg>
       </button>
     </div>
@@ -91,6 +87,11 @@ const image = getImage(iconPath);
 
   .share-button {
     transition: all 0.2s ease;
+    opacity: 0.7;
+  }
+
+  .timeline-experience:hover .share-button {
+    opacity: 1;
   }
 
   .share-button:hover {
