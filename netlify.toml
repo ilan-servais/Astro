@@ -4,12 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "18.17.1"
-  # Utiliser legacy-peer-deps pour ignorer les erreurs de dépendances
-  NPM_FLAGS = "--legacy-peer-deps"
-  # Désactiver la télémétrie Astro
+  NPM_FLAGS = "--legacy-peer-deps --force"
   ASTRO_TELEMETRY_DISABLED = "1"
-  # Force l'utilisation du mode statique
-  ASTRO_OUTPUT = "static"
 
 [[redirects]]
   from = "/career/*"
