@@ -1,14 +1,20 @@
 ---
 import timelineData from '../../data/timeline.json';
 
+// Cette fonction est nécessaire pour les routes dynamiques en mode statique
+export async function getStaticPaths() {
+  // Générer un chemin pour chaque experience dans le fichier de données
+  return timelineData.experiences.map(experience => ({
+    params: { id: experience.id.toString() },
+    props: { experience }
+  }));
+}
+
 const { id } = Astro.params;
 const numericId = parseInt(id);
 
-// Vérifier si l'ID existe dans les données
-const experienceExists = timelineData.experiences.some(exp => exp.id === numericId);
-
 // Construire l'URL de redirection
-const redirectUrl = experienceExists ? `/career#${id}` : '/career';
+const redirectUrl = `/career#${id}`;
 ---
 
 <meta http-equiv="refresh" content={`0;url=${redirectUrl}`} />
