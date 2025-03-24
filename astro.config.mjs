@@ -10,7 +10,7 @@ export default defineConfig({
     }
   })],
   image: {
-    // Service par défaut utilisant sharp au lieu de squoosh
+    // Service par défaut utilisant sharp
     service: { entrypoint: 'astro/assets/services/sharp' },
     // Configuration globale pour les images
     defaultOptions: {
@@ -18,14 +18,26 @@ export default defineConfig({
       quality: 80,
     }
   },
-  // Optimisations pour Netlify
   vite: {
     ssr: {
-      noExternal: ['astro-navbar']
+      noExternal: ['astro-navbar'],
+      // Avoid missing ./server specifier error
+      external: ['astro/server']
+    },
+    resolve: {
+      alias: {
+        // Add explicit alias for Astro server imports
+        'astro/server': 'astro/dist/server/index.js'
+      }
+    },
+    optimizeDeps: {
+      exclude: ['astro-icon']
     },
     build: {
-      rollupOptions: {
-        external: ['@assets/*']
+      // Ensure commonjs modules are properly handled
+      commonjsOptions: {
+        include: [/node_modules/],
+        transformMixedEsModules: true
       }
     }
   }
