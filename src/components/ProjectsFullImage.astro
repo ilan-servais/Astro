@@ -22,45 +22,54 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
                     aria-label="lien vers le projet"
                     class="block h-full flex flex-col"
                 >
-                    {project.data.image ? (
-                        project.slug === 'project-1' ? (
-                            <Image 
-                                src={project1Image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
-                                width={400}
-                                height={400}
-                                class="w-full object-cover"
-                            />
-                        ) : project.slug === 'project-2' ? (
-                            <Image 
-                                src={project2Image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
-                                width={400}
-                                height={400}
-                                class="w-full h-auto object-cover"
-                            />
-                        ) : project.slug === 'project-3' ? (
-                            <Image 
-                                src={project3Image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
-                                width={400}
-                                height={400}
-                                class="w-full h-auto object-cover"
-                            />
+                    <div class="relative">
+                        {project.data.image ? (
+                            project.slug === 'project-1' ? (
+                                <Image 
+                                    src={project1Image} 
+                                    alt={project.data.img_alt || 'Image du projet'} 
+                                    width={400}
+                                    height={400}
+                                    class="w-full object-cover"
+                                />
+                            ) : project.slug === 'project-2' ? (
+                                <Image 
+                                    src={project2Image} 
+                                    alt={project.data.img_alt || 'Image du projet'} 
+                                    width={400}
+                                    height={400}
+                                    class="w-full h-auto object-cover"
+                                />
+                            ) : project.slug === 'project-3' ? (
+                                <Image 
+                                    src={project3Image} 
+                                    alt={project.data.img_alt || 'Image du projet'} 
+                                    width={400}
+                                    height={400}
+                                    class="w-full h-auto object-cover"
+                                />
+                            ) : (
+                                <img 
+                                    src={project.data.image} 
+                                    alt={project.data.img_alt || 'Image du projet'} 
+                                    class="w-full h-auto object-cover"
+                                />
+                            )
                         ) : (
                             <img 
-                                src={project.data.image} 
-                                alt={project.data.img_alt || 'Image du projet'} 
+                                src="/default-image.png" 
+                                alt="Image par défaut" 
                                 class="w-full h-auto object-cover"
                             />
-                        )
-                    ) : (
-                        <img 
-                            src="/default-image.png" 
-                            alt="Image par défaut" 
-                            class="w-full h-auto object-cover"
-                        />
-                    )}
+                        )}
+                        
+                        {/* Badge avec la date du projet */}
+                        {project.data.date && (
+                            <div class="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded">
+                                {project.data.date}
+                            </div>
+                        )}
+                    </div>
                     <div class="p-4 flex flex-col flex-grow justify-end">
                         <h3 class="text-xl text-orange lg:text-2xl">{project.data.title}</h3>
                         <p class="text-s text-black mt-2">{project.data.description}</p>

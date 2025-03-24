@@ -8,7 +8,8 @@ const projectsCollection = defineCollection({
         tags: z.array(z.string()),
         link: z.string(),
         img_alt: z.string().optional(),
-        image: z.string().optional() // nouveau champ pour l'image personnalisée
+        image: z.string().optional(),
+        date: z.string().optional() // ajout du champ date optionnel
     }),
 });
 

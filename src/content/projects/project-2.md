@@ -6,4 +6,5 @@ img_alt: project image alt text
 link: https://ilan-servais-rick-et-morty-memory.netlify.app/
 tags: ['ReactJs', 'CSS3', 'JavaScript']
 image: '@assets/images/project-2.svg'
+date: "03/05/2024"
 ---
