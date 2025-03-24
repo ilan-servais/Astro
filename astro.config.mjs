@@ -18,17 +18,14 @@ export default defineConfig({
       quality: 80,
     }
   },
+  // Suppressing the server import issues by using output: 'static'
+  output: 'static',
   vite: {
     ssr: {
       noExternal: ['astro-navbar'],
-      // Avoid missing ./server specifier error
-      external: ['astro/server']
     },
     resolve: {
-      alias: {
-        // Add explicit alias for Astro server imports
-        'astro/server': 'astro/dist/server/index.js'
-      }
+      // Removed problematic alias that's causing the error
     },
     optimizeDeps: {
       exclude: ['astro-icon']

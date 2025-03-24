@@ -2,13 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   ssr: {
-    noExternal: ['astro-navbar'],
-    external: ['astro/server']
-  },
-  resolve: {
-    alias: {
-      'astro/server': 'astro/dist/server/index.js'
-    }
+    noExternal: ['astro-navbar']
   },
   optimizeDeps: {
     exclude: ['astro-icon']

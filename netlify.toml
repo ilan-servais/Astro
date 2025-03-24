@@ -5,6 +5,14 @@
 [build.environment]
   NODE_VERSION = "18.17.1"
   NPM_FLAGS = "--legacy-peer-deps"
+  NETLIFY_USE_YARN = "true"
+  # Prevent Netlify from processing images
+  NETLIFY_IMAGES_CDN_DOMAIN = "false"
+  # Disable Astro telemetry
+  ASTRO_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "./netlify-plugin-astro.js"
 
 [[redirects]]
   from = "/career/*"
