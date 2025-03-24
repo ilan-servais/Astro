@@ -1,3 +1,18 @@
 [build]
-  command = "npm run build"  # Remplace par "yarn build" si tu utilises Yarn
+  command = "npm run build"
   publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "16"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[redirects]]
+  from = "/career/*"
+  to = "/career/#:splat"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
