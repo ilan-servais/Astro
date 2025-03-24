@@ -6,7 +6,6 @@ import BackToTop from '@components/ui/BackToTop.astro';
 
 // Tri des expériences par année du plus récent au plus ancien
 const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
-  // Extraire les années numériques des chaînes de caractères (ex: "2025 - Present" → 2025)
   const extractYear = (yearStr) => {
     if (typeof yearStr === 'string') {
       const match = yearStr.match(/^\d{4}/);
@@ -15,282 +14,59 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     return yearStr;
   };
   
-  const yearA = extractYear(a.year);
-  const yearB = extractYear(b.year);
-  
-  return yearB - yearA;
-});
-
-// Création d'un mappage entre ID et index pour faciliter la recherche
-const idToIndexMap = {};
-sortedExperiences.forEach((exp, index) => {
-  idToIndexMap[exp.id] = index;
+  return extractYear(b.year) - extractYear(a.year);
 });
 ---
 
 <Layout title="Ilan Servais | Professional Journey">
-  <main class="relative min-h-screen overflow-hidden pt-0">
-    <!-- Titre de la fresque uniquement -->
-    <div class="text-center py-6">
-      <h1 class="font-monospace text-3xl text-orange lg:text-4xl">My career path</h1>
+  <main class="mx-auto max-w-4xl px-4">
+    <div class="text-center py-8">
+      <h1 class="font-monospace text-3xl text-orange mb-6">My Career Path</h1>
     </div>
 
-    <!-- Timeline Verticale -->
-    <div class="timeline-container pb-20">
-      <div class="relative max-w-5xl mx-auto">
-        <!-- Ligne verticale de la timeline en arrière-plan (cachée sur mobile) -->
-        <div class="absolute left-1/6 top-0 bottom-0 w-1 bg-orange/30 hidden md:block"></div>
-        
-        <!-- Contenu des expériences sans les points cliquables -->
-        <div class="relative z-10">
-          {sortedExperiences.map((exp, index) => (
-            <div 
-              class={`modal-card w-full max-w-2xl mx-auto mb-32 md:pl-12 transition-all duration-500 transform ${index === 0 ? 'initial-active' : ''}`}
-              data-index={index}
-              data-id={exp.id}
-              id={`card-${exp.id}`}
-            >
-              <TimelineExperience 
-                id={exp.id}
-                year={exp.year}
-                company={exp.company}
-                title={exp.title}
-                description={exp.description}
-                iconPath={exp.iconPath}
-              />
-            </div>
-          ))}
+    <div class="space-y-8 pb-20">
+      {sortedExperiences.map((exp) => (
+        <div id={`exp-${exp.id}`} class="card-container">
+          <TimelineExperience 
+            id={exp.id}
+            year={exp.year}
+            company={exp.company}
+            title={exp.title}
+            description={exp.description}
+            iconPath={exp.iconPath}
+          />
         </div>
-      </div>
+      ))}
     </div>
     
-    <!-- Bouton retour en haut avec un z-index plus élevé pour s'assurer qu'il soit toujours visible -->
-    <div class="fixed bottom-5 right-5 z-50 back-to-top-container">
+    <div class="fixed bottom-5 right-5 z-50">
       <BackToTop />
     </div>
   </main>
 </Layout>
 
-<style>
-  /* Position de la ligne verticale */
-  .left-1\/6 {
-    left: 16.666667%;
-  }
-  
-  /* Style pour la ligne de temps */
-  .timeline-container {
-    overscroll-behavior: none;
-  }
-  
-  /* Style pour les cartes de timeline */
-  .modal-card {
-    transition-property: transform, opacity;
-    transition-duration: 500ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    opacity: 0.5;
-    transform: translateX(2rem);
-  }
-  
-  /* Premier élément visible immédiatement */
-  .modal-card.initial-active {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  
-  /* Ajout d'un cercle stylisé pour chaque carte - visible uniquement sur desktop */
-  .modal-card::before {
-    content: "";
-    position: absolute;
-    left: 16.666667%;
-    top: 50%;
-    width: 12px;
-    height: 12px;
-    background-color: var(--orange-color, #E06330);
-    border-radius: 50%;
-    border: 3px solid white;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    display: none;
-  }
-  
-  @media (min-width: 768px) {
-    .modal-card::before {
-      display: block;
-    }
-  }
-  
-  .dark .modal-card::before {
-    border-color: var(--dark-bg-color, #120D16);
-  }
-  
-  /* Responsive design pour mobile */
-  @media (max-width: 768px) {
-    .modal-card {
-      width: 90%;
-      padding-left: 0;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-    }
-    
-    /* Sur mobile, la fresque est supprimée et les cartes sont centrées */
-    .timeline-container .relative {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-  }
-  
-  /* Classes pour l'animation des cartes */
-  .modal-card.active {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  
-  .back-to-top-container {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .back-to-top-container.visible {
-    opacity: 1;
-  }
-</style>
-
 <script>
-  // Définir des variables CSS pour les couleurs
-  document.documentElement.style.setProperty('--orange-color', '#E06330');
-  document.documentElement.style.setProperty('--dark-bg-color', '#120D16');
-  
-  // Fonction pour extraire l'ID de l'URL
-  function getIdFromUrl() {
-    // Vérifier s'il y a un hash dans l'URL (ex: /career#4)
+  // Handle hash navigation
+  document.addEventListener('DOMContentLoaded', () => {
     if (window.location.hash) {
-      const hash = window.location.hash.substring(1);
-      if (!isNaN(parseInt(hash))) {
-        return parseInt(hash);
-      }
-    }
-    
-    return null;
-  }
-  
-  // Fonction pour scroller vers une carte spécifique
-  function scrollToCard(cardElement) {
-    if (cardElement) {
-      const offset = 100; // Offset pour ne pas coller la carte tout en haut
-      const elementPosition = cardElement.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      const id = window.location.hash.substring(1);
+      const element = document.getElementById(`exp-${id}`);
       
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  }
-  
-  // Gestion des cartes et du bouton back-to-top
-  document.addEventListener('DOMContentLoaded', function() {
-    const cards = document.querySelectorAll('.modal-card');
-    const backToTopButton = document.querySelector('.back-to-top-container');
-    let activeIndex = 0;
-    
-    // Mappage des IDs aux indices
-    const idToIndexMap = {};
-    cards.forEach((card, index) => {
-      const id = parseInt(card.dataset.id);
-      idToIndexMap[id] = index;
-    });
-    
-    // Récupérer l'ID depuis l'URL
-    const targetId = getIdFromUrl();
-    
-    // Si un ID est spécifié dans l'URL, définir l'index actif correspondant
-    if (targetId !== null && idToIndexMap[targetId] !== undefined) {
-      activeIndex = idToIndexMap[targetId];
-      
-      // Trouver la carte correspondante
-      const targetCard = document.querySelector(`#card-${targetId}`);
-      if (targetCard) {
-        // Attendre un peu pour que la page soit complètement chargée
+      if (element) {
         setTimeout(() => {
-          scrollToCard(targetCard);
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 300);
       }
-    } else {
-      // Comportement par défaut : activer la première carte
-      activeIndex = 0;
     }
-    
-    // Mettre à jour les styles initiaux
-    updateCardStyles();
-    
-    function updateCardStyles() {
-      cards.forEach((card, index) => {
-        if (index === activeIndex) {
-          card.classList.add('active');
-        } else {
-          card.classList.remove('active');
-        }
-      });
-    }
-    
-    // Observer l'intersection des cartes
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const index = parseInt(entry.target.dataset.index);
-          activeIndex = index;
-          updateCardStyles();
-          
-          // Mise à jour de l'URL en fonction de la carte visible (navigation par historique)
-          const cardId = entry.target.dataset.id;
-          const newUrl = new URL(window.location);
-          newUrl.hash = cardId;
-          window.history.replaceState({}, '', newUrl);
-        }
-      });
-    }, {
-      root: null,
-      rootMargin: '-10% 0px -40% 0px',
-      threshold: 0.3
-    });
-    
-    // Observer toutes les cartes
-    cards.forEach(card => {
-      observer.observe(card);
-    });
-    
-    // Gérer l'affichage du bouton back-to-top et la détection du scroll
-    window.addEventListener('scroll', () => {
-      // Afficher le bouton back-to-top après un certain scroll
-      if (window.scrollY > 300) {
-        backToTopButton.classList.add('visible');
-      } else {
-        backToTopButton.classList.remove('visible');
-      }
-      
-      // Mettre à jour les cartes actives lors du défilement
-      let visibleCardIndex = null;
-      let closestDistance = Infinity;
-      
-      cards.forEach((card, index) => {
-        const rect = card.getBoundingClientRect();
-        const cardMiddle = rect.top + rect.height / 2;
-        const distanceFromCenter = Math.abs(cardMiddle - window.innerHeight / 2);
-        
-        // Trouver la carte la plus proche du centre de l'écran
-        if (distanceFromCenter < closestDistance && rect.top < window.innerHeight && rect.bottom > 0) {
-          closestDistance = distanceFromCenter;
-          visibleCardIndex = index;
-        }
-      });
-      
-      if (visibleCardIndex !== null && visibleCardIndex !== activeIndex) {
-        activeIndex = visibleCardIndex;
-        updateCardStyles();
-      }
-    });
   });
 </script>
+
+<style>
+  .card-container {
+    transition: transform 0.3s ease;
+  }
+  
+  .card-container:hover {
+    transform: translateX(5px);
+  }
+</style>

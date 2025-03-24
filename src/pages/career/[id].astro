@@ -1,33 +1,23 @@
 ---
+import Layout from '@layouts/Layout.astro';
 import timelineData from '../../data/timeline.json';
 
-// Cette fonction est nécessaire pour les routes dynamiques en mode statique
-export async function getStaticPaths() {
-  // Générer un chemin pour chaque experience dans le fichier de données
-  return timelineData.experiences.map(experience => ({
-    params: { id: experience.id.toString() }
+// Générer un chemin pour chaque experience
+export function getStaticPaths() {
+  return timelineData.experiences.map(exp => ({
+    params: { id: exp.id.toString() }
   }));
 }
 
 const { id } = Astro.params;
-
-// Construire l'URL de redirection
-const redirectUrl = `/career#${id}`;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content={`0;url=${redirectUrl}`}>
-  <title>Redirecting...</title>
-</head>
-<body>
-  <p>Redirecting to <a href={redirectUrl}>career page</a>...</p>
-  
-  <script>
-    window.location.href = "{redirectUrl}";
-  </script>
-</body>
-</html>
+<Layout title="Redirecting...">
+  <div class="flex items-center justify-center h-screen">
+    <p>Redirecting you to the career page...</p>
+  </div>
+</Layout>
+
+<script define:vars={{ id }}>
+  window.location.href = `/career#${id}`;
+</script>

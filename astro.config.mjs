@@ -14,23 +14,11 @@ export default defineConfig({
       quality: 80,
     }
   },
+  // Important: utilisation du mode statique sans format particulier
   output: 'static',
-  build: {
-    // Assurer la génération de tous les fichiers HTML, y compris pour les routes dynamiques
-    format: 'directory'
-  },
   vite: {
     ssr: {
       noExternal: ['astro-navbar']
-    },
-    build: {
-      rollupOptions: {
-        external: ['astro/server']
-      },
-      commonjsOptions: {
-        include: [/node_modules/],
-        transformMixedEsModules: true
-      }
     }
   }
 });

@@ -7,20 +7,19 @@
   NPM_FLAGS = "--legacy-peer-deps --force"
   ASTRO_TELEMETRY_DISABLED = "1"
 
-# Redirection spécifique pour les routes dynamiques career/[id]
-[[redirects]]
-  from = "/career/*"
-  to = "/career/#:splat"
-  status = 302
-  force = true
-
-# Assurer que les sous-répertoires de career sont accessibles
+# Redirection pour l'URL career
 [[redirects]]
   from = "/career"
   to = "/career/index.html"
   status = 200
 
-# Redirection par défaut pour le SPA
+# Redirection pour les identifiants career
+[[redirects]]
+  from = "/career/*"
+  to = "/career/index.html"
+  status = 200
+
+# Redirection par défaut pour une Single Page Application
 [[redirects]]
   from = "/*"
   to = "/index.html"
