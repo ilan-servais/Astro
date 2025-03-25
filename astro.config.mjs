@@ -14,11 +14,16 @@ export default defineConfig({
       quality: 80,
     }
   },
-  // Important: utilisation du mode statique sans format particulier
   output: 'static',
   vite: {
     ssr: {
       noExternal: ['astro-navbar']
+    },
+    build: {
+      // Aide à résoudre certains problèmes de compatibilité
+      cssCodeSplit: true,
+      minify: true,
+      assetsInlineLimit: 4096
     }
   }
 });
