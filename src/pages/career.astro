@@ -16,6 +16,9 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
   
   return extractYear(b.year) - extractYear(a.year);
 });
+
+// Récupérer l'ID de l'URL hash côté serveur si possible
+const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
 ---
 
 <Layout title="Ilan Servais | Professional Career">
@@ -28,7 +31,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
       {sortedExperiences.map((exp) => (
         <div 
           id={exp.id.toString()} 
-          class="card-container group relative" 
+          class={`card-container group relative ${exp.id.toString() === initialId ? 'active' : ''}`} 
           data-exp-id={exp.id}
         >
           <TimelineExperience 
@@ -65,9 +68,9 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     const bottomTriggerRatio = 0.6;  // À 60% du haut de la fenêtre
     
     // Fonction pour activer une carte sans déclencher de défilement
-    function activateCard(id) {
-      // Ne rien faire si c'est la même carte
-      if (id === lastActiveId) return;
+    function activateCard(id, scroll = false) {
+      // Ne rien faire si c'est la même carte et qu'elle est déjà active
+      if (id === lastActiveId && document.getElementById(id)?.classList.contains('active')) return;
       
       // Désactiver toutes les cartes
       document.querySelectorAll('.card-container').forEach(container => {
@@ -84,27 +87,26 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
         if (history.replaceState) {
           history.replaceState(null, null, `#${id}`);
         }
-      }
-    }
-    
-    // Activation initiale au chargement
-    if (window.location.hash) {
-      const idFromHash = window.location.hash.substring(1);
-      activateCard(idFromHash);
-      
-      // Faire défiler doucement vers la carte après un court délai
-      setTimeout(() => {
-        const element = document.getElementById(idFromHash);
-        if (element) {
-          element.scrollIntoView({
+        
+        // Faire défiler jusqu'à la carte si demandé
+        if (scroll) {
+          targetCard.scrollIntoView({
             behavior: 'smooth',
             block: 'center'
           });
         }
-      }, 500);
+      }
+    }
+    
+    // Activation initiale au chargement
+    // Garantit que la carte 1 est active par défaut, même si aucun hash n'est présent
+    if (!window.location.hash) {
+      // On force l'activation même si la classe est déjà présente côté serveur
+      activateCard('1', false);
     } else {
-      // Activer la première carte par défaut
-      activateCard('1');
+      // Si on arrive avec un hash dans l'URL, activer la carte correspondante
+      const idFromHash = window.location.hash.substring(1);
+      activateCard(idFromHash, true);
     }
     
     // Fonction principale de détection du défilement
