@@ -33,23 +33,40 @@
 		const button = document.querySelector(
 			'.theme-switch input[type="checkbox"]'
 		) as HTMLInputElement;
-
-		const switchTheme = () => {
-			document.documentElement.classList.toggle('dark');
-			if (document.documentElement.classList.contains('dark')) {
-				localStorage.setItem('theme', 'dark');
+		
+		// Créer une clé de session spécifique
+		const sessionThemeKey = 'theme-session';
+		
+		// Fonction pour appliquer le thème
+		const applyTheme = (isDark: boolean) => {
+			if (isDark) {
+				document.documentElement.classList.add('dark');
+				if (button) button.checked = false;
+			} else {
+				document.documentElement.classList.remove('dark');
+				if (button) button.checked = true;
 			}
 		};
-
-		if (
-			localStorage.theme === 'dark' ||
-			(!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-		) {
-			switchTheme();
+		
+		// Par défaut, utiliser le mode sombre
+		// A moins qu'un thème de session soit défini
+		const sessionTheme = sessionStorage.getItem(sessionThemeKey);
+		
+		if (sessionTheme === 'light') {
+			applyTheme(false);
+		} else {
+			// Mode sombre par défaut (soit sessionTheme === 'dark' soit pas de préférence enregistrée)
+			applyTheme(true);
+			sessionStorage.setItem(sessionThemeKey, 'dark');
 		}
 
-		button.addEventListener('click', () => {
-			switchTheme();
-		});
+		// Ajouter un écouteur d'événements au bouton
+		if (button) {
+			button.addEventListener('click', () => {
+				const isDark = !document.documentElement.classList.contains('dark');
+				applyTheme(isDark);
+				sessionStorage.setItem(sessionThemeKey, isDark ? 'dark' : 'light');
+			});
+		}
 	});
 </script>
