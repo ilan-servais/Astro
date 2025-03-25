@@ -26,8 +26,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
 
     <div class="space-y-12 pb-20">
       {sortedExperiences.map((exp) => (
-        <div id={exp.id.toString()} class="card-container group relative">
-          <!-- Suppression du lien d'ancre à gauche, on garde uniquement le bouton dans la carte -->
+        <div id={exp.id.toString()} class="card-container group relative" data-exp-id={exp.id}>
           <TimelineExperience 
             id={exp.id}
             year={exp.year}
@@ -35,7 +34,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
             title={exp.title}
             description={exp.description}
             iconPath={exp.iconPath}
-            city={exp.city} // Transmit la ville
+            city={exp.city}
           />
         </div>
       ))}
@@ -48,15 +47,36 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
 </Layout>
 
 <script>
-  // Handle hash navigation
+  // Handle hash navigation and card clicks
   document.addEventListener('DOMContentLoaded', () => {
-    // Si l'URL contient un hash (ex: #5)
+    // Gestion du hash dans l'URL
     if (window.location.hash) {
       const id = window.location.hash.substring(1);
-      const element = document.getElementById(id);
+      activateCard(id);
+    }
+    
+    // Ajouter des écouteurs de clic sur toutes les cartes
+    const cards = document.querySelectorAll('.card-container');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.getAttribute('data-exp-id');
+        activateCard(id);
+        
+        // Mettre à jour l'URL sans recharger la page pour permettre le partage
+        history.pushState(null, '', `#${id}`);
+      });
+    });
+    
+    // Fonction pour activer une carte spécifique
+    function activateCard(id) {
+      // Supprimer la classe active de toutes les cartes
+      document.querySelectorAll('.card-container').forEach(card => {
+        card.classList.remove('active');
+      });
       
+      // Ajouter la classe active à la carte cliquée
+      const element = document.getElementById(id);
       if (element) {
-        // Ajouter une classe active et faire défiler
         element.classList.add('active');
         setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -70,6 +90,7 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
   .card-container {
     transition: all 0.3s ease;
     scroll-margin-top: 4rem;
+    cursor: pointer; /* Indique que la carte est cliquable */
   }
   
   .card-container:hover {
