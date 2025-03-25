@@ -118,7 +118,29 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
       // Récupérer la position de défilement et la hauteur de la fenêtre
       const scrollPos = window.scrollY;
       const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
       
+      // Détection spécifique pour la fin de page (activation de la dernière carte)
+      const isNearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
+      
+      if (isNearBottom) {
+        // Activer la dernière carte quand on est proche du bas
+        const allCards = Array.from(document.querySelectorAll('.card-container'));
+        if (allCards.length > 0) {
+          const lastCard = allCards[allCards.length - 1];
+          const lastCardId = lastCard.getAttribute('data-exp-id');
+          activateCard(lastCardId);
+        }
+        
+        // Réinitialiser le drapeau après un léger délai
+        setTimeout(() => {
+          isScrolling = false;
+        }, 100);
+        
+        return; // Sortir tôt si nous sommes au bas de la page
+      }
+      
+      // Pour le reste du défilement, continuer avec la logique existante
       // Calculer les points de déclenchement
       const triggerTop = windowHeight * topTriggerRatio;
       const triggerBottom = windowHeight * bottomTriggerRatio;
@@ -194,6 +216,9 @@ const sortedExperiences = [...timelineData.experiences].sort((a, b) => {
     
     // Réagir au redimensionnement pour recalculer les positions
     window.addEventListener('resize', handleScroll, { passive: true });
+    
+    // Vérification initiale pour activer la dernière carte si la page est déjà en bas au chargement
+    setTimeout(handleScroll, 300);
   });
 </script>
 
