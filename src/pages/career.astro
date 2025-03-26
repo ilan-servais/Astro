@@ -55,7 +55,9 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Déclaration des variables globales
+    // Drapeaux pour gérer le deep linking et l'état
+    let deepLinkActive = !!window.location.hash;
+    let hasScrolled = false;
     let lastActiveId = window.location.hash ? window.location.hash.substring(1) : '1';
     
     // Variable pour suivre le défilement
@@ -64,8 +66,8 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
     let lastScrollPosition = window.scrollY;
     
     // Ratios de la hauteur de la fenêtre pour le déclenchement
-    const topTriggerRatio = 0.4;     // À 40% du haut de la fenêtre
-    const bottomTriggerRatio = 0.6;  // À 60% du haut de la fenêtre
+    const topTriggerRatio = 0.35;     // Abaissé à 35% du haut pour résoudre le problème
+    const bottomTriggerRatio = 0.65;  // Augmenté à 65% pour plus de marge
     
     // Fonction pour activer une carte sans déclencher de défilement
     function activateCard(id, scroll = false) {
@@ -90,29 +92,42 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
         
         // Faire défiler jusqu'à la carte si demandé
         if (scroll) {
-          targetCard.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
+          // Utiliser une méthode de défilement plus fiable pour Chrome
+          const yOffset = -80; // Décalage pour éviter que la carte soit complètement en haut
+          const y = targetCard.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          
+          window.scrollTo({
+            top: y,
+            behavior: 'smooth'
           });
+          
+          // Désactiver la détection de scroll pendant l'animation
+          hasScrolled = true;
+          setTimeout(() => { hasScrolled = false; }, 1000);
         }
       }
     }
     
-    // Activation initiale au chargement
-    // Garantit que la carte 1 est active par défaut, même si aucun hash n'est présent
+    // Activation initiale au chargement avec un délai pour assurer le rendu complet
     if (!window.location.hash) {
-      // On force l'activation même si la classe est déjà présente côté serveur
-      activateCard('1', false);
+      setTimeout(() => activateCard('1', false), 150);
     } else {
-      // Si on arrive avec un hash dans l'URL, activer la carte correspondante
       const idFromHash = window.location.hash.substring(1);
-      activateCard(idFromHash, true);
+      // Délai pour s'assurer que le DOM est complètement chargé
+      setTimeout(() => activateCard(idFromHash, true), 150);
     }
     
     // Fonction principale de détection du défilement
     function handleScroll() {
-      // Si on est déjà en train de défiler, ignorer
-      if (isScrolling) return;
+      // Ne pas traiter le défilement si activé par un deep link jusqu'à ce que l'utilisateur fasse défiler manuellement
+      if (deepLinkActive) {
+        const scrollDelta = Math.abs(window.scrollY - lastScrollPosition);
+        if (scrollDelta < 20) return;
+        deepLinkActive = false;
+      }
+      
+      // Ne pas traiter pendant le défilement programmé
+      if (hasScrolled || isScrolling) return;
       
       // Marquer comme défiant pour éviter de multiples déclenchements
       isScrolling = true;
@@ -227,7 +242,7 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
 <style>
   .card-container {
     transition: all 0.4s ease-out;
-    scroll-margin-top: 4rem;
+    scroll-margin-top: 80px;
     position: relative;
     padding-left: 0;
     border-left: 0px solid transparent;
