@@ -24,12 +24,12 @@
     },
     {
       "id": 3,
-      "year": "2022",
-      "period": "janvier 2022 - avril 2022",
+      "year": "2022 - 2024",
+      "period": "juillet 2022 - décembre 2024",
       "periodName": "Expérience",
-      "company": "Exit Café",
-      "title": "Manager | Bartender | Server",
-      "description": "Responsible for welcoming, service, and bar management in a dynamic environment.",
+      "company": "La Cabane des Amis & Barta Club",
+      "title": "Interim Bartender",
+      "description": "Experience working as a bartender in an establishment.",
       "iconPath": "../assets/images/barman1.svg",
       "city": "Marseille"
     },
@@ -47,11 +47,11 @@
     {
       "id": 5,
       "year": "2022",
-      "period": "juillet 2022 - décembre 2022",
+      "period": "janvier 2022 - avril 2022",
       "periodName": "Expérience",
-      "company": "La Cabane des Amis & Barta Club",
-      "title": "Interim Bartender",
-      "description": "Experience working as a bartender in an establishment.",
+      "company": "Exit Café",
+      "title": "Manager | Bartender",
+      "description": "Responsible for welcoming, service, and bar management in a dynamic environment.",
       "iconPath": "../assets/images/barman1.svg",
       "city": "Marseille"
     },
