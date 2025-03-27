@@ -55,223 +55,192 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Drapeaux pour gérer le deep linking et l'état
-    let deepLinkActive = !!window.location.hash;
-    let hasScrolled = false;
-    let lastActiveId = window.location.hash ? window.location.hash.substring(1) : '1';
+    let userInteracting = false;
     
-    // Variable pour suivre le défilement
-    let isScrolling = false;
-    let scrollTimeout;
-    let lastScrollPosition = window.scrollY;
-    
-    // Ratios de la hauteur de la fenêtre pour le déclenchement
-    const topTriggerRatio = 0.35;     // Abaissé à 35% du haut pour résoudre le problème
-    const bottomTriggerRatio = 0.65;  // Augmenté à 65% pour plus de marge
-    
-    // Fonction pour activer une carte sans déclencher de défilement
+    // Fonction d'activation des cartes améliorée
     function activateCard(id, scroll = false) {
-      // Ne rien faire si c'est la même carte et qu'elle est déjà active
-      if (id === lastActiveId && document.getElementById(id)?.classList.contains('active')) return;
-      
       // Désactiver toutes les cartes
-      document.querySelectorAll('.card-container').forEach(container => {
-        container.classList.remove('active');
+      document.querySelectorAll('.card-container').forEach(card => {
+        card.classList.remove('active');
       });
       
       // Activer la carte cible
       const targetCard = document.getElementById(id);
       if (targetCard) {
         targetCard.classList.add('active');
-        lastActiveId = id;
         
-        // Mettre à jour l'URL sans déclencher de rechargement
+        // Mettre à jour l'URL sans rechargement
         if (history.replaceState) {
           history.replaceState(null, null, `#${id}`);
         }
         
-        // Faire défiler jusqu'à la carte si demandé
+        // Défiler si nécessaire
         if (scroll) {
-          // Utiliser une méthode de défilement plus fiable pour Chrome
-          const yOffset = -80; // Décalage pour éviter que la carte soit complètement en haut
-          const y = targetCard.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          userInteracting = true;
           
-          window.scrollTo({
-            top: y,
-            behavior: 'smooth'
-          });
+          // Positionnement spécifique selon l'ID
+          if (id === '1') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } else if (id === '14') {
+            window.scrollTo({ 
+              top: document.body.scrollHeight, 
+              behavior: 'smooth'
+            });
+          } else {
+            targetCard.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+          }
           
-          // Désactiver la détection de scroll pendant l'animation
-          hasScrolled = true;
-          setTimeout(() => { hasScrolled = false; }, 1000);
+          setTimeout(() => { userInteracting = false; }, 1000);
         }
       }
     }
     
-    // Activation initiale au chargement avec un délai pour assurer le rendu complet
-    if (!window.location.hash) {
-      setTimeout(() => activateCard('1', false), 150);
-    } else {
-      const idFromHash = window.location.hash.substring(1);
-      // Délai pour s'assurer que le DOM est complètement chargé
-      setTimeout(() => activateCard(idFromHash, true), 150);
+    // Activation initiale basée sur le hash
+    setTimeout(() => {
+      const hash = window.location.hash;
+      if (hash) {
+        activateCard(hash.substring(1), true);
+      } else {
+        activateCard('1', false);
+      }
+    }, 100);
+    
+    // Ajout d'une détection spécifique pour les extrémités de la page
+    function checkExtremePositions() {
+      if (userInteracting) return;
+
+      // Détection pour la première carte
+      if (window.scrollY < 100) {
+        activateCard('1', false);
+        return;
+      }
+      
+      // Détection pour la dernière carte
+      const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 150;
+      if (nearBottom) {
+        activateCard('14', false);
+        return;
+      }
     }
     
-    // Fonction principale de détection du défilement
-    function handleScroll() {
-      // Ne pas traiter le défilement si activé par un deep link jusqu'à ce que l'utilisateur fasse défiler manuellement
-      if (deepLinkActive) {
-        const scrollDelta = Math.abs(window.scrollY - lastScrollPosition);
-        if (scrollDelta < 20) return;
-        deepLinkActive = false;
-      }
+    // Observer de visibilité avec ajustement pour les cas extrêmes
+    const observer = new IntersectionObserver(entries => {
+      // Ne pas traiter pendant une interaction utilisateur
+      if (userInteracting) return;
       
-      // Ne pas traiter pendant le défilement programmé
-      if (hasScrolled || isScrolling) return;
+      // Vérifier d'abord les positions extrêmes
+      checkExtremePositions();
       
-      // Marquer comme défiant pour éviter de multiples déclenchements
-      isScrolling = true;
+      // Poursuivre le traitement normal pour les autres cartes
+      const visibleEntries = entries.filter(entry => entry.isIntersecting);
+      if (!visibleEntries.length) return;
       
-      // Récupérer la position de défilement et la hauteur de la fenêtre
-      const scrollPos = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      
-      // Détection spécifique pour la fin de page (activation de la dernière carte)
-      const isNearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
-      
-      if (isNearBottom) {
-        // Activer la dernière carte quand on est proche du bas
-        const allCards = Array.from(document.querySelectorAll('.card-container'));
-        if (allCards.length > 0) {
-          const lastCard = allCards[allCards.length - 1];
-          const lastCardId = lastCard.getAttribute('data-exp-id');
-          activateCard(lastCardId);
-        }
-        
-        // Réinitialiser le drapeau après un léger délai
-        setTimeout(() => {
-          isScrolling = false;
-        }, 100);
-        
-        return; // Sortir tôt si nous sommes au bas de la page
-      }
-      
-      // Pour le reste du défilement, continuer avec la logique existante
-      // Calculer les points de déclenchement
-      const triggerTop = windowHeight * topTriggerRatio;
-      const triggerBottom = windowHeight * bottomTriggerRatio;
-      
-      // Récupérer toutes les cartes
+      // Obtenir toutes les cartes et leurs positions
       const cards = Array.from(document.querySelectorAll('.card-container'));
-      
-      // Direction du défilement
-      const scrollingDown = scrollPos > lastScrollPosition;
-      lastScrollPosition = scrollPos;
-      
-      // Trouver la carte qui est dans la zone de déclenchement
-      let activeCard = null;
-      
-      for (const card of cards) {
+      const cardPositions = cards.map(card => {
         const rect = card.getBoundingClientRect();
+        const cardId = card.getAttribute('data-exp-id');
         
-        // Déterminer si la carte est dans la zone de déclenchement
-        if (scrollingDown) {
-          // Pour le défilement vers le bas, vérifier si la carte entre dans la zone de déclenchement par le haut
-          if (rect.top <= triggerTop && rect.bottom >= triggerTop) {
-            activeCard = card;
-            break;
-          }
-        } else {
-          // Pour le défilement vers le haut, vérifier si la carte entre dans la zone de déclenchement par le bas
-          if (rect.bottom >= triggerBottom && rect.top <= triggerBottom) {
-            activeCard = card;
-            break;
-          }
-        }
-      }
-      
-      // Si aucune carte n'est trouvée mais que nous défilons, trouver la carte la plus visible
-      if (!activeCard) {
-        let maxVisibility = 0;
+        // Score de visibilité plus élevé pour les cartes extrêmes
+        let centerScore = 1 - Math.abs(0.5 - ((rect.top + rect.bottom) / 2 / window.innerHeight));
         
-        for (const card of cards) {
-          const rect = card.getBoundingClientRect();
-          
-          // Calculer la visibilité comme le pourcentage de la carte visible dans la fenêtre
-          const visibility = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0);
-          
-          if (visibility > maxVisibility) {
-            maxVisibility = visibility;
-            activeCard = card;
-          }
+        // Bonus pour les cartes 1 et 14 pour faciliter leur activation
+        if (cardId === '1' || cardId === '14') {
+          centerScore *= 1.2; // Bonus de 20%
         }
-      }
+        
+        return { id: cardId, centerScore };
+      });
       
-      // Activer la carte trouvée
-      if (activeCard) {
-        const id = activeCard.getAttribute('data-exp-id');
-        activateCard(id);
-      }
+      // Trier par score de visibilité
+      cardPositions.sort((a, b) => b.centerScore - a.centerScore);
       
-      // Réinitialiser le drapeau après un léger délai pour permettre un nouveau déclenchement
-      setTimeout(() => {
-        isScrolling = false;
-      }, 100);
-    }
+      // Activer la carte la plus visible si son score est suffisant
+      if (cardPositions.length && cardPositions[0].centerScore > 0.25) {
+        activateCard(cardPositions[0].id, false);
+      }
+    }, {
+      // Marges plus larges pour mieux détecter en haut et en bas
+      rootMargin: "-5% 0px -5% 0px",
+      threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+    });
     
-    // Écouteur d'événements de défilement optimisé
+    // Observer toutes les cartes
+    document.querySelectorAll('.card-container').forEach(card => {
+      observer.observe(card);
+    });
+    
+    // Ajouter un écouteur pour le défilement pour les positions extrêmes
     window.addEventListener('scroll', () => {
-      // Annuler le timeout précédent
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
+      if (!userInteracting) {
+        checkExtremePositions();
       }
-      
-      // Définir un nouveau timeout pour ralentir les déclenchements
-      scrollTimeout = setTimeout(handleScroll, 50);
     }, { passive: true });
     
-    // Réagir au redimensionnement pour recalculer les positions
-    window.addEventListener('resize', handleScroll, { passive: true });
-    
-    // Vérification initiale pour activer la dernière carte si la page est déjà en bas au chargement
-    setTimeout(handleScroll, 300);
+    // Gestion des boutons de partage
+    document.addEventListener('click', e => {
+      const shareButton = e.target.closest('.share-button');
+      if (!shareButton) return;
+      
+      const id = shareButton.dataset.id;
+      if (id) {
+        userInteracting = true;
+        
+        // Copier le lien
+        const url = `${window.location.origin}/career#${id}`;
+        navigator.clipboard.writeText(url).then(() => {
+          const notification = document.getElementById('copy-notification');
+          if (notification) {
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 2000);
+          }
+        });
+        
+        setTimeout(() => { userInteracting = false; }, 500);
+      }
+    });
   });
 </script>
 
 <style>
+  /* Styles simplifiés pour une animation plus fluide */
   .card-container {
-    transition: all 0.4s ease-out;
-    scroll-margin-top: 80px;
     position: relative;
-    padding-left: 0;
-    border-left: 0px solid transparent;
-    will-change: transform, border-left;
+    scroll-margin: 80px;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
   
-  /* Animation plus fluide pour l'activation - zoom au lieu de padding */
+  /* Styles spécifiques pour la première et la dernière carte */
+  .card-container[data-exp-id="1"] {
+    scroll-margin-top: 120px;
+  }
+  
+  .card-container[data-exp-id="14"] {
+    scroll-margin-bottom: 120px;
+  }
+  
   .card-container.active {
     border-left: 4px solid #E06330;
-    transform: scale(1.02);
-    transform-origin: center left;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease-out, border-left 0.3s ease-out, box-shadow 0.3s ease-out;
+    transform: scale(1.01);
+    transform-origin: left center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
   }
   
-  /* Pour un effet plus doux et moins saccadé */
+  /* Reste des styles inchangé */
   .timeline-experience {
     transition: transform 0.3s ease;
     transform-origin: left center;
     width: 100%;
   }
   
-  /* Stabiliser les éléments internes lors des transitions */
   .timeline-experience > * {
     transform: translateZ(0);
     backface-visibility: hidden;
   }
   
-  /* Style pour la notification de copie */
   .copy-notification {
     position: fixed;
     bottom: 20px;
