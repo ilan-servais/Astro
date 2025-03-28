@@ -21,10 +21,12 @@ import school3Image from '../assets/images/school3.svg';
 import school42Image from '../assets/images/school42.svg';
 import game1Image from '../assets/images/game1.svg';
 import game2Image from '../assets/images/game2.svg';
+import questionImage from '../assets/images/question.svg';
+
 
 interface Props {
   id: number;
-  year: number;
+  year: number | string;
   company: string;
   title: string;
   description: string;
@@ -51,6 +53,7 @@ const getImage = (path) => {
   if (path.includes('school42')) return school42Image;
   if (path.includes('game1')) return game1Image;
   if (path.includes('game2')) return game2Image;
+  if (path.includes('question')) return questionImage;
   
   // Fallback pour les anciennes images si nécessaire
   if (path.includes('project-1')) return project1Image;
@@ -62,6 +65,22 @@ const getImage = (path) => {
 };
 
 const image = getImage(iconPath);
+
+// Fonction pour formater l'année et mettre en évidence le symbole infini
+function formatYear(yearStr) {
+  if (typeof yearStr !== 'string') return yearStr;
+  
+  // Recherche du symbole infini
+  if (yearStr.includes('∞')) {
+    const parts = yearStr.split('∞');
+    return {
+      __html: parts[0] + '<span class="infinity-symbol">∞</span>' + (parts[1] || '')
+    };
+  }
+  return { __html: yearStr };
+}
+
+const formattedYear = formatYear(year);
 ---
 
 <div class="timeline-experience bg-white dark:bg-darkBg rounded-xl overflow-hidden shadow-xl">
@@ -75,7 +94,7 @@ const image = getImage(iconPath);
         class="w-full h-auto object-contain max-h-[200px]"
       />
       <div class="absolute top-2 right-2 bg-orange text-white text-xs font-bold px-2 py-1 rounded-full">
-        {year}
+        <span set:html={formattedYear.__html} />
       </div>
       <!-- Bouton de partage sur mobile - Rendu plus visible -->
       <button 
@@ -146,5 +165,23 @@ const image = getImage(iconPath);
   .share-button:hover {
     background-color: #E06330;
     transform: scale(1.1);
+  }
+
+  /* Style amélioré pour le symbole infini */
+  .infinity-symbol {
+    font-size: 2em;          /* Augmenté à 2em pour plus de visibilité */
+    font-weight: bold;
+    vertical-align: middle;
+    display: inline-block;
+    transform: translateY(-2px);
+    margin: 0 2px;
+    color: #E06330;          /* Même couleur orange que le thème pour mieux ressortir */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Léger ombrage pour effet 3D */
+    animation: pulse 1.5s infinite ease-in-out alternate; /* Animation subtile de pulsation */
+  }
+
+  @keyframes pulse {
+    from { transform: translateY(-2px) scale(1); }
+    to { transform: translateY(-2px) scale(1.1); }
   }
 </style>
