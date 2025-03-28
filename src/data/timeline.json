@@ -2,12 +2,12 @@
   "experiences": [
     {
       "id": 1,
-      "year": "2025 - ∞",
+      "year": "2025 - <span style=\"font-size: 2em; vertical-align: middle; display: inline-block; margin: 0 2px;\">&#8734;</span>",
       "period": "septembre 2025 - juillet 2027",
       "periodName": "Expérience",
-      "company": " ? ",
+      "company": "My dream company",
       "title": "Web developer",
-      "description": ".",
+      "description": "As of September, I'm ready to make a commitment to the company that will become the extension of my professional dreams. If that's you, then let's talk!",
       "iconPath": "../assets/images/question.svg",
       "city": "Marseille"
     },
