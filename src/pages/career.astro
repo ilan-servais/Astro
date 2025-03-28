@@ -211,6 +211,8 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
     position: relative;
     scroll-margin: 80px;
     transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden; /* Pour s'assurer que le pseudo-élément ne déborde pas */
+    border-radius: 0.75rem; /* Correspondant à rounded-xl de TailwindCSS */
   }
   
   /* Styles spécifiques pour la première et la dernière carte */
@@ -222,11 +224,26 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
     scroll-margin-bottom: 120px;
   }
   
+  /* Utilisation d'un pseudo-élément pour créer une bordure arrondie */
   .card-container.active {
-    border-left: 4px solid #E06330;
+    position: relative;
     transform: scale(1.01);
     transform-origin: left center;
     box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    border-left: none; /* Suppression de la bordure directe */
+  }
+  
+  .card-container.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #E06330;
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+    z-index: 1;
   }
   
   /* Reste des styles inchangé */
@@ -234,6 +251,7 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
     transition: transform 0.3s ease;
     transform-origin: left center;
     width: 100%;
+    border-radius: 0.75rem; /* Ajouter le même rayon de courbure */
   }
   
   .timeline-experience > * {
