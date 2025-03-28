@@ -2,6 +2,17 @@
   "experiences": [
     {
       "id": 1,
+      "year": "2025 - ∞",
+      "period": "septembre 2025 - juillet 2027",
+      "periodName": "Expérience",
+      "company": " ? ",
+      "title": "Web developer",
+      "description": ".",
+      "iconPath": "../assets/images/school3.svg",
+      "city": "Marseille"
+    },
+    {
+      "id": 2,
       "year": "2025 - Present",
       "period": "février 2025 - Present",
       "periodName": "Expérience",
@@ -12,7 +23,7 @@
       "city": "Marseille"
     },
     {
-      "id": 2,
+      "id": 3,
       "year": "2023 - 2024",
       "period": "septembre 2023 - juillet 2024",
       "periodName": "Expérience",
@@ -23,7 +34,7 @@
       "city": "Marseille"
     },
     {
-      "id": 3,
+      "id": 4,
       "year": "2022 - 2024",
       "period": "juillet 2022 - décembre 2024",
       "periodName": "Expérience",
@@ -34,7 +45,7 @@
       "city": "Marseille"
     },
     {
-      "id": 4,
+      "id": 5,
       "year": "2022",
       "period": "janvier 2022 - juillet 2022",
       "periodName": "Expérience",
@@ -45,7 +56,7 @@
       "city": "Marseille"
     },
     {
-      "id": 5,
+      "id": 6,
       "year": "2022",
       "period": "janvier 2022 - avril 2022",
       "periodName": "Expérience",
@@ -56,7 +67,7 @@
       "city": "Marseille"
     },
     {
-      "id": 6,
+      "id": 7,
       "year": "2021",
       "period": "mai 2021 - décembre 2021",
       "periodName": "Expérience",
@@ -67,7 +78,7 @@
       "city": "Marseille"
     },
     {
-      "id": 7,
+      "id": 8,
       "year": "2014",
       "period": "septembre 2014 - septembre 2014",
       "periodName": "Expérience",
@@ -78,7 +89,7 @@
       "city": "Paris"
     },
     {
-      "id": 8,
+      "id": 9,
       "year": "2013 - 2020",
       "period": "mai 2013 - décembre 2020",
       "periodName": "Expérience",
@@ -89,7 +100,7 @@
       "city": "Marseille"
     },
     {
-      "id": 9,
+      "id": 10,
       "year": "2011 - 2012",
       "period": "juin 2011 - août 2012",
       "periodName": "Expérience",
@@ -100,7 +111,7 @@
       "city": "Online"
     },
     {
-      "id": 10,
+      "id": 11,
       "year": "2011",
       "period": "janvier 2011 - juin 2011",
       "periodName": "Expérience",
@@ -111,7 +122,7 @@
       "city": "Online"
     },
     {
-      "id": 11,
+      "id": 12,
       "year": "2009 - 2010",
       "period": "août 2009 - juin 2010",
       "periodName": "Expérience",
@@ -122,7 +133,7 @@
       "city": "Marseille"
     },
     {
-      "id": 12,
+      "id": 13,
       "year": "2008 - 2009",
       "period": "août 2008 - juin 2009",
       "periodName": "Expérience",
@@ -133,7 +144,7 @@
       "city": "Marseille"
     },
     {
-      "id": 13,
+      "id": 14,
       "year": "2008",
       "period": "janvier 2008 - janvier 2008",
       "periodName": "Expérience",
@@ -144,7 +155,7 @@
       "city": "Amiens"
     },
     {
-      "id": 14,
+      "id": 15,
       "year": "2006 - 2007",
       "period": "août 2006 - juin 2007",
       "periodName": "Expérience",
