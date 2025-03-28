@@ -81,9 +81,10 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
           // Positionnement spécifique selon l'ID
           if (id === '1') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-          } else if (id === '14') {
+          } else if (id === '15') {
+            // Pour la dernière carte, faire défiler vers le bas de la page
             window.scrollTo({ 
-              top: document.body.scrollHeight, 
+              top: document.body.scrollHeight - window.innerHeight,
               behavior: 'smooth'
             });
           } else {
@@ -98,15 +99,32 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
       }
     }
     
-    // Activation initiale basée sur le hash
+    // Activation initiale basée sur le hash - CORRECTION POUR LE DEEP LINKING
     setTimeout(() => {
-      const hash = window.location.hash;
+      let hash = window.location.hash;
       if (hash) {
-        activateCard(hash.substring(1), true);
+        // Extraire l'ID sans le symbole #
+        let targetId = hash.substring(1);
+        
+        // Vérifier si l'ID existe dans le DOM
+        if (document.getElementById(targetId)) {
+          // Activer avec défilement
+          activateCard(targetId, true);
+          
+          // Désactiver temporairement la détection de scroll pour éviter les conflits
+          userInteracting = true;
+          setTimeout(() => { 
+            userInteracting = false;
+          }, 1500); // Délai plus long pour s'assurer que le défilement est terminé
+        } else {
+          // Si l'ID n'existe pas, défaut à la première carte
+          activateCard('1', false);
+        }
       } else {
+        // Pas de hash, activer la première carte sans défilement
         activateCard('1', false);
       }
-    }, 100);
+    }, 200); // Augmentation du délai à 200ms pour s'assurer que le DOM est prêt
     
     // Ajout d'une détection spécifique pour les extrémités de la page
     function checkExtremePositions() {
@@ -118,10 +136,10 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
         return;
       }
       
-      // Détection pour la dernière carte
+      // Détection pour la dernière carte - mise à jour pour utiliser ID 15
       const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 150;
       if (nearBottom) {
-        activateCard('14', false);
+        activateCard('15', false);
         return;
       }
     }
@@ -147,8 +165,8 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
         // Score de visibilité plus élevé pour les cartes extrêmes
         let centerScore = 1 - Math.abs(0.5 - ((rect.top + rect.bottom) / 2 / window.innerHeight));
         
-        // Bonus pour les cartes 1 et 14 pour faciliter leur activation
-        if (cardId === '1' || cardId === '14') {
+        // Bonus pour les cartes 1 et 15 pour faciliter leur activation
+        if (cardId === '1' || cardId === '15') {  // Mise à jour pour l'ID 15
           centerScore *= 1.2; // Bonus de 20%
         }
         
@@ -220,7 +238,7 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
     scroll-margin-top: 120px;
   }
   
-  .card-container[data-exp-id="14"] {
+  .card-container[data-exp-id="15"] {  /* Mise à jour pour l'ID 15 */
     scroll-margin-bottom: 120px;
   }
   
