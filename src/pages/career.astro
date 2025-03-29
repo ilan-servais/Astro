@@ -56,22 +56,31 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     let userInteracting = false;
+    let initialLoad = true;
     
     // Fonction d'activation des cartes améliorée
     function activateCard(id, scroll = false) {
+      // Validation de l'id pour éviter les erreurs
+      if (!id) return;
+
+      console.log(`Activating card: ${id}`); // Pour le débogage
+
+      // Convertir en chaîne si ce n'est pas déjà le cas
+      const cardId = id.toString();
+      
       // Désactiver toutes les cartes
       document.querySelectorAll('.card-container').forEach(card => {
         card.classList.remove('active');
       });
       
       // Activer la carte cible
-      const targetCard = document.getElementById(id);
+      const targetCard = document.getElementById(cardId);
       if (targetCard) {
         targetCard.classList.add('active');
         
         // Mettre à jour l'URL sans rechargement
         if (history.replaceState) {
-          history.replaceState(null, null, `#${id}`);
+          history.replaceState(null, null, `#${cardId}`);
         }
         
         // Défiler si nécessaire
@@ -79,9 +88,9 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
           userInteracting = true;
           
           // Positionnement spécifique selon l'ID
-          if (id === '1') {
+          if (cardId === '1') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-          } else if (id === '15') {
+          } else if (cardId === '15') {
             // Pour la dernière carte, faire défiler vers le bas de la page
             window.scrollTo({ 
               top: document.body.scrollHeight - window.innerHeight,
@@ -96,39 +105,61 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
           
           setTimeout(() => { userInteracting = false; }, 1000);
         }
+      } else {
+        console.error(`Card with ID ${cardId} not found`);
       }
     }
     
-    // Activation initiale basée sur le hash - CORRECTION POUR LE DEEP LINKING
-    setTimeout(() => {
-      let hash = window.location.hash;
+    // Adaptation pour garantir que le hash est traité à la fin du chargement
+    function processInitialHash() {
+      // Désactiver temporairement l'observer pour éviter les conflits
+      userInteracting = true;
+      initialLoad = true;
+      
+      // Récupérer le hash et retirer le caractère '#'
+      const hash = window.location.hash ? window.location.hash.substring(1) : null;
+      
       if (hash) {
-        // Extraire l'ID sans le symbole #
-        let targetId = hash.substring(1);
+        console.log(`Processing hash: ${hash}`);
         
-        // Vérifier si l'ID existe dans le DOM
-        if (document.getElementById(targetId)) {
-          // Activer avec défilement
-          activateCard(targetId, true);
-          
-          // Désactiver temporairement la détection de scroll pour éviter les conflits
-          userInteracting = true;
-          setTimeout(() => { 
-            userInteracting = false;
-          }, 1500); // Délai plus long pour s'assurer que le défilement est terminé
+        // Vérifier si l'élément avec cet id existe
+        if (document.getElementById(hash)) {
+          // Attendre que toutes les ressources soient chargées
+          window.requestAnimationFrame(() => {
+            // Double requestAnimationFrame pour s'assurer que le DOM est prêt
+            window.requestAnimationFrame(() => {
+              activateCard(hash, true);
+              
+              // Réactiver l'observer après un délai suffisant
+              setTimeout(() => {
+                userInteracting = false;
+                initialLoad = false;
+              }, 1500);
+            });
+          });
         } else {
-          // Si l'ID n'existe pas, défaut à la première carte
+          console.error(`Element with ID ${hash} not found`);
           activateCard('1', false);
+          initialLoad = false;
+          userInteracting = false;
         }
       } else {
-        // Pas de hash, activer la première carte sans défilement
         activateCard('1', false);
+        initialLoad = false;
+        userInteracting = false;
       }
-    }, 200); // Augmentation du délai à 200ms pour s'assurer que le DOM est prêt
+    }
+    
+    // Traiter le hash initial après chargement complet
+    if (document.readyState === 'complete') {
+      processInitialHash();
+    } else {
+      window.addEventListener('load', processInitialHash);
+    }
     
     // Ajout d'une détection spécifique pour les extrémités de la page
     function checkExtremePositions() {
-      if (userInteracting) return;
+      if (userInteracting || initialLoad) return;
 
       // Détection pour la première carte
       if (window.scrollY < 100) {
@@ -136,7 +167,7 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
         return;
       }
       
-      // Détection pour la dernière carte - mise à jour pour utiliser ID 15
+      // Détection pour la dernière carte
       const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 150;
       if (nearBottom) {
         activateCard('15', false);
@@ -144,10 +175,10 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
       }
     }
     
-    // Observer de visibilité avec ajustement pour les cas extrêmes
+    // Observer de visibilité amélioré
     const observer = new IntersectionObserver(entries => {
-      // Ne pas traiter pendant une interaction utilisateur
-      if (userInteracting) return;
+      // Ne pas traiter pendant une interaction utilisateur ou au chargement initial
+      if (userInteracting || initialLoad) return;
       
       // Vérifier d'abord les positions extrêmes
       checkExtremePositions();
@@ -160,13 +191,13 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
       const cards = Array.from(document.querySelectorAll('.card-container'));
       const cardPositions = cards.map(card => {
         const rect = card.getBoundingClientRect();
-        const cardId = card.getAttribute('data-exp-id');
+        const cardId = card.getAttribute('id');
         
         // Score de visibilité plus élevé pour les cartes extrêmes
         let centerScore = 1 - Math.abs(0.5 - ((rect.top + rect.bottom) / 2 / window.innerHeight));
         
         // Bonus pour les cartes 1 et 15 pour faciliter leur activation
-        if (cardId === '1' || cardId === '15') {  // Mise à jour pour l'ID 15
+        if (cardId === '1' || cardId === '15') {
           centerScore *= 1.2; // Bonus de 20%
         }
         
@@ -181,7 +212,6 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
         activateCard(cardPositions[0].id, false);
       }
     }, {
-      // Marges plus larges pour mieux détecter en haut et en bas
       rootMargin: "-5% 0px -5% 0px",
       threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
     });
@@ -193,10 +223,20 @@ const initialId = Astro.url.hash ? Astro.url.hash.substring(1) : "1";
     
     // Ajouter un écouteur pour le défilement pour les positions extrêmes
     window.addEventListener('scroll', () => {
-      if (!userInteracting) {
+      if (!userInteracting && !initialLoad) {
         checkExtremePositions();
       }
     }, { passive: true });
+    
+    // Écouteur pour les changements de hash pendant la navigation
+    window.addEventListener('hashchange', (event) => {
+      const newHash = window.location.hash.substring(1);
+      if (newHash && document.getElementById(newHash)) {
+        userInteracting = true;
+        activateCard(newHash, true);
+        setTimeout(() => { userInteracting = false; }, 1000);
+      }
+    });
     
     // Gestion des boutons de partage
     document.addEventListener('click', e => {
