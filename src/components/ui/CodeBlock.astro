@@ -1,0 +1,168 @@
+---
+export interface Props {
+  code: string;
+  language?: string;
+  maxHeight?: string;
+}
+
+const { 
+  code, 
+  language = "javascript",
+  maxHeight = "350px"
+} = Astro.props;
+---
+
+<div class="code-block-container w-full rounded-lg overflow-hidden">
+  <div class="flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-700">
+    <div class="flex space-x-1">
+      <div class="w-3 h-3 rounded-full bg-red-500"></div>
+      <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+      <div class="w-3 h-3 rounded-full bg-green-500"></div>
+    </div>
+    
+    <button 
+      type="button" 
+      class="copy-button text-black hover:text-orange dark:text-white dark:hover:text-orange transition-colors"
+      aria-label="Copy code"
+      title="Copy code to clipboard"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+      </svg>
+    </button>
+  </div>
+  
+  <div class="relative bg-gray-100 dark:bg-gray-800">
+    <!-- Code avec défilement - sans numéros de ligne -->
+    <div class="overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
+      style={`max-height: ${maxHeight};`}>
+      <pre class="p-4 min-w-full">
+        <code class="font-mono text-black dark:text-white text-[13px] sm:text-sm lg:text-[14px] xl:text-[15px] whitespace-pre-wrap break-words">{code}</code>
+      </pre>
+    </div>
+  </div>
+  
+  <div class="copy-notification fixed bottom-4 right-4 bg-black dark:bg-white text-white dark:text-black py-1 px-3 rounded-md text-sm opacity-0 transform translate-y-2 transition-all duration-300">
+    Copied!
+  </div>
+</div>
+
+<script define:vars={{ maxHeight }}>
+  function setupCodeBlocks() {
+    document.querySelectorAll('.code-block-container').forEach(container => {
+      const copyButton = container.querySelector('.copy-button');
+      const codeElement = container.querySelector('code');
+      
+      if (copyButton && codeElement) {
+        copyButton.addEventListener('click', () => {
+          // Copier le texte du code
+          const code = codeElement.textContent || '';
+          navigator.clipboard.writeText(code).then(() => {
+            // Afficher la notification
+            document.querySelectorAll('.copy-notification').forEach(notification => {
+              notification.classList.remove('opacity-0', 'translate-y-2');
+              notification.classList.add('opacity-100', 'translate-y-0');
+              
+              // Cacher la notification après 2 secondes
+              setTimeout(() => {
+                notification.classList.remove('opacity-100', 'translate-y-0');
+                notification.classList.add('opacity-0', 'translate-y-2');
+              }, 2000);
+            });
+          });
+        });
+      }
+      
+      // Ajuster la hauteur maximale en fonction de la hauteur réelle du contenu
+      const preElement = container.querySelector('pre');
+      const codeLines = (codeElement?.textContent?.split('\n') || []).length;
+      
+      // Si le code est petit, limiter la hauteur pour qu'elle corresponde au contenu
+      if (codeLines < 10 && preElement) {
+        const estimatedHeight = Math.min(codeLines * 24 + 32, parseInt(maxHeight));
+        preElement.style.height = `${estimatedHeight}px`;
+        if (preElement.parentElement) {
+          preElement.parentElement.style.height = `${estimatedHeight}px`;
+        }
+      }
+    });
+  }
+  
+  // Initialiser au chargement du DOM
+  document.addEventListener('DOMContentLoaded', setupCodeBlocks);
+  
+  // Initialiser immédiatement si le DOM est déjà chargé
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    setupCodeBlocks();
+  }
+</script>
+
+<style>
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 20px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.8);
+  }
+  
+  /* Mode foncé */
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(209, 213, 219, 0.3);
+  }
+  
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(209, 213, 219, 0.5);
+  }
+
+  /* Adapter la taille du code selon la taille de l'écran */
+  @media (min-width: 1280px) {
+    .code-block-container pre {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    .code-block-container pre {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+    
+    .code-block-container code {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+  }
+
+  /* Pour les petits écrans */
+  @media (max-width: 640px) {
+    .code-block-container pre {
+      padding: 0.75rem;
+    }
+    
+    .code-block-container code {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+  }
+  
+  .copy-button {
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+  
+  .copy-button:hover {
+    opacity: 1;
+  }
+</style>

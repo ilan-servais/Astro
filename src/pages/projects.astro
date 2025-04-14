@@ -21,76 +21,25 @@ function getProjectImage(slug) {
   return project1Image; // Default fallback
 }
 
-// Placeholder content for more detailed project info that might come from a CMS later
-const projectDetails = {
-  'project-1': {
-    codeSnippet: `// Example code for project 1
-import React from 'react';
-import { useEffect, useState } from 'react';
+// Interface simplifiée pour typer les détails du projet (sans code)
+interface ProjectDetail {
+  videoUrl: string;
+  hasVideo?: boolean;
+}
 
-const MyComponent = () => {
-  const [data, setData] = useState([]);
-  
-  useEffect(() => {
-    // Fetch data here
-    fetchData().then(response => setData(response));
-  }, []);
-  
-  return (
-    <div className="container">
-      {data.map(item => (
-        <div key={item.id}>{item.name}</div>
-      ))}
-    </div>
-  );
-};`,
+// Placeholder content for more detailed project info - suppression du codeSnippet
+const projectDetails: Record<string, ProjectDetail> = {
+  'project-1': {
     videoUrl: "",
-    imagePaths: ['/images/project1-detail1.jpg', '/images/project1-detail2.jpg']
+    hasVideo: true
   },
   'project-2': {
-    codeSnippet: `// Example React component for memory game
-function Card({ card, handleChoice, flipped, disabled }) {
-  const handleClick = () => {
-    if (!disabled) {
-      handleChoice(card);
-    }
-  };
-
-  return (
-    <div className="card">
-      <div className={flipped ? "flipped" : ""}>
-        <img className="front" src={card.src} alt="card front" />
-        <img 
-          className="back" 
-          src="/img/cover.jpg" 
-          onClick={handleClick} 
-          alt="card back" 
-        />
-      </div>
-    </div>
-  );
-}`,
     videoUrl: "",
-    hasVideo: true,
-    imagePaths: []
+    hasVideo: true
   },
   'project-3': {
-    codeSnippet: `// Example JavaScript fetch for movie API
-async function fetchMovies(query) {
-  const API_KEY = 'your_api_key_here';
-  const url = \`https://api.themoviedb.org/3/search/movie?api_key=\${API_KEY}&query=\${query}\`;
-  
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data.results;
-  } catch (error) {
-    console.error('Error fetching movies:', error);
-    return [];
-  }
-}`,
     videoUrl: "",
-    imagePaths: ['/images/project3-detail1.jpg', '/images/project3-detail2.jpg']
+    hasVideo: true
   }
 };
 ---
@@ -108,6 +57,11 @@ async function fetchMovies(query) {
     <div class="space-y-6 pb-20">
       {projects.map((project) => {
         const projectImage = getProjectImage(project.slug);
+        const projectDetail = projectDetails[project.slug] || {
+          videoUrl: "",
+          hasVideo: true
+        };
+        
         return (
           <div>
             <HorizontalProjectCard
@@ -118,6 +72,7 @@ async function fetchMovies(query) {
               imageAlt={project.data.img_alt || `Image for ${project.data.title}`}
               tags={project.data.tags}
               date={project.data.date}
+              hasVideo={true}
             />
             
             <ProjectModal
@@ -128,10 +83,8 @@ async function fetchMovies(query) {
               tags={project.data.tags}
               link={project.data.link}
               date={project.data.date}
-              codeSnippet={projectDetails[project.slug]?.codeSnippet}
-              videoUrl={projectDetails[project.slug]?.videoUrl || undefined}
-              imagePaths={projectDetails[project.slug]?.imagePaths}
-              hasVideo={projectDetails[project.slug]?.hasVideo || false}
+              videoUrl={projectDetail.videoUrl || undefined}
+              hasVideo={true}
             />
           </div>
         );
@@ -145,14 +98,16 @@ async function fetchMovies(query) {
 </Layout>
 
 <script>
-  // Add click handler for cards to open modals
+  // Amélioration du gestionnaire de clics pour éviter de déclencher le modal quand on clique sur le bouton de détails
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.project-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        // Ignore clicks on the view details button as it has its own handler
+        // Ignore clicks on buttons/links with their own handlers
         const target = e.target as Element;
         const modalTrigger = target.closest('[data-modal-trigger]');
-        if (modalTrigger) {
+        const detailsLink = target.closest('a[href^="/project/"]');
+        
+        if (modalTrigger || detailsLink) {
           return;
         }
         

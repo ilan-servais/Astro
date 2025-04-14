@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Tags from '@components/ui/Tags.astro';
 import Button from '@components/ui/Button.astro';
+import CodeBlock from '@components/ui/CodeBlock.astro';
 
 // Import project images based on slug
 import project1Image from '@assets/images/project-1.svg';
@@ -28,8 +29,16 @@ function getProjectImage(slug: string) {
   return project1Image; // Default fallback
 }
 
-// Placeholder content for more detailed project info that might come from a CMS later
-const projectDetails = {
+// Utilisation d'une interface pour typer les détails du projet
+interface ProjectDetails {
+  fullDescription: string;
+  codeSnippet: string;
+  videoUrl: string;
+  hasVideo?: boolean;
+}
+
+// Placeholder content for more detailed project info - suppression des imagePaths
+const projectDetails: Record<string, ProjectDetails> = {
   'project-1': {
     fullDescription: `Collaborative project carried out in 5 groups, with each team developing specific functionalities (user management, educational content, internal communication, etc.).
 
@@ -64,7 +73,7 @@ const MyComponent = () => {
   );
 };`,
     videoUrl: "",
-    imagePaths: ['/images/project1-detail1.jpg', '/images/project1-detail2.jpg']
+    hasVideo: true
   },
   'project-2': {
     fullDescription: `Dynamic and responsive ReactJs game featuring smooth card animations, adjustable difficulty, and persistent score saving via localStorage.
@@ -102,8 +111,7 @@ function Card({ card, handleChoice, flipped, disabled }) {
   );
 }`,
     videoUrl: "",
-    hasVideo: true,
-    imagePaths: []
+    hasVideo: true
   },
   'project-3': {
     fullDescription: `Personalized library that lets you discover and save movies and TV shows using a public API.
@@ -133,12 +141,18 @@ async function fetchMovies(query) {
   }
 }`,
     videoUrl: "",
-    imagePaths: ['/images/project3-detail1.jpg', '/images/project3-detail2.jpg']
+    hasVideo: true
   }
 };
 
-const details = projectDetails[project.slug] || {};
+const details = projectDetails[project.slug] || {
+  fullDescription: project.data.description,
+  codeSnippet: "",
+  videoUrl: "",
+  hasVideo: true
+};
 const projectImage = getProjectImage(project.slug);
+const hasProjectVideo = ['project-1', 'project-2', 'project-3'].includes(project.slug);
 ---
 
 <Layout title={`${project.data.title} | Ilan Servais Projects`}>
@@ -174,69 +188,37 @@ const projectImage = getProjectImage(project.slug);
             {details.fullDescription || project.data.description}
           </p>
           
-          <div class="my-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {details.imagePaths && details.imagePaths.length > 0 && (
-              <div class="space-y-4">
-                <h2 class="text-xl font-bold text-orange">Project Gallery</h2>
-                <div class="grid grid-cols-2 gap-4">
-                  {details.imagePaths.map((path: string) => (
-                    <div class="rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
-                      <img src={path} alt="Project screenshot" class="w-full h-auto" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {details.codeSnippet && (
-              <div class="space-y-4">
-                <h2 class="text-xl font-bold text-orange">Code Example</h2>
-                <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto">
-                  <pre class="text-sm text-black dark:text-white">
-                    <code>{details.codeSnippet}</code>
-                  </pre>
-                </div>
-              </div>
-            )}
+          <!-- Vidéo du projet - section agrandie avec plus d'espace autour -->
+          <div class="my-12">
+            <h2 class="text-xl font-bold text-orange mb-4">Project Demo</h2>
+            <div class="aspect-video rounded-lg overflow-hidden shadow-xl">
+              <video 
+                controls
+                class="w-full h-full"
+                poster={`/images/videos/${project.slug}-poster.png`}
+              >
+                <source src={`/images/videos/${project.slug}.mp4`} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
           
-          {details.hasVideo && project.slug === 'project-2' && (
+          <!-- Section code example - gardée uniquement sur la page détaillée -->
+          {details.codeSnippet && (
             <div class="my-12">
-              <h2 class="text-xl font-bold text-orange mb-4">Project Demo</h2>
-              <div class="aspect-video rounded-lg overflow-hidden">
-                <video 
-                  controls
-                  class="w-full h-full"
-                  poster="/images/videos/project-2-poster.png"
-                >
-                  <source src="/images/videos/project-2.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            </div>
-          )}
-          
-          {details.videoUrl && !details.hasVideo && (
-            <div class="my-12">
-              <h2 class="text-xl font-bold text-orange mb-4">Project Demo</h2>
-              <div class="aspect-video rounded-lg overflow-hidden">
-                <iframe
-                  src={details.videoUrl}
-                  class="w-full h-full"
-                  title={`Video demo for ${project.data.title}`}
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen>
-                </iframe>
-              </div>
+              <h2 class="text-xl font-bold text-orange mb-4">Code Example</h2>
+              <CodeBlock 
+                code={details.codeSnippet} 
+                maxHeight="500px"
+              />
             </div>
           )}
         </div>
         
-        <div class="flex flex-wrap gap-4 mt-8">
+        <div class="flex flex-wrap gap-4 mt-12">
           <a href={project.data.link} target="_blank" rel="noopener noreferrer">
             <Button size="lg">
-              Visit Project
+              Visit Live Project
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
@@ -248,7 +230,7 @@ const projectImage = getProjectImage(project.slug);
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back to Projects
+              Back to Projects Archive
             </Button>
           </a>
         </div>

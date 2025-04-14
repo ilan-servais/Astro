@@ -11,10 +11,8 @@ export interface Props {
   tags: string[];
   link: string;
   date?: string;
-  codeSnippet?: string;
-  videoUrl?: string;
-  imagePaths?: string[];
   hasVideo?: boolean;
+  videoUrl?: string;  // Ajout de cette propriété manquante
 }
 
 const { 
@@ -25,10 +23,8 @@ const {
   tags, 
   link, 
   date,
-  codeSnippet,
-  videoUrl,
-  imagePaths = [],
-  hasVideo = false
+  hasVideo = false,
+  videoUrl
 } = Astro.props;
 ---
 
@@ -36,7 +32,7 @@ const {
   <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out" data-modal-backdrop></div>
   <div class="modal-container fixed inset-0 flex items-center justify-center px-4 py-6 pointer-events-none">
     <div 
-      class="modal-content bg-white dark:bg-darkBg rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto pointer-events-auto transform transition-all duration-300 ease-out translate-y-8 opacity-0"
+      class="modal-content bg-white dark:bg-darkBg rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto pointer-events-auto transform transition-all duration-300 ease-out translate-y-8 opacity-0"
     >
       <div class="relative">
         <button 
@@ -50,9 +46,22 @@ const {
         </button>
         
         <div class="p-6 md:p-8">
-          <div class="flex flex-col md:flex-row gap-6">
-            <div class="md:w-1/2">
-              {image && (
+          <div class="flex flex-col lg:flex-row gap-6">
+            <div class="lg:w-1/2">
+              {/* Affichage uniquement de la vidéo, sans galerie d'images */}
+              {hasVideo || ['project-1', 'project-2', 'project-3'].includes(id) ? (
+                <div class="rounded-lg overflow-hidden">
+                  <video 
+                    controls
+                    preload="metadata"
+                    class="w-full aspect-video"
+                    poster={`/images/videos/${id}-poster.png`}
+                  >
+                    <source src={`/images/videos/${id}.mp4`} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ) : image && (
                 <div class="rounded-lg overflow-hidden mb-4">
                   <Image 
                     src={image} 
@@ -63,46 +72,9 @@ const {
                   />
                 </div>
               )}
-              
-              {imagePaths && imagePaths.length > 0 && (
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                  {imagePaths.map((path) => (
-                    <div class="rounded-lg overflow-hidden">
-                      <img src={path} alt="Project image" class="w-full h-auto object-cover" />
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {hasVideo && id === 'project-2' && (
-                <div class="mt-4 rounded-lg overflow-hidden">
-                  <video 
-                    controls
-                    preload="metadata"
-                    class="w-full aspect-video"
-                    poster="/images/videos/project-2-poster.png"
-                  >
-                    <source src="/images/videos/project-2.mp4" type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              )}
-              
-              {videoUrl && !hasVideo && (
-                <div class="mt-4 rounded-lg overflow-hidden">
-                  <iframe 
-                    src={videoUrl}
-                    class="w-full aspect-video"
-                    title={`Video for ${title}`}
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                  </iframe>
-                </div>
-              )}
             </div>
             
-            <div class="md:w-1/2">
+            <div class="lg:w-1/2">
               <h2 class="text-2xl md:text-3xl font-bold text-orange mb-4">{title}</h2>
               
               {date && (
@@ -115,21 +87,12 @@ const {
                 <p>{description}</p>
               </div>
               
-              {codeSnippet && (
-                <div class="mb-6">
-                  <h3 class="text-lg font-semibold mb-2 text-black dark:text-white">Code Example:</h3>
-                  <pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto text-sm">
-                    <code class="text-black dark:text-white">{codeSnippet}</code>
-                  </pre>
-                </div>
-              )}
-              
               <div class="mb-6">
                 <h4 class="text-sm font-medium mb-2 text-black dark:text-white">Technologies:</h4>
                 <Tags tags={tags} />
               </div>
               
-              <div class="flex flex-wrap gap-4">
+              <div class="flex justify-between items-center mt-8">
                 <a href={link} target="_blank" rel="noopener noreferrer">
                   <Button>
                     View Project
@@ -139,11 +102,12 @@ const {
                   </Button>
                 </a>
                 
-                <a href={`/project/${id}`} aria-label={`View ${title} details`}>
+                <a href={`/project/${id}`} aria-label={`View ${title} details`} class="ml-auto">
                   <Button style="primary">
-                    View Details
+                    View Full Details
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </Button>
                 </a>
