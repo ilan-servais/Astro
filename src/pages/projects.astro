@@ -1,0 +1,170 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import HorizontalProjectCard from '@components/HorizontalProjectCard.astro';
+import ProjectModal from '@components/ui/ProjectModal.astro';
+import BackToTop from '@components/ui/BackToTop.astro';
+
+// Import project images based on slug
+import project1Image from '@assets/images/project-1.svg';
+import project2Image from '@assets/images/project-2.svg';
+import project3Image from '@assets/images/project-3.svg';
+
+// Get all projects
+const projects = await getCollection('projects', ({ data }) => !data.inProgress);
+
+// Helper function to get the appropriate image
+function getProjectImage(slug) {
+  if (slug === 'project-1') return project1Image;
+  if (slug === 'project-2') return project2Image;
+  if (slug === 'project-3') return project3Image;
+  return project1Image; // Default fallback
+}
+
+// Placeholder content for more detailed project info that might come from a CMS later
+const projectDetails = {
+  'project-1': {
+    codeSnippet: `// Example code for project 1
+import React from 'react';
+import { useEffect, useState } from 'react';
+
+const MyComponent = () => {
+  const [data, setData] = useState([]);
+  
+  useEffect(() => {
+    // Fetch data here
+    fetchData().then(response => setData(response));
+  }, []);
+  
+  return (
+    <div className="container">
+      {data.map(item => (
+        <div key={item.id}>{item.name}</div>
+      ))}
+    </div>
+  );
+};`,
+    videoUrl: "",
+    imagePaths: ['/images/project1-detail1.jpg', '/images/project1-detail2.jpg']
+  },
+  'project-2': {
+    codeSnippet: `// Example React component for memory game
+function Card({ card, handleChoice, flipped, disabled }) {
+  const handleClick = () => {
+    if (!disabled) {
+      handleChoice(card);
+    }
+  };
+
+  return (
+    <div className="card">
+      <div className={flipped ? "flipped" : ""}>
+        <img className="front" src={card.src} alt="card front" />
+        <img 
+          className="back" 
+          src="/img/cover.jpg" 
+          onClick={handleClick} 
+          alt="card back" 
+        />
+      </div>
+    </div>
+  );
+}`,
+    videoUrl: "",
+    hasVideo: true,
+    imagePaths: []
+  },
+  'project-3': {
+    codeSnippet: `// Example JavaScript fetch for movie API
+async function fetchMovies(query) {
+  const API_KEY = 'your_api_key_here';
+  const url = \`https://api.themoviedb.org/3/search/movie?api_key=\${API_KEY}&query=\${query}\`;
+  
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    console.error('Error fetching movies:', error);
+    return [];
+  }
+}`,
+    videoUrl: "",
+    imagePaths: ['/images/project3-detail1.jpg', '/images/project3-detail2.jpg']
+  }
+};
+---
+
+<Layout title="Projects | Ilan Servais">
+  <main class="mx-auto max-w-4xl px-4">
+    <div class="text-center py-8">
+      <h1 class="font-monospace text-3xl text-orange mb-6">All Projects</h1>
+      <p class="text-black dark:text-white max-w-2xl mx-auto mb-10">
+        Explore my portfolio of web development projects, from React applications to full-stack solutions.
+        Click on any project to view more details.
+      </p>
+    </div>
+
+    <div class="space-y-6 pb-20">
+      {projects.map((project) => {
+        const projectImage = getProjectImage(project.slug);
+        return (
+          <div>
+            <HorizontalProjectCard
+              id={project.slug}
+              title={project.data.title}
+              description={project.data.description}
+              image={projectImage}
+              imageAlt={project.data.img_alt || `Image for ${project.data.title}`}
+              tags={project.data.tags}
+              date={project.data.date}
+            />
+            
+            <ProjectModal
+              id={project.slug}
+              title={project.data.title}
+              description={project.data.description}
+              image={projectImage}
+              tags={project.data.tags}
+              link={project.data.link}
+              date={project.data.date}
+              codeSnippet={projectDetails[project.slug]?.codeSnippet}
+              videoUrl={projectDetails[project.slug]?.videoUrl || undefined}
+              imagePaths={projectDetails[project.slug]?.imagePaths}
+              hasVideo={projectDetails[project.slug]?.hasVideo || false}
+            />
+          </div>
+        );
+      })}
+    </div>
+    
+    <div class="fixed bottom-5 right-5 z-40">
+      <BackToTop />
+    </div>
+  </main>
+</Layout>
+
+<script>
+  // Add click handler for cards to open modals
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.project-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Ignore clicks on the view details button as it has its own handler
+        const target = e.target as Element;
+        const modalTrigger = target.closest('[data-modal-trigger]');
+        if (modalTrigger) {
+          return;
+        }
+        
+        const projectId = card.getAttribute('data-project-id');
+        if (projectId) {
+          const modalButton = card.querySelector(`[data-modal-target="modal-${projectId}"]`) as HTMLElement;
+          
+          if (modalButton) {
+            modalButton.click();
+          }
+        }
+      });
+    });
+  });
+</script>

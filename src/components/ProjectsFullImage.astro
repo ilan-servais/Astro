@@ -6,20 +6,21 @@ import project2Image from '@assets/images/project-2.svg';
 import project3Image from '@assets/images/project-3.svg';
 import Tags from '@components/ui/Tags.astro';
 
-const projects = await getCollection('projects', ({ data }) => !data.inProgress);
+// Utiliser un type plus spécifique pour éviter les erreurs "never"
+const projects = await getCollection('projects', ({ data }) => {
+    return !data.inProgress;
+});
 ---
 
 <section data-testid="projects" id="projects" class="mb-10 flex flex-col items-center justify-center md:mb-0 md:h-screen">
-    <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Projects</h2>
+    <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Top Projects</h2>
     <span class="mb-10 h-1 w-10 bg-orange"></span>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
         {projects.map((project) => (
             <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white">
                 <a 
-                    href={project.data.link} 
-                    target="_blank" 
-                    rel="noopener" 
-                    aria-label="lien vers le projet"
+                    href={`/project/${project.slug}`} 
+                    aria-label={`View details of ${project.data.title}`}
                     class="block h-full flex flex-col"
                 >
                     <div class="relative">
@@ -50,8 +51,8 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
                                 />
                             ) : (
                                 <img 
-                                    src={project.data.image} 
-                                    alt={project.data.img_alt || 'Image du projet'} 
+                                    src={(project.data.image as string).toString()} 
+                                    alt={(project.data.img_alt as string) || 'Image du projet'} 
                                     class="w-full h-auto object-cover"
                                 />
                             )
@@ -83,13 +84,11 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
     </div>
     
     <a
-        href="https://github.com/ilan-servais"
-        target="_blank"
-        rel="noopener"
+        href="/projects"
         class="flex flex-row text-black hover:text-orange dark:text-white dark:hover:text-orange mt-8"
-        aria-label="link to repository"
+        aria-label="Browse all projects"
     >
-        View full projects archive
+        View all projects
         <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -105,30 +104,3 @@ const projects = await getCollection('projects', ({ data }) => !data.inProgress)
         </svg>
     </a>
 </section>
-
-<style>
-    /* Alignement du contenu vers le bas */
-    .rounded-xl a {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    /* Expansion pour pousser le contenu vers le bas */
-    .flex-grow {
-        flex-grow: 1;
-    }
-    
-    /* Positionnement du contenu textuel vers le bas */
-    .justify-end {
-        justify-content: flex-end;
-    }
-    
-    /* Espacement entre les éléments */
-    .mt-2 {
-        margin-top: 0.5rem;
-    }
-    
-    .mt-4 {
-        margin-top: 1rem;
-    }
-</style>

@@ -1,0 +1,274 @@
+---
+import { Image } from 'astro:assets';
+import Tags from '@components/ui/Tags.astro';
+import Button from '@components/ui/Button.astro';
+
+export interface Props {
+  id: string;
+  title: string;
+  description: string;
+  image: any;
+  tags: string[];
+  link: string;
+  date?: string;
+  codeSnippet?: string;
+  videoUrl?: string;
+  imagePaths?: string[];
+  hasVideo?: boolean;
+}
+
+const { 
+  id, 
+  title, 
+  description, 
+  image, 
+  tags, 
+  link, 
+  date,
+  codeSnippet,
+  videoUrl,
+  imagePaths = [],
+  hasVideo = false
+} = Astro.props;
+---
+
+<div id={`modal-${id}`} class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out" data-modal-backdrop></div>
+  <div class="modal-container fixed inset-0 flex items-center justify-center px-4 py-6 pointer-events-none">
+    <div 
+      class="modal-content bg-white dark:bg-darkBg rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto pointer-events-auto transform transition-all duration-300 ease-out translate-y-8 opacity-0"
+    >
+      <div class="relative">
+        <button 
+          type="button" 
+          class="absolute top-4 right-4 text-black dark:text-white hover:text-orange dark:hover:text-orange transition-colors z-10" 
+          data-close-modal
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <div class="p-6 md:p-8">
+          <div class="flex flex-col md:flex-row gap-6">
+            <div class="md:w-1/2">
+              {image && (
+                <div class="rounded-lg overflow-hidden mb-4">
+                  <Image 
+                    src={image} 
+                    alt={title} 
+                    width={600} 
+                    height={400} 
+                    class="w-full h-auto object-cover"
+                  />
+                </div>
+              )}
+              
+              {imagePaths && imagePaths.length > 0 && (
+                <div class="grid grid-cols-2 gap-2 mt-4">
+                  {imagePaths.map((path) => (
+                    <div class="rounded-lg overflow-hidden">
+                      <img src={path} alt="Project image" class="w-full h-auto object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {hasVideo && id === 'project-2' && (
+                <div class="mt-4 rounded-lg overflow-hidden">
+                  <video 
+                    controls
+                    preload="metadata"
+                    class="w-full aspect-video"
+                    poster="/images/videos/project-2-poster.png"
+                  >
+                    <source src="/images/videos/project-2.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              )}
+              
+              {videoUrl && !hasVideo && (
+                <div class="mt-4 rounded-lg overflow-hidden">
+                  <iframe 
+                    src={videoUrl}
+                    class="w-full aspect-video"
+                    title={`Video for ${title}`}
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                  </iframe>
+                </div>
+              )}
+            </div>
+            
+            <div class="md:w-1/2">
+              <h2 class="text-2xl md:text-3xl font-bold text-orange mb-4">{title}</h2>
+              
+              {date && (
+                <div class="inline-block bg-orange text-white text-xs px-2 py-1 rounded mb-4">
+                  {date}
+                </div>
+              )}
+              
+              <div class="text-black dark:text-white prose dark:prose-invert mb-6">
+                <p>{description}</p>
+              </div>
+              
+              {codeSnippet && (
+                <div class="mb-6">
+                  <h3 class="text-lg font-semibold mb-2 text-black dark:text-white">Code Example:</h3>
+                  <pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto text-sm">
+                    <code class="text-black dark:text-white">{codeSnippet}</code>
+                  </pre>
+                </div>
+              )}
+              
+              <div class="mb-6">
+                <h4 class="text-sm font-medium mb-2 text-black dark:text-white">Technologies:</h4>
+                <Tags tags={tags} />
+              </div>
+              
+              <div class="flex flex-wrap gap-4">
+                <a href={link} target="_blank" rel="noopener noreferrer">
+                  <Button>
+                    View Project
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Button>
+                </a>
+                
+                <a href={`/project/${id}`} aria-label={`View ${title} details`}>
+                  <Button style="primary">
+                    View Details
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setupModals() {
+    // Find all modal triggers
+    document.querySelectorAll('[data-modal-trigger]').forEach((trigger: Element) => {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const modalId = trigger.getAttribute('data-modal-target');
+        if (modalId) {
+          const modal = document.getElementById(modalId);
+          if (modal) {
+            openModal(modal);
+            // Update URL with hash
+            const projectId = modalId.replace('modal-', '');
+            history.pushState(null, '', `#${projectId}`);
+          }
+        }
+      });
+    });
+
+    // Setup close buttons
+    document.querySelectorAll('[data-close-modal]').forEach((closeBtn: Element) => {
+      closeBtn.addEventListener('click', () => {
+        const modal = closeBtn.closest('.fixed');
+        if (modal) {
+          closeModal(modal);
+          // Remove hash from URL
+          history.pushState(null, '', window.location.pathname);
+        }
+      });
+    });
+
+    // Close modal when clicking outside
+    document.querySelectorAll('[data-modal-backdrop]').forEach((backdrop: Element) => {
+      backdrop.addEventListener('click', () => {
+        const modal = backdrop.closest('.fixed');
+        if (modal) {
+          closeModal(modal);
+          history.pushState(null, '', window.location.pathname);
+        }
+      });
+    });
+
+    // Check for hash in URL on load
+    function checkHash() {
+      const hash = window.location.hash;
+      if (hash) {
+        const projectId = hash.substring(1); // Remove # character
+        const modal = document.getElementById(`modal-${projectId}`);
+        if (modal) {
+          openModal(modal);
+        }
+      }
+    }
+    
+    // Function to open modal with animation
+    function openModal(modal: HTMLElement) {
+      // Show the modal container
+      modal.classList.remove('hidden');
+      
+      // Get position of the clicked card if available
+      let startY = window.innerHeight / 2;
+      const triggerId = modal.id.replace('modal-', '');
+      const triggerEl = document.querySelector(`[data-project-id="${triggerId}"]`);
+      
+      if (triggerEl) {
+        const rect = triggerEl.getBoundingClientRect();
+        startY = rect.top + (rect.height / 2);
+      }
+      
+      // Set initial position based on card location
+      const modalContent = modal.querySelector('.modal-content');
+      if (modalContent) {
+        // Utiliser une assertion de type pour résoudre l'erreur style
+        (modalContent as HTMLElement).style.transformOrigin = `center ${startY}px`;
+        
+        // Force a reflow to ensure the initial state is applied
+        // Utiliser une assertion de type pour résoudre l'erreur offsetWidth
+        void (modalContent as HTMLElement).offsetWidth;
+        
+        // Apply animation
+        requestAnimationFrame(() => {
+          modalContent.classList.remove('translate-y-8', 'opacity-0');
+          modalContent.classList.add('translate-y-0', 'opacity-100');
+        });
+      }
+    }
+    
+    // Function to close modal with animation
+    function closeModal(modal: Element) {
+      const modalContent = modal.querySelector('.modal-content');
+      if (modalContent) {
+        modalContent.classList.remove('translate-y-0', 'opacity-100');
+        modalContent.classList.add('translate-y-8', 'opacity-0');
+        
+        // Wait for animation to complete before hiding
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 300);
+      }
+    }
+    
+    // Check hash on load
+    checkHash();
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', checkHash);
+  }
+
+  // Initialize on DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', setupModals);
+
+  // Initialize immediately if DOM is already loaded
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    setupModals();
+  }
+</script>

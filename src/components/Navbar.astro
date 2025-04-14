@@ -7,13 +7,15 @@ import { Astronav, MenuIcon, MenuItems } from 'astro-navbar';
 const currentPath = Astro.url.pathname;
 const isHomePage = currentPath === '/' || currentPath === '';
 const isCareerPage = currentPath.includes('/career');
+const isProjectsPage = currentPath.includes('/projects') || currentPath.includes('/project/');
 
 // Adapter les liens en fonction de la page actuelle
 const menuitems = [
 	{
 		title: 'Home',
 		path: '/',
-		showOnlyOnCareer: true
+		showOnlyOnNonHome: true,
+		hideOnHome: true
 	},
 	{
 		title: 'About',
@@ -21,12 +23,11 @@ const menuitems = [
 	},
 	{
 		title: 'Projects',
-		path: isHomePage ? '#projects' : '/#projects',
+		path: '/projects',
 	},
 	{
 		title: 'Career',
 		path: '/career',
-		hideOnCareer: true
 	},
 	{
 		title: 'Contact',
@@ -36,8 +37,8 @@ const menuitems = [
 
 // Filtrer les éléments à afficher
 const filteredItems = menuitems.filter(item => {
-	if (isCareerPage && item.hideOnCareer) return false;
-	if (!isCareerPage && item.showOnlyOnCareer) return false;
+	if (!isHomePage && item.hideOnHome) return true;
+	if (isHomePage && item.showOnlyOnNonHome) return false;
 	return true;
 });
 ---
@@ -60,7 +61,10 @@ const filteredItems = menuitems.filter(item => {
 							<a
 								aria-label="navigation link"
 								href={item.path}
-								class="flex py-2 text-black hover:text-orange dark:text-white dark:hover:text-orange lg:px-3"
+								class={`flex py-2 text-black hover:text-orange dark:text-white dark:hover:text-orange lg:px-3 
+								       ${(isProjectsPage && item.title === 'Projects') || 
+                                         (isCareerPage && item.title === 'Career') ? 
+                                         'text-orange dark:text-orange' : ''}`}
 							>
 								{item.title}
 							</a>
