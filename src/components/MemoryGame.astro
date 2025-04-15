@@ -1,0 +1,386 @@
+---
+import Button from '@components/ui/Button.astro';
+
+// Définir les symboles pour les cartes
+const symbols = [
+  { id: 1, name: "infinity", svg: "M18.6,6.62C17.16,6.62 15.8,7.18 14.83,8.15L7.8,14.39C7.16,15.03 6.31,15.38 5.4,15.38C3.53,15.38 2,13.87 2,12C2,10.13 3.53,8.62 5.4,8.62C6.31,8.62 7.16,8.97 7.84,9.65L8.97,10.65L10.5,9.13L9.4,8.13C8.04,6.78 6.74,6 5.4,6C2.58,6 0.26,8.67 0.26,12C0.26,15.33 2.58,18 5.4,18C6.74,18 8.04,17.22 9.4,15.88L16.43,9.66C17.07,9 17.93,8.65 18.85,8.65C20.72,8.65 22.25,10.16 22.25,12.03C22.25,13.9 20.72,15.41 18.85,15.41C17.94,15.41 17.1,15.07 16.42,14.39L15.3,13.38L13.77,14.9L14.87,15.91C16.23,17.26 17.53,18.04 18.87,18.04C21.7,18.04 24,15.36 24,12.03C24,8.7 21.7,6.62 18.6,6.62Z" },
+  { id: 2, name: "star", svg: "M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.46,13.97L5.82,21L12,17.27Z" },
+  { id: 3, name: "heart", svg: "M12,21.35L10.55,20.03C5.4,15.36 2,12.28 2,8.5C2,5.42 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.09C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.42 22,8.5C22,12.28 18.6,15.36 13.45,20.04L12,21.35Z" },
+  { id: 4, name: "diamond", svg: "M12,2L19.5,12.5L12,23L4.5,12.5L12,2Z" },
+  { id: 5, name: "lightning", svg: "M11,15H6L13,1V9H18L11,23V15Z" },
+  { id: 6, name: "eye", svg: "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" },
+  { id: 7, name: "cloud", svg: "M19.35,10.03C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.03C2.34,8.36 0,10.9 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.03Z" },
+  { id: 8, name: "code", svg: "M8,3A2,2 0 0,0 6,5V9A2,2 0 0,1 4,11H3V13H4A2,2 0 0,1 6,15V19A2,2 0 0,0 8,21H10V19H8V14A2,2 0 0,0 6,12A2,2 0 0,0 8,10V5H10V3H8Z" }
+];
+
+// Dupliquer et mélanger les symboles pour créer des paires
+const allSymbols = [...symbols, ...symbols].map((symbol, index) => ({
+  ...symbol,
+  uniqueId: `${symbol.id}-${index}`, // Identifiant unique pour chaque carte
+  isFlipped: false, // Toutes les cartes commencent face cachée
+  isMatched: false
+})).sort(() => Math.random() - 0.5);
+---
+
+<div 
+  id="memory-game"
+  class="memory-game w-full max-w-3xl mx-auto bg-gradient-to-br from-white to-gray-100 dark:from-darkBg dark:to-gray-900 rounded-xl shadow-lg p-6 md:p-8 border border-gray-200 dark:border-gray-700"
+  data-cards={JSON.stringify(allSymbols)}
+>
+  <div class="flex justify-between items-center mb-6">
+    <div class="text-black dark:text-white">
+      <p>
+        <span class="font-bold">Found:</span>
+        <span id="found-pairs">0</span>/<span id="total-pairs">8</span>
+      </p>
+      <p class="text-sm">
+        <span class="font-bold">Moves:</span>
+        <span id="moves-count">0</span>
+      </p>
+    </div>
+    
+    <div>
+      <Button id="reset-game" size="sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+        </svg>
+        Reset Game
+      </Button>
+    </div>
+  </div>
+
+  <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    <!-- Les cartes seront générées par JavaScript -->
+  </div>
+  
+  <div id="win-message" class="mt-6 py-4 text-center text-black dark:text-white hidden bg-gray-50 dark:bg-gray-800 rounded-lg">
+    <p class="text-xl font-bold text-orange">Congratulations! 🎉</p>
+    <p>You completed the game in <span id="final-moves">0</span> moves.</p>
+    <Button id="play-again" class="mt-4">Play Again</Button>
+  </div>
+</div>
+
+<script>
+  // Fonction pour mélanger un tableau
+  function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  }
+
+  // Définition explicite des types pour TS
+  interface Card {
+    id: number;
+    name: string;
+    svg: string;
+    uniqueId: string;
+    isFlipped: boolean;
+    isMatched: boolean;
+  }
+
+  class MemoryGame {
+    private cards: Card[];
+    private flippedCards: number[];
+    private matchedPairs: number;
+    private totalPairs: number;
+    private isLocked: boolean;
+    private moves: number;
+    private cardGrid: HTMLDivElement;
+    private foundPairsEl: HTMLElement;
+    private totalPairsEl: HTMLElement;
+    private movesCountEl: HTMLElement;
+    private winMessageEl: HTMLElement;
+    private finalMovesEl: HTMLElement;
+    private resetButton: HTMLElement;
+    private playAgainButton: HTMLElement;
+
+    constructor() {
+      // Récupérer les données des cartes
+      const gameElement = document.getElementById('memory-game');
+      this.cards = JSON.parse(gameElement?.dataset.cards || '[]');
+      this.flippedCards = [];
+      this.matchedPairs = 0;
+      this.totalPairs = 8;
+      this.isLocked = false;
+      this.moves = 0;
+      
+      // DOM Elements
+      this.cardGrid = document.getElementById('card-grid') as HTMLDivElement;
+      this.foundPairsEl = document.getElementById('found-pairs') as HTMLElement;
+      this.totalPairsEl = document.getElementById('total-pairs') as HTMLElement;
+      this.movesCountEl = document.getElementById('moves-count') as HTMLElement;
+      this.winMessageEl = document.getElementById('win-message') as HTMLElement;
+      this.finalMovesEl = document.getElementById('final-moves') as HTMLElement;
+      this.resetButton = document.getElementById('reset-game') as HTMLElement;
+      this.playAgainButton = document.getElementById('play-again') as HTMLElement;
+      
+      // Initialize the game
+      this.initEventListeners();
+      this.initGame();
+      
+      console.log("Memory game initialized with cards:", this.cards.length);
+    }
+    
+    initEventListeners() {
+      this.resetButton.addEventListener('click', () => this.initGame());
+      this.playAgainButton.addEventListener('click', () => this.initGame());
+    }
+    
+    initGame() {
+      // Reset game state
+      this.cards = shuffleArray(this.cards.map(card => ({...card, isFlipped: false, isMatched: false})));
+      this.flippedCards = [];
+      this.matchedPairs = 0;
+      this.isLocked = false;
+      this.moves = 0;
+      
+      // Update UI
+      this.updateStats();
+      this.winMessageEl.classList.add('hidden');
+      
+      // Render cards
+      this.renderCards();
+      
+      console.log("Game reset with all cards face down");
+    }
+    
+    renderCards() {
+      // Clear the grid
+      this.cardGrid.innerHTML = '';
+      
+      // Add cards
+      this.cards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'memory-card aspect-square w-full rounded-xl overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105';
+        cardElement.dataset.index = index.toString();
+        cardElement.innerHTML = `
+          <div class="flip-container w-full h-full">
+            <div class="flipper w-full h-full relative">
+              <!-- Face cachée (verso) -->
+              <div class="back absolute w-full h-full bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center shadow-md border-2 border-gray-300 dark:border-gray-600">
+                <div class="w-12 h-12 text-orange">
+                  <!-- Pattern de fond - grille -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Face visible avec symbole (recto) -->
+              <div class="front absolute w-full h-full bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center shadow-md border-2 border-gray-200 dark:border-gray-700">
+                <div class="w-12 h-12 text-black dark:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="${card.svg}"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Add click event
+        cardElement.addEventListener('click', () => this.flipCard(index));
+        
+        // Add card to grid
+        this.cardGrid.appendChild(cardElement);
+      });
+    }
+    
+    flipCard(index: number) {
+      // Prevent flipping if the game is locked or card is already flipped
+      const card = this.cards[index];
+      if (this.isLocked || card.isFlipped || card.isMatched || this.flippedCards.length >= 2) return;
+      
+      console.log(`Flipping card at index ${index}`);
+      
+      // Flip the card
+      card.isFlipped = true;
+      this.flippedCards.push(index);
+      
+      // Update the card display
+      const cardElement = this.cardGrid.children[index] as HTMLElement;
+      cardElement.querySelector('.flipper')?.classList.add('is-flipped');
+      
+      // Check for matches when two cards are flipped
+      if (this.flippedCards.length === 2) {
+        this.moves++;
+        this.updateStats();
+        this.isLocked = true;
+        
+        const [firstIndex, secondIndex] = this.flippedCards;
+        const firstCard = this.cards[firstIndex];
+        const secondCard = this.cards[secondIndex];
+        
+        if (firstCard.id === secondCard.id) {
+          // Match found
+          this.matchedPairs++;
+          this.updateStats();
+          
+          // Mark cards as matched
+          firstCard.isMatched = true;
+          secondCard.isMatched = true;
+          
+          const firstCardEl = (this.cardGrid.children[firstIndex] as HTMLElement).querySelector('.front');
+          const secondCardEl = (this.cardGrid.children[secondIndex] as HTMLElement).querySelector('.front');
+          
+          if (firstCardEl && secondCardEl) {
+            // Ajouter des classes et animations pour les cartes correspondantes
+            firstCardEl.classList.add('border-orange', 'border-3');
+            secondCardEl.classList.add('border-orange', 'border-3');
+            firstCardEl.querySelector('div')?.classList.add('text-orange');
+            secondCardEl.querySelector('div')?.classList.add('text-orange');
+            
+            firstCardEl.classList.add('matched-card');
+            secondCardEl.classList.add('matched-card');
+          }
+          
+          // Reset for next turn
+          this.flippedCards = [];
+          this.isLocked = false;
+          
+          // Check if game is won
+          if (this.matchedPairs === this.totalPairs) {
+            setTimeout(() => {
+              this.showWinMessage();
+            }, 800);
+          }
+        } else {
+          // No match - flip cards back
+          setTimeout(() => {
+            const firstCardEl = (this.cardGrid.children[firstIndex] as HTMLElement).querySelector('.flipper');
+            const secondCardEl = (this.cardGrid.children[secondIndex] as HTMLElement).querySelector('.flipper');
+            
+            firstCardEl?.classList.remove('is-flipped');
+            secondCardEl?.classList.remove('is-flipped');
+            
+            // Reset card state
+            this.cards[firstIndex].isFlipped = false;
+            this.cards[secondIndex].isFlipped = false;
+            this.flippedCards = [];
+            this.isLocked = false;
+          }, 1000);
+        }
+      }
+    }
+    
+    updateStats() {
+      this.foundPairsEl.textContent = this.matchedPairs.toString();
+      this.totalPairsEl.textContent = this.totalPairs.toString();
+      this.movesCountEl.textContent = this.moves.toString();
+      this.finalMovesEl.textContent = this.moves.toString();
+    }
+    
+    showWinMessage() {
+      this.winMessageEl.classList.remove('hidden');
+      this.winMessageEl.classList.add('animate-fade-in');
+    }
+  }
+
+  // Initialize the game when the DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM loaded, initializing Memory Game");
+    new MemoryGame();
+  });
+  
+  // Initialize immediately if DOM is already loaded
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    console.log("DOM already ready, initializing Memory Game immediately");
+    new MemoryGame();
+  }
+</script>
+
+<style>
+  .memory-card {
+    perspective: 1000px;
+  }
+  
+  .flip-container {
+    perspective: 1000px;
+  }
+  
+  .flipper {
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .front, .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+  }
+  
+  .front {
+    transform: rotateY(180deg);
+  }
+  
+  .back {
+    /* Assurons-nous que le dos est visible par défaut */
+    transform: rotateY(0deg);
+    z-index: 2; /* Mettre le dos au-dessus pour qu'il soit visible initialement */
+  }
+  
+  .is-flipped {
+    transform: rotateY(180deg);
+  }
+  
+  /* S'assurer que les cartes appariées restent face visible */
+  .matched-card {
+    z-index: 3; /* Mettre les cartes correspondantes au-dessus de tout */
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: rotateY(180deg) scale(1);
+    }
+    50% {
+      transform: rotateY(180deg) scale(1.1);
+    }
+    100% {
+      transform: rotateY(180deg) scale(1);
+    }
+  }
+  
+  .border-orange {
+    border-color: #E06330 !important;
+  }
+  
+  .text-orange {
+    color: #E06330 !important;
+  }
+  
+  .matched-card {
+    animation: pulse 1s;
+  }
+  
+  /* Épaisseur de bordure */
+  .border-3 {
+    border-width: 3px;
+  }
+  
+  /* Animation fade in */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+  }
+</style>

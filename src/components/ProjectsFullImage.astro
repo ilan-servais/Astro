@@ -7,13 +7,30 @@ import project3Image from '@assets/images/project-3.svg';
 import Tags from '@components/ui/Tags.astro';
 
 const projects = await getCollection('projects', ({ data }) => !data.inProgress);
+
+// S'assurer que projects est bien typé pour éviter les erreurs
+type Project = {
+    slug: string;
+    data: {
+        title: string;
+        description: string;
+        img_alt?: string;
+        image?: string;
+        link: string;
+        date?: string;
+        tags: string[];
+    }
+};
+
+// On type la variable projects explicitement
+const typedProjects = projects as unknown as Project[];
 ---
 
 <section data-testid="projects" id="projects" class="mb-10 flex flex-col items-center justify-center md:mb-0 md:h-screen">
     <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Projects</h2>
     <span class="mb-10 h-1 w-10 bg-orange"></span>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
-        {projects.map((project) => (
+        {typedProjects.map((project) => (
             <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white">
                 <a 
                     href={project.data.link} 
