@@ -1,0 +1,270 @@
+---
+import Button from '@components/ui/Button.astro';
+
+// Définir les symboles pour les cartes
+const symbols = [
+  { id: 1, name: "infinity", svg: "M18.6,6.62C17.16,6.62 15.8,7.18 14.83,8.15L7.8,14.39C7.16,15.03 6.31,15.38 5.4,15.38C3.53,15.38 2,13.87 2,12C2,10.13 3.53,8.62 5.4,8.62C6.31,8.62 7.16,8.97 7.84,9.65L8.97,10.65L10.5,9.13L9.4,8.13C8.04,6.78 6.74,6 5.4,6C2.58,6 0.26,8.67 0.26,12C0.26,15.33 2.58,18 5.4,18C6.74,18 8.04,17.22 9.4,15.88L16.43,9.66C17.07,9 17.93,8.65 18.85,8.65C20.72,8.65 22.25,10.16 22.25,12.03C22.25,13.9 20.72,15.41 18.85,15.41C17.94,15.41 17.1,15.07 16.42,14.39L15.3,13.38L13.77,14.9L14.87,15.91C16.23,17.26 17.53,18.04 18.87,18.04C21.7,18.04 24,15.36 24,12.03C24,8.7 21.7,6.62 18.6,6.62Z" },
+  { id: 2, name: "star", svg: "M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.46,13.97L5.82,21L12,17.27Z" },
+  { id: 3, name: "heart", svg: "M12,21.35L10.55,20.03C5.4,15.36 2,12.28 2,8.5C2,5.42 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.09C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.42 22,8.5C22,12.28 18.6,15.36 13.45,20.04L12,21.35Z" },
+  { id: 4, name: "diamond", svg: "M12,2L19.5,12.5L12,23L4.5,12.5L12,2Z" },
+  { id: 5, name: "lightning", svg: "M11,15H6L13,1V9H18L11,23V15Z" },
+  { id: 6, name: "eye", svg: "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" },
+  { id: 7, name: "cloud", svg: "M19.35,10.03C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.03C2.34,8.36 0,10.9 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.03Z" },
+  { id: 8, name: "code", svg: "M8,3A2,2 0 0,0 6,5V9A2,2 0 0,1 4,11H3V13H4A2,2 0 0,1 6,15V19A2,2 0 0,0 8,21H10V19H8V14A2,2 0 0,0 6,12A2,2 0 0,0 8,10V5H10V3H8Z" }
+];
+
+// Dupliquer les symboles pour créer des paires
+const allSymbols = [...symbols, ...symbols].map((symbol, index) => ({
+  ...symbol,
+  uniqueId: `${symbol.id}-${index}` // Identifiant unique pour chaque carte
+}));
+
+// Convertir en JSON pour l'utiliser dans Alpine.js
+const cardsData = JSON.stringify(allSymbols);
+---
+
+<!-- Inclure Alpine.js directement via CDN -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<div 
+  x-data={`{
+    cards: [],
+    flippedCards: [],
+    matchedPairs: 0,
+    totalPairs: 8,
+    moves: 0,
+    isLocked: false,
+    gameCompleted: false,
+    
+    initGame() {
+      // Récupérer et mélanger les cartes
+      this.cards = JSON.parse('${cardsData}')
+        .map(card => ({ ...card, isFlipped: false, isMatched: false }));
+      this.shuffleCards();
+      
+      // Initialiser les compteurs
+      this.flippedCards = [];
+      this.matchedPairs = 0;
+      this.moves = 0;
+      this.isLocked = false;
+      this.gameCompleted = false;
+    },
+    
+    shuffleCards() {
+      // Mélanger les cartes
+      for (let i = this.cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+      }
+    },
+    
+    flipCard(index) {
+      const card = this.cards[index];
+      
+      // Ne rien faire si le jeu est bloqué ou que la carte est déjà retournée/associée
+      if (this.isLocked || card.isFlipped || card.isMatched || this.flippedCards.length >= 2) {
+        return;
+      }
+      
+      // Retourner la carte
+      card.isFlipped = true;
+      this.flippedCards.push(index);
+      
+      // Vérifier si deux cartes sont retournées
+      if (this.flippedCards.length === 2) {
+        this.moves++;
+        this.checkForMatch();
+      }
+    },
+    
+    checkForMatch() {
+      this.isLocked = true;
+      const [firstIndex, secondIndex] = this.flippedCards;
+      const firstCard = this.cards[firstIndex];
+      const secondCard = this.cards[secondIndex];
+      
+      if (firstCard.id === secondCard.id) {
+        // Match trouvé
+        this.matchedPairs++;
+        firstCard.isMatched = true;
+        secondCard.isMatched = true;
+        this.flippedCards = [];
+        this.isLocked = false;
+        
+        // Vérifier si le jeu est terminé
+        if (this.matchedPairs === this.totalPairs) {
+          setTimeout(() => {
+            this.gameCompleted = true;
+          }, 800);
+        }
+      } else {
+        // Pas de correspondance - retourner les cartes
+        setTimeout(() => {
+          firstCard.isFlipped = false;
+          secondCard.isFlipped = false;
+          this.flippedCards = [];
+          this.isLocked = false;
+        }, 1000);
+      }
+    },
+    
+    resetGame() {
+      // Réinitialisation complète du jeu
+      this.initGame();
+    }
+  }`}
+  x-init="initGame()"
+  class="memory-game w-full max-w-3xl mx-auto bg-gradient-to-br from-white to-gray-100 dark:from-darkBg dark:to-gray-900 rounded-xl shadow-lg p-6 md:p-8 border border-gray-200 dark:border-gray-700"
+>
+  <div class="flex justify-between items-center mb-6">
+    <div class="text-black dark:text-white">
+      <p>
+        <span class="font-bold">Found:</span>
+        <span x-text="matchedPairs"></span>/<span x-text="totalPairs"></span>
+      </p>
+      <p class="text-sm">
+        <span class="font-bold">Moves:</span>
+        <span x-text="moves"></span>
+      </p>
+    </div>
+    
+    <div>
+      <Button x-on:click="resetGame()" size="sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+        </svg>
+        Reset Game
+      </Button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    <template x-for="(card, index) in cards" :key="card.uniqueId">
+      <div 
+        class="memory-card aspect-square w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105"
+        x-on:click="flipCard(index)"
+        :class="{ 'pointer-events-none': card.isMatched || card.isFlipped && flippedCards.length === 2 }"
+      >
+        <div class="card-container w-full h-full">
+          <div 
+            class="card w-full h-full relative transition-transform duration-500"
+            :class="{ 'is-flipped': card.isFlipped }"
+          >
+            <!-- Dos de carte (face cachée - orange) -->
+            <div class="card-back absolute w-full h-full rounded-xl flex items-center justify-center bg-orange shadow-md">
+              <div class="w-12 h-12 text-white">
+                <!-- Logo ou motif au dos -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="9" y1="3" x2="9" y2="21"></line>
+                  <line x1="15" y1="3" x2="15" y2="21"></line>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="3" y1="15" x2="21" y2="15"></line>
+                </svg>
+              </div>
+            </div>
+            
+            <!-- Face avant (avec symbole) -->
+            <div 
+              class="card-front absolute w-full h-full bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center border-2"
+              :class="{ 'border-orange': card.isMatched, 'border-gray-200 dark:border-gray-700': !card.isMatched }"
+            >
+              <div 
+                class="w-12 h-12 transition-colors duration-300 text-gray-700" 
+                :class="card.isMatched ? 'text-orange' : ''"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 24 24" fill="currentColor">
+                  <path :d="card.svg"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+  
+  <div 
+    class="mt-6 py-4 text-center text-black dark:text-white bg-gray-50 dark:bg-gray-800 rounded-lg transition-all duration-500"
+    :class="{ 'opacity-0 h-0 py-0 overflow-hidden': !gameCompleted, 'opacity-100 animate-fade-in': gameCompleted }"
+  >
+    <p class="text-xl font-bold text-orange">Congratulations! 🎉</p>
+    <p>You completed the game in <span x-text="moves"></span> moves.</p>
+    <Button x-on:click="resetGame()" class="mt-4">Play Again</Button>
+  </div>
+</div>
+
+<style>
+  .memory-card {
+    perspective: 1000px;
+  }
+  
+  .card-container {
+    perspective: 1000px;
+  }
+  
+  .card {
+    transform-style: preserve-3d;
+  }
+  
+  .card-front, .card-back {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .card-front {
+    transform: rotateY(180deg);
+  }
+  
+  .is-flipped {
+    transform: rotateY(180deg);
+  }
+  
+  .bg-orange {
+    background-color: #E06330;
+  }
+  
+  .text-orange {
+    color: #E06330;
+  }
+  
+  .border-orange {
+    border-color: #E06330;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .card-front:has(.text-orange) {
+    animation: pulse 0.5s;
+  }
+  
+  .text-gray-700 {
+    color: #374151; /* Gris foncé, suffisamment foncé pour être visible sur fond blanc et suffisamment clair pour être visible sur fond sombre */
+  }
+</style>
