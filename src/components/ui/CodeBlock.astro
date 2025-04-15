@@ -40,7 +40,7 @@ const {
 	</div>
 </div>
 
-<script>
+<script define:vars={{ maxHeight }}>
   function setupCodeBlocks() {
     document.querySelectorAll('.code-block-container').forEach(container => {
       const copyButton = container.querySelector('.copy-button');
@@ -72,36 +72,28 @@ const {
       
       // Si le code est petit, limiter la hauteur pour qu'elle corresponde au contenu
       if (codeLines < 10 && preElement) {
-        const estimatedHeight = Math.min(codeLines * 24 + 32, parseInt(maxHeight));
+        const estimatedHeight = Math.min(codeLines * 24 + 32, parseInt(maxHeight || "350"));
         preElement.style.height = `${estimatedHeight}px`;
-        if (preElement.parentElement) {
-          preElement.parentElement.style.height = `${estimatedHeight}px`;
-        }
       }
     });
   }
-  
-  // Initialiser au chargement du DOM
-  document.addEventListener('DOMContentLoaded', setupCodeBlocks);
-  
-  // Initialiser immédiatement si le DOM est déjà chargé
-  if (document.readyState === 'interactive' || document.readyState === 'complete') {
-    setupCodeBlocks();
-  }
 
-  // Initialiser Prism pour coloriser la syntaxe
+  // Initialiser Prism pour coloriser la syntaxe en vérifiant sa présence
   document.addEventListener('DOMContentLoaded', () => {
-    if (typeof Prism !== 'undefined') {
-      Prism.highlightAll();
+    if (typeof window.Prism !== 'undefined') {
+      window.Prism.highlightAll();
     }
   });
   
   // Si le DOM est déjà chargé
   if (document.readyState === 'interactive' || document.readyState === 'complete') {
-    if (typeof Prism !== 'undefined') {
-      Prism.highlightAll();
+    if (typeof window.Prism !== 'undefined') {
+      window.Prism.highlightAll();
     }
   }
+
+  // Exécuter l'initialisation des blocs de code
+  setupCodeBlocks();
 </script>
 
 <style>

@@ -1,162 +1,164 @@
 ---
-import { hasProjectVideo } from '../utils/projectUtils';
-import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
+import Tags from './ui/Tags.astro';
+import { getCollection } from 'astro:content';
+// Import des utilitaires vidéo
+import { hasProjectVideo } from '../utils/projectUtils';
+
+// Import project images based on slug
 import project1Image from '@assets/images/project-1.svg';
 import project2Image from '@assets/images/project-2.svg';
 import project3Image from '@assets/images/project-3.svg';
-import Tags from '@components/ui/Tags.astro';
 
-// Utiliser un type plus spécifique pour éviter les erreurs "never"
-const projects = await getCollection('projects', ({ data }) => {
-    return !data.inProgress;
-});
+// Get 3 featured projects
+const projects = await getCollection('projects', ({ data }) => !data.inProgress);
+const featuredProjects = projects.slice(0, 3);
+
+// Type pour les projets
+interface Project {
+  slug: string;
+  data: {
+    title: string;
+    description: string;
+    img_alt?: string;
+    tags: string[];
+    image?: string;
+    // Autres propriétés potentielles
+    [key: string]: any;
+  };
+}
+
+// Helper function to get the appropriate image
+function getProjectImage(slug: string) {
+  if (slug === 'project-1') return project1Image;
+  if (slug === 'project-2') return project2Image;
+  if (slug === 'project-3') return project3Image;
+  return project1Image; // Default fallback
+}
 ---
 
-<section data-testid="projects" id="projects" class="mb-10 flex flex-col items-center justify-center md:mb-0 md:h-screen">
-    <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Top Projects</h2>
-    <span class="mb-10 h-1 w-10 bg-orange"></span>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
-        {projects.map((project) => (
-            <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white group">
-                <a 
-                    href={`/project/${project.slug}`} 
-                    aria-label={`View details of ${project.data.title}`}
-                    class="block h-full flex flex-col"
-                >
-                    <div class="relative overflow-hidden">
-                        {project.data.image ? (
-                            project.slug === 'project-1' ? (
-                                <Image 
-                                    src={project1Image} 
-                                    alt={project.data.img_alt || 'Image du projet'} 
-                                    width={400}
-                                    height={400}
-                                    class={`w-full object-cover transition-opacity duration-300 ${hasProjectVideo(project.slug) ? 'group-hover:opacity-0' : ''}`}
-                                />
-                            ) : project.slug === 'project-2' ? (
-                                <Image 
-                                    src={project2Image} 
-                                    alt={project.data.img_alt || 'Image du projet'} 
-                                    width={400}
-                                    height={400}
-                                    class={`w-full h-auto object-cover transition-opacity duration-300 ${hasProjectVideo(project.slug) ? 'group-hover:opacity-0' : ''}`}
-                                />
-                            ) : project.slug === 'project-3' ? (
-                                <Image 
-                                    src={project3Image} 
-                                    alt={project.data.img_alt || 'Image du projet'} 
-                                    width={400}
-                                    height={400}
-                                    class={`w-full h-auto object-cover transition-opacity duration-300 ${hasProjectVideo(project.slug) ? 'group-hover:opacity-0' : ''}`}
-                                />
-                            ) : (
-                                <img 
-                                    src={(project.data.image as any).toString()} 
-                                    alt={(project.data.img_alt as string || 'Image du projet')} 
-                                    class="w-full h-auto object-cover"
-                                />
-                            )
-                        ) : (
-                            <img 
-                                src="/default-image.png" 
-                                alt="Image par défaut" 
-                                class="w-full h-auto object-cover"
-                            />
-                        )}
-                        
-                        {/* Vidéo qui apparaît au survol */}
-                        {hasProjectVideo(project.slug) && (
-                            <video 
-                                class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                poster={`/images/videos/${project.slug}-poster.png`}
-                                muted
-                                loop
-                                preload="metadata"
-                                playsinline
-                            >
-                                <source src={`/images/videos/${project.slug}.mp4`} type="video/mp4" />
-                            </video>
-                        )}
-                        
-                        {/* Badge avec la date du projet */}
-                        {project.data.date && (
-                            <div class="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded z-10">
-                                {project.data.date}
-                            </div>
-                        )}
-                        
-                        {/* Badge indiquant la présence d'une vidéo */}
-                        {hasProjectVideo(project.slug) && (
-                            <div class="absolute bottom-2 right-2 bg-orange text-white text-xs font-bold px-2 py-1 rounded-full z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        )}
-                    </div>
-                    <div class="p-4 flex flex-col flex-grow justify-end">
-                        <h3 class="text-xl text-orange lg:text-2xl">{project.data.title}</h3>
-                        <p class="text-s text-black mt-2">{project.data.description}</p>
-                        <div class="mt-4">
-                          <Tags tags={project.data.tags} isHomepage={true} />
-                        </div>
-                    </div>
-                </a>
-            </div>
-        ))}
-
-    </div>
-    
-    <a
-        href="/projects"
-        class="flex flex-row text-black hover:text-orange dark:text-white dark:hover:text-orange mt-8"
-        aria-label="Browse all projects"
-    >
-        View all projects
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="ml-1 h-6 w-6"
+<!-- Reste du code -->
+<section data-testid="projects" id="projects" class="flex flex-col py-12 md:py-24">
+  <h2 class="text-black dark:text-white text-2xl lg:text-3xl font-bold lg:tracking-tight mb-4">
+    Recent Projects
+  </h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+    {featuredProjects.map((project: Project) => (
+      <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white group">
+        <a 
+          href={`/project/${project.slug}`} 
+          aria-label={`View details of ${project.data.title}`}
+          class="block h-full flex flex-col"
         >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"></path>
-        </svg>
-    </a>
+          <div class="relative overflow-hidden">
+            {project.data.image ? (
+              <Image 
+                src={getProjectImage(project.slug)} 
+                alt={project.data.img_alt || 'Image du projet'} 
+                width={400}
+                height={400}
+                class={`w-full h-auto object-cover transition-opacity duration-300 ${hasProjectVideo(project.slug) ? 'group-hover:opacity-0' : ''}`}
+              />
+            ) : (
+              <img 
+                src="/default-image.png" 
+                alt="Image par défaut" 
+                class="w-full h-auto object-cover"
+              />
+            )}
+            
+            {/* Vidéo qui apparaît au survol */}
+            {hasProjectVideo(project.slug) && (
+              <video 
+                class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                poster={`/images/videos/${project.slug}-poster.png`}
+                muted
+                loop
+                preload="metadata"
+                playsinline
+              >
+                <source src={`/images/videos/${project.slug}.mp4`} type="video/mp4" />
+              </video>
+            )}
+            
+            {/* Badge avec la date du projet */}
+            {project.data.date && (
+              <div class="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded z-10">
+                {project.data.date}
+              </div>
+            )}
+            
+            {/* Badge indiquant la présence d'une vidéo */}
+            {hasProjectVideo(project.slug) && (
+              <div class="absolute bottom-2 right-2 bg-orange text-white text-xs font-bold px-2 py-1 rounded-full z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            )}
+          </div>
+          <div class="p-4 flex flex-col flex-grow justify-end">
+            <h3 class="text-xl text-orange lg:text-2xl">{project.data.title}</h3>
+            <p class="text-s text-black mt-2">{project.data.description}</p>
+            <div class="mt-4">
+              <Tags tags={project.data.tags} isHomepage={true} />
+            </div>
+          </div>
+        </a>
+      </div>
+    ))}
+  </div>
+  
+  <a
+    href="/projects"
+    class="flex flex-row text-black hover:text-orange dark:text-white dark:hover:text-orange mt-8"
+    aria-label="Browse all projects"
+  >
+    View all projects
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="ml-1 h-6 w-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"></path>
+    </svg>
+  </a>
 </section>
 
 <script>
-    // Script pour démarrer automatiquement les vidéos au survol
-    document.addEventListener('DOMContentLoaded', function() {
-        const projectCards = document.querySelectorAll('.group');
-        
-        projectCards.forEach(card => {
-            const video = card.querySelector('video');
-            if (video) {
-                card.addEventListener('mouseenter', () => {
-                    video.play();
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    video.pause();
-                    video.currentTime = 0;
-                });
-                
-                // Pour les appareils tactiles
-                card.addEventListener('touchstart', () => {
-                    if (video.paused) {
-                        video.play();
-                    } else {
-                        video.pause();
-                    }
-                });
-            }
+  // Script pour démarrer automatiquement les vidéos au survol
+  document.addEventListener('DOMContentLoaded', function() {
+    const projectCards = document.querySelectorAll('.group');
+    
+    projectCards.forEach(card => {
+      const video = card.querySelector('video');
+      if (video) {
+        card.addEventListener('mouseenter', () => {
+          video.play();
         });
+        
+        card.addEventListener('mouseleave', () => {
+          video.pause();
+          video.currentTime = 0;
+        });
+        
+        // Pour les appareils tactiles
+        card.addEventListener('touchstart', () => {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        });
+      }
     });
+  });
 </script>
