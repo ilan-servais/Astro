@@ -22,7 +22,8 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
+		<link rel="stylesheet" href="/node_modules/prismjs/themes/prism.css" />
+		<script src="/node_modules/prismjs/prism.js" is:inline></script>
 		<title>{title}</title>
 	</head>
 	<body
@@ -73,29 +74,28 @@ const { title = 'Ilan Servais | Web Developer' } = Astro.props as LayoutProps;
 		</style>
 		
 		<script>
-			// Gestionnaire global de partage
-			document.addEventListener('DOMContentLoaded', function() {
-				// Rechercher tous les boutons de partage
-				document.addEventListener('click', function(e) {
-					if (e.target.closest('.share-button')) {
-						const shareButton = e.target.closest('.share-button');
+		// Gestionnaire global de partage
+		document.addEventListener('DOMContentLoaded', function() {
+			document.addEventListener('click', function(e) {
+				const target = e.target;
+				if (target instanceof HTMLElement) {
+					const shareButton = target.closest('.share-button') as HTMLElement | null;
+					if (shareButton) {
 						const id = shareButton.dataset.id;
 						const url = `${window.location.origin}/career#${id}`;
-						
-						// Essayer de copier l'URL
 						navigator.clipboard.writeText(url).then(() => {
-							// Afficher la notification
 							const notification = document.getElementById('copy-notification');
-							notification.classList.add('show');
-							
-							// Masquer après 2 secondes
-							setTimeout(() => {
-								notification.classList.remove('show');
-							}, 2000);
+							if (notification) {
+								notification.classList.add('show');
+								setTimeout(() => {
+									notification.classList.remove('show');
+								}, 2000);
+							}
 						});
 					}
-				});
+				}
 			});
+		});
 		</script>
 	</body>
 </html>

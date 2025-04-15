@@ -19,7 +19,8 @@ export async function getStaticPaths() {
   }));
 }
 
-const { project } = Astro.props;
+// Ajout de l'assertion de type sur Astro.props
+const { project } = Astro.props as { project: { slug: string, data: any } };
 
 // Helper function to get the appropriate image
 function getProjectImage(slug: string) {
@@ -40,38 +41,37 @@ interface ProjectDetails {
 // Placeholder content for more detailed project info - suppression des imagePaths
 const projectDetails: Record<string, ProjectDetails> = {
   'project-1': {
-    fullDescription: `Collaborative project carried out in 5 groups, with each team developing specific functionalities (user management, educational content, internal communication, etc.).
+    fullDescription: `Collaborative project carried out in 5 groups, with each team developing specific functionalities [...]`,
+    // Remplacement du code d'exemple initial par un extrait pertinent de gestion d'utilisateurs
+    codeSnippet: `// Extrait de code pertinent pour la gestion des utilisateurs (exemple CRUD)
+import React, { useState, useEffect } from 'react';
 
-This platform provides a comprehensive solution for schools and training centers to manage their courses, students, and administrative tasks. Features include:
+const UserList = () => {
+  const [users, setUsers] = useState([]);
 
-- User roles and permissions (admin, teacher, student)  
-- Course management and content delivery
-- Interactive assignments and grading
-- Internal messaging and notification system
-- Progress tracking and reporting dashboard
-- Calendar integration and scheduling
-
-The frontend was built with React for a modern, responsive user interface, while Symfony powers the backend API for robust data management and security.`,
-    codeSnippet: `// Example code for project 1
-import React from 'react';
-import { useEffect, useState } from 'react';
-
-const MyComponent = () => {
-  const [data, setData] = useState([]);
-  
   useEffect(() => {
-    // Fetch data here
-    fetchData().then(response => setData(response));
+    async function fetchUsers() {
+      const response = await fetch('/api/users');
+      const data = await response.json();
+      setUsers(data);
+    }
+    fetchUsers();
   }, []);
-  
+
   return (
-    <div className="container">
-      {data.map(item => (
-        <div key={item.id}>{item.name}</div>
-      ))}
+    <div>
+      <h2>User Management</h2>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>{user.name} - {user.role}</li>
+        ))}
+      </ul>
     </div>
   );
-};`,
+};
+
+export default UserList;
+`,
     videoUrl: "",
     hasVideo: true
   },
