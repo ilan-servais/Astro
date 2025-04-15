@@ -41,9 +41,19 @@ interface ProjectDetails {
 // Placeholder content for more detailed project info - suppression des imagePaths
 const projectDetails: Record<string, ProjectDetails> = {
   'project-1': {
-    fullDescription: `Collaborative project carried out in 5 groups, with each team developing specific functionalities [...]`,
-    // Remplacement du code d'exemple initial par un extrait pertinent de gestion d'utilisateurs
-    codeSnippet: `// Extrait de code pertinent pour la gestion des utilisateurs (exemple CRUD)
+    fullDescription: `Collaborative project carried out in 5 groups, with each team developing specific functionalities (user management, educational content, internal communication, etc.).
+
+This platform provides a comprehensive solution for schools and training centers to manage their courses, students, and administrative tasks. Features include:
+
+- User roles and permissions (admin, teacher, student)  
+- Course management and content delivery
+- Interactive assignments and grading
+- Internal messaging and notification system
+- Progress tracking and reporting dashboard
+- Calendar integration and scheduling
+
+The frontend was built with React for a modern, responsive user interface, while Symfony powers the backend API for robust data management and security.`,
+    codeSnippet: `// Example code for project 1
 import React, { useState, useEffect } from 'react';
 
 const UserList = () => {
