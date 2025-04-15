@@ -8,6 +8,7 @@ const currentPath = Astro.url.pathname;
 const isHomePage = currentPath === '/' || currentPath === '';
 const isCareerPage = currentPath.includes('/career');
 const isProjectsPage = currentPath.includes('/projects') || currentPath.includes('/project/');
+const isGamePage = currentPath.includes('/memory-game');
 
 // Adapter les liens en fonction de la page actuelle
 const menuitems = [
@@ -28,6 +29,10 @@ const menuitems = [
 	{
 		title: 'Career',
 		path: '/career',
+	},
+	{
+		title: 'Game',
+		path: '/memory-game',
 	},
 	{
 		title: 'Contact',
@@ -63,7 +68,8 @@ const filteredItems = menuitems.filter(item => {
 								href={item.path}
 								class={`flex py-2 text-black hover:text-orange dark:text-white dark:hover:text-orange lg:px-3 
 								       ${(isProjectsPage && item.title === 'Projects') || 
-                                         (isCareerPage && item.title === 'Career') ? 
+                                         (isCareerPage && item.title === 'Career') ||
+                                         (isGamePage && item.title === 'Game') ? 
                                          'text-orange dark:text-orange' : ''}`}
 							>
 								{item.title}
