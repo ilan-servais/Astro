@@ -12,7 +12,7 @@ export interface Props {
   link: string;
   date?: string;
   hasVideo?: boolean;
-  videoUrl?: string;  // Ajout de cette propriété manquante
+  videoUrl?: string;
 }
 
 const { 
@@ -28,7 +28,7 @@ const {
 } = Astro.props;
 ---
 
-<div id={`modal-${id}`} class="fixed inset-0 z-50 hidden">
+<div id={`modal-${id}`} class="fixed inset-0 z-50 hidden" role="dialog" aria-labelledby={`modal-title-${id}`} aria-modal="true">
   <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out" data-modal-backdrop></div>
   <div class="modal-container fixed inset-0 flex items-center justify-center px-4 py-6 pointer-events-none">
     <div 
@@ -39,6 +39,7 @@ const {
           type="button" 
           class="absolute top-4 right-4 text-black dark:text-white hover:text-orange dark:hover:text-orange transition-colors z-10" 
           data-close-modal
+          aria-label="Close modal"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -75,7 +76,7 @@ const {
             </div>
             
             <div class="lg:w-1/2">
-              <h2 class="text-2xl md:text-3xl font-bold text-orange mb-4">{title}</h2>
+              <h2 id={`modal-title-${id}`} class="text-2xl md:text-3xl font-bold text-orange mb-4">{title}</h2>
               
               {date && (
                 <div class="inline-block bg-orange text-white text-xs px-2 py-1 rounded mb-4">
@@ -85,6 +86,11 @@ const {
               
               <div class="text-black dark:text-white prose dark:prose-invert mb-6">
                 <p>{description}</p>
+              </div>
+
+              <div class="mb-6">
+                <h4 class="text-sm font-medium mb-2 text-black dark:text-white"></h4>
+                <Tags tags={tags} />
               </div>
               
               <div class="flex justify-between items-center mt-8">
@@ -117,8 +123,8 @@ const {
 
 <script>
   function setupModals() {
-    // Find all modal triggers
-    document.querySelectorAll('[data-modal-trigger]').forEach((trigger: Element) => {
+    // Trouver tous les triggers de modal
+    document.querySelectorAll('[data-modal-target]').forEach((trigger) => {
       trigger.addEventListener('click', (e) => {
         e.preventDefault();
         const modalId = trigger.getAttribute('data-modal-target');
@@ -126,7 +132,7 @@ const {
           const modal = document.getElementById(modalId);
           if (modal) {
             openModal(modal);
-            // Update URL with hash
+            // Mettre à jour l'URL avec le hash
             const projectId = modalId.replace('modal-', '');
             history.pushState(null, '', `#${projectId}`);
           }
@@ -134,22 +140,22 @@ const {
       });
     });
 
-    // Setup close buttons
-    document.querySelectorAll('[data-close-modal]').forEach((closeBtn: Element) => {
+    // Configurer les boutons de fermeture
+    document.querySelectorAll('[data-close-modal]').forEach((closeBtn) => {
       closeBtn.addEventListener('click', () => {
-        const modal = closeBtn.closest('.fixed');
+        const modal = closeBtn.closest('[role="dialog"]');
         if (modal) {
           closeModal(modal);
-          // Remove hash from URL
+          // Supprimer le hash de l'URL
           history.pushState(null, '', window.location.pathname);
         }
       });
     });
 
-    // Close modal when clicking outside
-    document.querySelectorAll('[data-modal-backdrop]').forEach((backdrop: Element) => {
+    // Fermer la modal en cliquant à l'extérieur
+    document.querySelectorAll('[data-modal-backdrop]').forEach((backdrop) => {
       backdrop.addEventListener('click', () => {
-        const modal = backdrop.closest('.fixed');
+        const modal = backdrop.closest('[role="dialog"]');
         if (modal) {
           closeModal(modal);
           history.pushState(null, '', window.location.pathname);
@@ -157,11 +163,11 @@ const {
       });
     });
 
-    // Check for hash in URL on load
+    // Vérifier le hash dans l'URL au chargement
     function checkHash() {
       const hash = window.location.hash;
       if (hash) {
-        const projectId = hash.substring(1); // Remove # character
+        const projectId = hash.substring(1); // Supprimer le caractère #
         const modal = document.getElementById(`modal-${projectId}`);
         if (modal) {
           openModal(modal);
@@ -169,12 +175,12 @@ const {
       }
     }
     
-    // Function to open modal with animation
-    function openModal(modal: HTMLElement) {
-      // Show the modal container
+    // Fonction pour ouvrir la modal avec animation
+    function openModal(modal) {
+      // Afficher le conteneur de la modal
       modal.classList.remove('hidden');
       
-      // Get position of the clicked card if available
+      // Obtenir la position de la carte cliquée si disponible
       let startY = window.innerHeight / 2;
       const triggerId = modal.id.replace('modal-', '');
       const triggerEl = document.querySelector(`[data-project-id="${triggerId}"]`);
@@ -184,17 +190,15 @@ const {
         startY = rect.top + (rect.height / 2);
       }
       
-      // Set initial position based on card location
+      // Définir la position initiale basée sur l'emplacement de la carte
       const modalContent = modal.querySelector('.modal-content');
       if (modalContent) {
-        // Utiliser une assertion de type pour résoudre l'erreur style
-        (modalContent as HTMLElement).style.transformOrigin = `center ${startY}px`;
+        modalContent.style.transformOrigin = `center ${startY}px`;
         
-        // Force a reflow to ensure the initial state is applied
-        // Utiliser une assertion de type pour résoudre l'erreur offsetWidth
-        void (modalContent as HTMLElement).offsetWidth;
+        // Forcer un reflow pour s'assurer que l'état initial est appliqué
+        void modalContent.offsetWidth;
         
-        // Apply animation
+        // Appliquer l'animation
         requestAnimationFrame(() => {
           modalContent.classList.remove('translate-y-8', 'opacity-0');
           modalContent.classList.add('translate-y-0', 'opacity-100');
@@ -202,31 +206,31 @@ const {
       }
     }
     
-    // Function to close modal with animation
-    function closeModal(modal: Element) {
+    // Fonction pour fermer la modal avec animation
+    function closeModal(modal) {
       const modalContent = modal.querySelector('.modal-content');
       if (modalContent) {
         modalContent.classList.remove('translate-y-0', 'opacity-100');
         modalContent.classList.add('translate-y-8', 'opacity-0');
         
-        // Wait for animation to complete before hiding
+        // Attendre que l'animation se termine avant de cacher
         setTimeout(() => {
           modal.classList.add('hidden');
         }, 300);
       }
     }
     
-    // Check hash on load
+    // Vérifier le hash au chargement
     checkHash();
     
-    // Listen for hash changes
+    // Écouter les changements de hash
     window.addEventListener('hashchange', checkHash);
   }
 
-  // Initialize on DOMContentLoaded
+  // Initialiser au DOMContentLoaded
   document.addEventListener('DOMContentLoaded', setupModals);
 
-  // Initialize immediately if DOM is already loaded
+  // Initialiser immédiatement si le DOM est déjà chargé
   if (document.readyState === 'interactive' || document.readyState === 'complete') {
     setupModals();
   }

@@ -1,16 +1,17 @@
 ---
 export interface Props {
 	tags?: string[];
+	isHomepage?: boolean;
 }
 
-const { tags } = Astro.props;
+const { tags, isHomepage = false } = Astro.props;
 ---
 
 {
 	tags && (
-		<div class="mt-2 flex w-2/3 flex-row flex-wrap justify-between">
+		<div class={`mt-2 flex w-2/3 flex-row flex-wrap justify-between ${isHomepage ? 'pointer-events-none' : ''}`}>
 			{tags.map((tag) => (
-				<span class="inline-block rounded py-2 text-xs text-black lg:py-1">#{tag}</span>
+				<span class={`inline-block rounded py-2 text-xs text-black ${!isHomepage ? 'dark:text-white' : ''} lg:py-1`}>#{tag}</span>
 			))}
 		</div>
 	)

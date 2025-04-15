@@ -16,7 +16,7 @@ export interface Props {
 const { id, title, description, image, imageAlt = 'Project image', tags, date, hasVideo = false } = Astro.props;
 ---
 
-<div class="project-card group" data-project-id={id}>
+<div class="project-card group cursor-pointer" data-project-id={id}>
   <div class="flex flex-col md:flex-row bg-white dark:bg-darkBg rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 ease-in-out">
     <div class="md:w-1/3 bg-gray-100 dark:bg-gray-800 relative">
       <Image 
@@ -53,18 +53,14 @@ const { id, title, description, image, imageAlt = 'Project image', tags, date, h
         <Tags tags={tags} />
       </div>
       
-      {/* Bouton flèche qui ouvre la modal (remplace les deux boutons précédents) */}
-      <button
-        class="absolute bottom-5 right-5 bg-black dark:bg-white text-white dark:text-black p-2 rounded-full hover:bg-orange dark:hover:bg-orange dark:hover:text-white transition-colors"
-        data-modal-trigger
+      {/* Bouton pour ouvrir la modal - utilisation d'un attribut plus standard et sans aria-hidden */}
+      <button 
+        type="button"
+        class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer" 
+        aria-label={`Open details for ${title}`}
         data-modal-target={`modal-${id}`}
-        aria-label="View project details"
-        title="View project details"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-        </svg>
-      </button>
+        data-modal-project-id={id}
+      ></button>
     </div>
   </div>
 </div>
