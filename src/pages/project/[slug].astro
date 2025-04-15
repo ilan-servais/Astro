@@ -1,0 +1,250 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Tags from '@components/ui/Tags.astro';
+import Button from '@components/ui/Button.astro';
+import CodeBlock from '@components/ui/CodeBlock.astro';
+
+// Import project images based on slug
+import project1Image from '@assets/images/project-1.svg';
+import project2Image from '@assets/images/project-2.svg';
+import project3Image from '@assets/images/project-3.svg';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project }
+  }));
+}
+
+// Ajout de l'assertion de type sur Astro.props
+const { project } = Astro.props as { project: { slug: string, data: any } };
+
+// Helper function to get the appropriate image
+function getProjectImage(slug: string) {
+  if (slug === 'project-1') return project1Image;
+  if (slug === 'project-2') return project2Image;
+  if (slug === 'project-3') return project3Image;
+  return project1Image; // Default fallback
+}
+
+// Utilisation d'une interface pour typer les détails du projet
+interface ProjectDetails {
+  fullDescription: string;
+  codeSnippet: string;
+  videoUrl: string;
+  hasVideo?: boolean;
+}
+
+// Placeholder content for more detailed project info - suppression des imagePaths
+const projectDetails: Record<string, ProjectDetails> = {
+  'project-1': {
+    fullDescription: `Collaborative project carried out in 5 groups, with each team developing specific functionalities (user management, educational content, internal communication, etc.).
+
+This platform provides a comprehensive solution for schools and training centers to manage their courses, students, and administrative tasks. Features include:
+
+- User roles and permissions (admin, teacher, student)  
+- Course management and content delivery
+- Interactive assignments and grading
+- Internal messaging and notification system
+- Progress tracking and reporting dashboard
+- Calendar integration and scheduling
+
+The frontend was built with React for a modern, responsive user interface, while Symfony powers the backend API for robust data management and security.`,
+    codeSnippet: `// Example code for project 1
+import React, { useState, useEffect } from 'react';
+
+const UserList = () => {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      const response = await fetch('/api/users');
+      const data = await response.json();
+      setUsers(data);
+    }
+    fetchUsers();
+  }, []);
+
+  return (
+    <div>
+      <h2>User Management</h2>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>{user.name} - {user.role}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default UserList;
+`,
+    videoUrl: "",
+    hasVideo: true
+  },
+  'project-2': {
+    fullDescription: `Dynamic and responsive ReactJs game featuring smooth card animations, adjustable difficulty, and persistent score saving via localStorage.
+
+This memory game features Rick & Morty characters and includes:
+
+- Multiple difficulty levels changing the number of cards
+- Score tracking and personal best records
+- Smooth flip animations using CSS transitions
+- Responsive design for all device sizes
+- Sound effects and visual feedback
+- localStorage implementation for saving game progress
+
+The game demonstrates effective use of React hooks (useState, useEffect), custom animations, and state management in a fun interactive application.`,
+    codeSnippet: `// Example React component for memory game
+function Card({ card, handleChoice, flipped, disabled }) {
+  const handleClick = () => {
+    if (!disabled) {
+      handleChoice(card);
+    }
+  };
+
+  return (
+    <div className="card">
+      <div className={flipped ? "flipped" : ""}>
+        <img className="front" src={card.src} alt="card front" />
+        <img 
+          className="back" 
+          src="/img/cover.jpg" 
+          onClick={handleClick} 
+          alt="card back" 
+        />
+      </div>
+    </div>
+  );
+}`,
+    videoUrl: "",
+    hasVideo: true
+  },
+  'project-3': {
+    fullDescription: `Personalized library that lets you discover and save movies and TV shows using a public API.
+
+This application integrates with The Movie Database (TMDb) API to provide:
+
+- Search functionality for movies and TV shows
+- Detailed information pages with cast, reviews, and related content
+- User accounts with personalized watchlists and favorites
+- Filtering options by genre, year, rating, etc.
+- Responsive design with a mobile-first approach
+- Recent releases and trending content sections
+
+Built entirely with vanilla JavaScript, HTML5 and CSS3, this project demonstrates effective API integration, user authentication, and dynamic content rendering without relying on frameworks.`,
+    codeSnippet: `// Example JavaScript fetch for movie API
+async function fetchMovies(query) {
+  const API_KEY = 'your_api_key_here';
+  const url = \`https://api.themoviedb.org/3/search/movie?api_key=\${API_KEY}&query=\${query}\`;
+  
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    console.error('Error fetching movies:', error);
+    return [];
+  }
+}`,
+    videoUrl: "",
+    hasVideo: true
+  }
+};
+
+const details = projectDetails[project.slug] || {
+  fullDescription: project.data.description,
+  codeSnippet: "",
+  videoUrl: "",
+  hasVideo: true
+};
+const projectImage = getProjectImage(project.slug);
+const hasProjectVideo = ['project-1', 'project-2', 'project-3'].includes(project.slug);
+---
+
+<Layout title={`${project.data.title} | Ilan Servais Projects`}>
+  <main class="mx-auto max-w-4xl px-4 py-12">
+    <div class="bg-white dark:bg-darkBg rounded-xl overflow-hidden shadow-xl">
+      <div class="relative">
+        <div class="h-64 md:h-80 overflow-hidden">
+          <Image 
+            src={projectImage} 
+            alt={project.data.img_alt || project.data.title} 
+            width={1200}
+            height={600}
+            class="w-full h-full object-cover"
+          />
+        </div>
+        
+        {project.data.date && (
+          <div class="absolute top-4 right-4 bg-orange text-white font-bold px-3 py-1 rounded-full">
+            {project.data.date}
+          </div>
+        )}
+      </div>
+      
+      <div class="p-6 md:p-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-orange mb-4">{project.data.title}</h1>
+        
+        <div class="flex flex-wrap gap-2 mb-6">
+          <Tags tags={project.data.tags} />
+        </div>
+        
+        <div class="prose dark:prose-invert max-w-none mb-8">
+          <p class="text-black dark:text-white text-lg" style="white-space: pre-line;">
+            {details.fullDescription || project.data.description}
+          </p>
+          
+          <!-- Vidéo du projet - section agrandie avec plus d'espace autour -->
+          <div class="my-12">
+            <h2 class="text-xl font-bold text-orange mb-4">Project Demo</h2>
+            <div class="aspect-video rounded-lg overflow-hidden shadow-xl">
+              <video 
+                controls
+                class="w-full h-full"
+                poster={`/images/videos/${project.slug}-poster.png`}
+              >
+                <source src={`/images/videos/${project.slug}.mp4`} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+          
+          <!-- Section code example - gardée uniquement sur la page détaillée -->
+          {details.codeSnippet && (
+            <div class="my-12">
+              <h2 class="text-xl font-bold text-orange mb-4">Code Example</h2>
+              <CodeBlock 
+                code={details.codeSnippet} 
+                maxHeight="500px"
+              />
+            </div>
+          )}
+        </div>
+        
+        <div class="flex flex-wrap gap-4 mt-12">
+          <a href={project.data.link} target="_blank" rel="noopener noreferrer">
+            <Button size="lg">
+              Visit Live Project
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </Button>
+          </a>
+          
+          <a href="/projects" class="inline-flex">
+            <Button size="lg" style="primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Projects Archive
+            </Button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

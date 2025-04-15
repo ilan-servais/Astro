@@ -27,19 +27,17 @@ const typedProjects = projects as unknown as Project[];
 ---
 
 <section data-testid="projects" id="projects" class="mb-10 flex flex-col items-center justify-center md:mb-0 md:h-screen">
-    <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Projects</h2>
+    <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Top Projects</h2>
     <span class="mb-10 h-1 w-10 bg-orange"></span>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
         {typedProjects.map((project) => (
             <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white">
                 <a 
-                    href={project.data.link} 
-                    target="_blank" 
-                    rel="noopener" 
-                    aria-label="lien vers le projet"
+                    href={`/project/${project.slug}`} 
+                    aria-label={`View details of ${project.data.title}`}
                     class="block h-full flex flex-col"
                 >
-                    <div class="relative">
+                    <div class="relative overflow-hidden">
                         {project.data.image ? (
                             project.slug === 'project-1' ? (
                                 <Image 
@@ -47,7 +45,7 @@ const typedProjects = projects as unknown as Project[];
                                     alt={project.data.img_alt || 'Image du projet'} 
                                     width={400}
                                     height={400}
-                                    class="w-full object-cover"
+                                    class={`w-full object-cover transition-opacity duration-300 ${hasProjectVideo(project.slug) ? 'group-hover:opacity-0' : ''}`}
                                 />
                             ) : project.slug === 'project-2' ? (
                                 <Image 
@@ -55,7 +53,7 @@ const typedProjects = projects as unknown as Project[];
                                     alt={project.data.img_alt || 'Image du projet'} 
                                     width={400}
                                     height={400}
-                                    class="w-full h-auto object-cover"
+                                    class={`w-full h-auto object-cover transition-opacity duration-300 ${hasProjectVideo(project.slug) ? 'group-hover:opacity-0' : ''}`}
                                 />
                             ) : project.slug === 'project-3' ? (
                                 <Image 
@@ -63,12 +61,12 @@ const typedProjects = projects as unknown as Project[];
                                     alt={project.data.img_alt || 'Image du projet'} 
                                     width={400}
                                     height={400}
-                                    class="w-full h-auto object-cover"
+                                    class={`w-full h-auto object-cover transition-opacity duration-300 ${hasProjectVideo(project.slug) ? 'group-hover:opacity-0' : ''}`}
                                 />
                             ) : (
                                 <img 
-                                    src={project.data.image} 
-                                    alt={project.data.img_alt || 'Image du projet'} 
+                                    src={(project.data.image as any).toString()} 
+                                    alt={(project.data.img_alt as string || 'Image du projet')} 
                                     class="w-full h-auto object-cover"
                                 />
                             )
@@ -80,10 +78,34 @@ const typedProjects = projects as unknown as Project[];
                             />
                         )}
                         
+                        {/* Vidéo qui apparaît au survol */}
+                        {hasProjectVideo(project.slug) && (
+                            <video 
+                                class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                poster={`/images/videos/${project.slug}-poster.png`}
+                                muted
+                                loop
+                                preload="metadata"
+                                playsinline
+                            >
+                                <source src={`/images/videos/${project.slug}.mp4`} type="video/mp4" />
+                            </video>
+                        )}
+                        
                         {/* Badge avec la date du projet */}
                         {project.data.date && (
-                            <div class="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded">
+                            <div class="absolute top-2 right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded z-10">
                                 {project.data.date}
+                            </div>
+                        )}
+                        
+                        {/* Badge indiquant la présence d'une vidéo */}
+                        {hasProjectVideo(project.slug) && (
+                            <div class="absolute bottom-2 right-2 bg-orange text-white text-xs font-bold px-2 py-1 rounded-full z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                             </div>
                         )}
                     </div>
@@ -91,7 +113,7 @@ const typedProjects = projects as unknown as Project[];
                         <h3 class="text-xl text-orange lg:text-2xl">{project.data.title}</h3>
                         <p class="text-s text-black mt-2">{project.data.description}</p>
                         <div class="mt-4">
-                            <Tags tags={project.data.tags} />
+                          <Tags tags={project.data.tags} isHomepage={true} />
                         </div>
                     </div>
                 </a>
@@ -100,13 +122,11 @@ const typedProjects = projects as unknown as Project[];
     </div>
     
     <a
-        href="https://github.com/ilan-servais"
-        target="_blank"
-        rel="noopener"
+        href="/projects"
         class="flex flex-row text-black hover:text-orange dark:text-white dark:hover:text-orange mt-8"
-        aria-label="link to repository"
+        aria-label="Browse all projects"
     >
-        View full projects archive
+        View all projects
         <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -123,29 +143,32 @@ const typedProjects = projects as unknown as Project[];
     </a>
 </section>
 
-<style>
-    /* Alignement du contenu vers le bas */
-    .rounded-xl a {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    /* Expansion pour pousser le contenu vers le bas */
-    .flex-grow {
-        flex-grow: 1;
-    }
-    
-    /* Positionnement du contenu textuel vers le bas */
-    .justify-end {
-        justify-content: flex-end;
-    }
-    
-    /* Espacement entre les éléments */
-    .mt-2 {
-        margin-top: 0.5rem;
-    }
-    
-    .mt-4 {
-        margin-top: 1rem;
-    }
-</style>
+<script>
+    // Script pour démarrer automatiquement les vidéos au survol
+    document.addEventListener('DOMContentLoaded', function() {
+        const projectCards = document.querySelectorAll('.group');
+        
+        projectCards.forEach(card => {
+            const video = card.querySelector('video');
+            if (video) {
+                card.addEventListener('mouseenter', () => {
+                    video.play();
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+                
+                // Pour les appareils tactiles
+                card.addEventListener('touchstart', () => {
+                    if (video.paused) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,192 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import HorizontalProjectCard from '@components/HorizontalProjectCard.astro';
+import ProjectModal from '@components/ui/ProjectModal.astro';
+import BackToTop from '@components/ui/BackToTop.astro';
+
+// Import project images based on slug
+import project1Image from '@assets/images/project-1.svg';
+import project2Image from '@assets/images/project-2.svg';
+import project3Image from '@assets/images/project-3.svg';
+
+// Get all projects
+const projects = await getCollection('projects', ({ data }) => !data.inProgress);
+
+// Helper function to get the appropriate image
+function getProjectImage(slug) {
+  if (slug === 'project-1') return project1Image;
+  if (slug === 'project-2') return project2Image;
+  if (slug === 'project-3') return project3Image;
+  return project1Image; // Default fallback
+}
+
+// Interface simplifiée pour typer les détails du projet (sans code)
+interface ProjectDetail {
+  videoUrl: string;
+  hasVideo?: boolean;
+}
+
+// Placeholder content for more detailed project info - suppression du codeSnippet
+const projectDetails: Record<string, ProjectDetail> = {
+  'project-1': {
+    videoUrl: "",
+    hasVideo: true
+  },
+  'project-2': {
+    videoUrl: "",
+    hasVideo: true
+  },
+  'project-3': {
+    videoUrl: "",
+    hasVideo: true
+  }
+};
+---
+
+<Layout title="Projects | Ilan Servais">
+  <main class="mx-auto max-w-4xl px-4">
+    <div class="text-center py-8">
+      <h1 class="font-monospace text-3xl text-orange mb-6">All Projects</h1>
+      <p class="text-black dark:text-white max-w-2xl mx-auto mb-10">
+        From React applications to full-stack solutions.
+        Click on any project to view more details.
+      </p>
+    </div>
+
+    <div class="space-y-6 pb-20">
+      {projects.map((project) => {
+        const projectImage = getProjectImage(project.slug);
+        const projectDetail = projectDetails[project.slug] || {
+          videoUrl: "",
+          hasVideo: true
+        };
+        
+        return (
+          <div>
+            <HorizontalProjectCard
+              id={project.slug}
+              title={project.data.title}
+              description={project.data.description}
+              image={projectImage}
+              imageAlt={project.data.img_alt || `Image for ${project.data.title}`}
+              tags={project.data.tags}
+              date={project.data.date}
+              hasVideo={true}
+            />
+            
+            <ProjectModal
+              id={project.slug}
+              title={project.data.title}
+              description={project.data.description}
+              image={projectImage}
+              tags={project.data.tags}
+              link={project.data.link}
+              date={project.data.date}
+              videoUrl={projectDetail.videoUrl || undefined}
+              hasVideo={true}
+            />
+          </div>
+        );
+      })}
+    </div>
+    
+    <div class="fixed bottom-5 right-5 z-40">
+      <BackToTop />
+    </div>
+  </main>
+</Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialiser l'ouverture des modals
+    document.querySelectorAll('[data-modal-target]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation(); // Arrêter la propagation pour éviter les déclenchements multiples
+        
+        const modalId = button.getAttribute('data-modal-target');
+        if (modalId) {
+          const modal = document.getElementById(modalId);
+          if (modal) {
+            // Ouvrir la modal directement
+            modal.classList.remove('hidden');
+            
+            // Animer le contenu de la modal
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+              setTimeout(() => {
+                modalContent.classList.remove('translate-y-8', 'opacity-0');
+                modalContent.classList.add('translate-y-0', 'opacity-100');
+              }, 10);
+            }
+            
+            // Mettre à jour l'URL
+            const projectId = button.getAttribute('data-modal-project-id');
+            if (projectId) {
+              history.pushState(null, '', `#${projectId}`);
+            }
+          }
+        }
+      });
+    });
+    
+    // Gestion de fermeture des modals
+    document.querySelectorAll('[data-close-modal]').forEach((closeButton) => {
+      closeButton.addEventListener('click', () => {
+        const modal = closeButton.closest('[role="dialog"]');
+        if (modal) {
+          // Animation de fermeture
+          const modalContent = modal.querySelector('.modal-content');
+          if (modalContent) {
+            modalContent.classList.remove('translate-y-0', 'opacity-100');
+            modalContent.classList.add('translate-y-8', 'opacity-0');
+            
+            // Cacher après l'animation
+            setTimeout(() => {
+              modal.classList.add('hidden');
+            }, 300);
+          }
+          
+          // Réinitialiser l'URL
+          history.pushState(null, '', window.location.pathname);
+        }
+      });
+    });
+    
+    // Fermeture en cliquant sur l'arrière-plan
+    document.querySelectorAll('[data-modal-backdrop]').forEach((backdrop) => {
+      backdrop.addEventListener('click', () => {
+        const modal = backdrop.closest('[role="dialog"]');
+        if (modal) {
+          // Trouver et simuler un clic sur le bouton de fermeture
+          const closeButton = modal.querySelector('[data-close-modal]');
+          if (closeButton && closeButton instanceof HTMLElement) {
+            closeButton.click();
+          } else {
+            // Fallback si le bouton n'est pas disponible
+            modal.classList.add('hidden');
+            history.pushState(null, '', window.location.pathname);
+          }
+        }
+      });
+    });
+    
+    // Vérification du hash initial
+    const hash = window.location.hash;
+    if (hash) {
+      const projectId = hash.substring(1);
+      const modalId = `modal-${projectId}`;
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('hidden');
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+          setTimeout(() => {
+            modalContent.classList.remove('translate-y-8', 'opacity-0');
+            modalContent.classList.add('translate-y-0', 'opacity-100');
+          }, 10);
+        }
+      }
+    }
+  });
+</script>

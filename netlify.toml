@@ -42,6 +42,18 @@
   to = "/career/index.html"
   status = 200
 
+# Redirection pour les projets
+[[redirects]]
+  from = "/projects"
+  to = "/projects/index.html"
+  status = 200
+
+# Redirection pour les pages de détail de projet
+[[redirects]]
+  from = "/project/*"
+  to = "/project/index.html"
+  status = 200
+
 # Redirection par défaut pour une Single Page Application
 [[redirects]]
   from = "/*"

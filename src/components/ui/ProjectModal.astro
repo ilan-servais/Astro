@@ -1,0 +1,237 @@
+---
+import { Image } from 'astro:assets';
+import Tags from '@components/ui/Tags.astro';
+import Button from '@components/ui/Button.astro';
+
+export interface Props {
+  id: string;
+  title: string;
+  description: string;
+  image: any;
+  tags: string[];
+  link: string;
+  date?: string;
+  hasVideo?: boolean;
+  videoUrl?: string;
+}
+
+const { 
+  id, 
+  title, 
+  description, 
+  image, 
+  tags, 
+  link, 
+  date,
+  hasVideo = false,
+  videoUrl
+} = Astro.props;
+---
+
+<div id={`modal-${id}`} class="fixed inset-0 z-50 hidden" role="dialog" aria-labelledby={`modal-title-${id}`} aria-modal="true">
+  <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out" data-modal-backdrop></div>
+  <div class="modal-container fixed inset-0 flex items-center justify-center px-4 py-6 pointer-events-none">
+    <div 
+      class="modal-content bg-white dark:bg-darkBg rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto pointer-events-auto transform transition-all duration-300 ease-out translate-y-8 opacity-0"
+    >
+      <div class="relative">
+        <button 
+          type="button" 
+          class="absolute top-4 right-4 text-black dark:text-white hover:text-orange dark:hover:text-orange transition-colors z-10" 
+          data-close-modal
+          aria-label="Close modal"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <div class="p-6 md:p-8">
+          <div class="flex flex-col lg:flex-row gap-6">
+            <div class="lg:w-1/2">
+              {/* Affichage uniquement de la vidéo, sans galerie d'images */}
+              {hasVideo || ['project-1', 'project-2', 'project-3'].includes(id) ? (
+                <div class="rounded-lg overflow-hidden">
+                  <video 
+                    controls
+                    preload="metadata"
+                    class="w-full aspect-video"
+                    poster={`/images/videos/${id}-poster.png`}
+                  >
+                    <source src={`/images/videos/${id}.mp4`} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ) : image && (
+                <div class="rounded-lg overflow-hidden mb-4">
+                  <Image 
+                    src={image} 
+                    alt={title} 
+                    width={600} 
+                    height={400} 
+                    class="w-full h-auto object-cover"
+                  />
+                </div>
+              )}
+            </div>
+            
+            <div class="lg:w-1/2">
+              <h2 id={`modal-title-${id}`} class="text-2xl md:text-3xl font-bold text-orange mb-4">{title}</h2>
+              
+              {date && (
+                <div class="inline-block bg-orange text-white text-xs px-2 py-1 rounded mb-4">
+                  {date}
+                </div>
+              )}
+              
+              <div class="text-black dark:text-white prose dark:prose-invert mb-6">
+                <p>{description}</p>
+              </div>
+
+              <div class="mb-6">
+                <h4 class="text-sm font-medium mb-2 text-black dark:text-white"></h4>
+                <Tags tags={tags} />
+              </div>
+              
+              <div class="flex justify-between items-center mt-8">
+                <a href={link} target="_blank" rel="noopener noreferrer">
+                  <Button>
+                    View Project
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Button>
+                </a>
+                
+                <a href={`/project/${id}`} aria-label={`View ${title} details`} class="ml-auto">
+                  <Button style="primary">
+                    View Full Details
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setupModals() {
+    // Trouver tous les triggers de modal
+    document.querySelectorAll('[data-modal-target]').forEach((trigger) => {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const modalId = trigger.getAttribute('data-modal-target');
+        if (modalId) {
+          const modal = document.getElementById(modalId);
+          if (modal) {
+            openModal(modal);
+            // Mettre à jour l'URL avec le hash
+            const projectId = modalId.replace('modal-', '');
+            history.pushState(null, '', `#${projectId}`);
+          }
+        }
+      });
+    });
+
+    // Configurer les boutons de fermeture
+    document.querySelectorAll('[data-close-modal]').forEach((closeBtn) => {
+      closeBtn.addEventListener('click', () => {
+        const modal = closeBtn.closest('[role="dialog"]');
+        if (modal) {
+          closeModal(modal);
+          // Supprimer le hash de l'URL
+          history.pushState(null, '', window.location.pathname);
+        }
+      });
+    });
+
+    // Fermer la modal en cliquant à l'extérieur
+    document.querySelectorAll('[data-modal-backdrop]').forEach((backdrop) => {
+      backdrop.addEventListener('click', () => {
+        const modal = backdrop.closest('[role="dialog"]');
+        if (modal) {
+          closeModal(modal);
+          history.pushState(null, '', window.location.pathname);
+        }
+      });
+    });
+
+    // Vérifier le hash dans l'URL au chargement
+    function checkHash() {
+      const hash = window.location.hash;
+      if (hash) {
+        const projectId = hash.substring(1); // Supprimer le caractère #
+        const modal = document.getElementById(`modal-${projectId}`);
+        if (modal) {
+          openModal(modal);
+        }
+      }
+    }
+    
+    // Fonction pour ouvrir la modal avec animation
+    function openModal(modal) {
+      // Afficher le conteneur de la modal
+      modal.classList.remove('hidden');
+      
+      // Obtenir la position de la carte cliquée si disponible
+      let startY = window.innerHeight / 2;
+      const triggerId = modal.id.replace('modal-', '');
+      const triggerEl = document.querySelector(`[data-project-id="${triggerId}"]`);
+      
+      if (triggerEl) {
+        const rect = triggerEl.getBoundingClientRect();
+        startY = rect.top + (rect.height / 2);
+      }
+      
+      // Définir la position initiale basée sur l'emplacement de la carte
+      const modalContent = modal.querySelector('.modal-content');
+      if (modalContent) {
+        modalContent.style.transformOrigin = `center ${startY}px`;
+        
+        // Forcer un reflow pour s'assurer que l'état initial est appliqué
+        void modalContent.offsetWidth;
+        
+        // Appliquer l'animation
+        requestAnimationFrame(() => {
+          modalContent.classList.remove('translate-y-8', 'opacity-0');
+          modalContent.classList.add('translate-y-0', 'opacity-100');
+        });
+      }
+    }
+    
+    // Fonction pour fermer la modal avec animation
+    function closeModal(modal) {
+      const modalContent = modal.querySelector('.modal-content');
+      if (modalContent) {
+        modalContent.classList.remove('translate-y-0', 'opacity-100');
+        modalContent.classList.add('translate-y-8', 'opacity-0');
+        
+        // Attendre que l'animation se termine avant de cacher
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 300);
+      }
+    }
+    
+    // Vérifier le hash au chargement
+    checkHash();
+    
+    // Écouter les changements de hash
+    window.addEventListener('hashchange', checkHash);
+  }
+
+  // Initialiser au DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', setupModals);
+
+  // Initialiser immédiatement si le DOM est déjà chargé
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    setupModals();
+  }
+</script>
