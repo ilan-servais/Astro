@@ -6,5 +6,5 @@ img_alt: project image alt text
 link: https://github.com/ilan-servais
 tags: ['Symfony', 'React', 'Tailwind']
 image: '@assets/images/project-1.svg'
-date: "04/04/2025"
+date: "April 2025"
 ---
