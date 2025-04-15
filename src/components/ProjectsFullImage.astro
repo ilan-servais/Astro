@@ -6,21 +6,32 @@ import project2Image from '@assets/images/project-2.svg';
 import project3Image from '@assets/images/project-3.svg';
 import Tags from '@components/ui/Tags.astro';
 
-// Utiliser un type plus spécifique pour éviter les erreurs "never"
-const projects = await getCollection('projects', ({ data }) => {
-    return !data.inProgress;
-});
+const projects = await getCollection('projects', ({ data }) => !data.inProgress);
 
-// Fonction pour déterminer si un projet a une vidéo associée
-const hasProjectVideo = (slug: string) => ['project-1', 'project-2', 'project-3'].includes(slug);
+// S'assurer que projects est bien typé pour éviter les erreurs
+type Project = {
+    slug: string;
+    data: {
+        title: string;
+        description: string;
+        img_alt?: string;
+        image?: string;
+        link: string;
+        date?: string;
+        tags: string[];
+    }
+};
+
+// On type la variable projects explicitement
+const typedProjects = projects as unknown as Project[];
 ---
 
 <section data-testid="projects" id="projects" class="mb-10 flex flex-col items-center justify-center md:mb-0 md:h-screen">
     <h2 class="font-monospace text-2xl text-orange lg:text-4xl">Top Projects</h2>
     <span class="mb-10 h-1 w-10 bg-orange"></span>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
-        {projects.map((project) => (
-            <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white group">
+        {typedProjects.map((project) => (
+            <div class="rounded-xl overflow-hidden shadow-lg hover:scale-105 transition bg-white">
                 <a 
                     href={`/project/${project.slug}`} 
                     aria-label={`View details of ${project.data.title}`}

@@ -1,0 +1,32 @@
+---
+import Layout from '@layouts/Layout.astro';
+// Changement du nom de l'import pour éviter le conflit de noms
+import MemoryGameComponent from '@components/MemoryGameComponent.astro';
+import BackToTop from '@components/ui/BackToTop.astro';
+---
+
+<Layout title="Memory Game | Ilan Servais">
+  <main class="mx-auto max-w-4xl px-4 py-12">
+    <div class="text-center py-8">
+      <h1 class="font-monospace text-3xl text-orange mb-4">Memory Game</h1>
+      <p class="text-black dark:text-white max-w-2xl mx-auto mb-10">
+        Test your memory with this simple yet challenging game. Match pairs of symbols to win!
+      </p>
+    </div>
+    
+    <MemoryGameComponent />
+    
+    <div class="mt-16 text-center">
+      <a href="/" class="flex flex-row justify-center text-black hover:text-orange dark:text-white dark:hover:text-orange">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to home
+      </a>
+    </div>
+    
+    <div class="fixed bottom-5 right-5 z-40">
+      <BackToTop />
+    </div>
+  </main>
+</Layout>
