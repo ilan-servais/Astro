@@ -136,7 +136,7 @@ import RobotControl from "./ui/RobotControl.astro";
       
       // Configuration de la scène
       scene = new THREE.Scene();
-      // Utiliser un fond transparent sans grille ni sol
+      // Utiliser un fond transparent mais garder le sol
       scene.background = null;
       scene.fog = null;
       
@@ -147,6 +147,11 @@ import RobotControl from "./ui/RobotControl.astro";
           scene.children.forEach(child => {
             if (child instanceof THREE.Light) {
               child.intensity = isDark ? 2 : 3;
+            }
+            // Ajuster la couleur du sol en fonction du mode
+            if (child instanceof THREE.Mesh && child.userData.isFloor) {
+              const material = child.material as THREE.MeshPhongMaterial;
+              material.color.set(isDark ? 0x1a1a1a : 0xcbcbcb);
             }
           });
         }
@@ -173,17 +178,40 @@ import RobotControl from "./ui/RobotControl.astro";
       dirLight.castShadow = true;
       scene.add(dirLight);
       
+      // Ajouter uniquement le sol
+      const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(20, 20),
+        new THREE.MeshPhongMaterial({ 
+          color: window.matchMedia('(prefers-color-scheme: dark)').matches ? 0x1a1a1a : 0xcbcbcb, 
+          depthWrite: false,
+          transparent: true,
+          opacity: 0.75
+        })
+      );
+      floor.rotation.x = -Math.PI / 2; // Horizontal
+      floor.position.y = -0.01; // Légèrement sous le robot pour éviter les z-fighting
+      floor.receiveShadow = true;
+      floor.userData.isFloor = true; // Marqueur pour l'identifier plus tard
+      scene.add(floor);
+      
       // Charge le modèle
       const loader = new GLTFLoader();
       loader.load('/models/gltf/RobotExpressive/RobotExpressive.glb', function(gltf) {
         model = gltf.scene;
+        // Activer les ombres pour le modèle
+        model.traverse((object) => {
+          if (object instanceof THREE.Mesh) {
+            object.castShadow = true;
+            object.receiveShadow = true;
+          }
+        });
         scene.add(model);
         setupAnimations(model, gltf.animations);
       }, undefined, function(e) {
         console.error(e);
       });
       
-      // Options du renderer pour la transparence
+      // Options du renderer pour la transparence avec ombres
       const rendererOptions = {
         canvas: document.createElement('canvas'),
         antialias: true,
@@ -197,11 +225,13 @@ import RobotControl from "./ui/RobotControl.astro";
         // Créer le renderer
         renderer = new THREE.WebGLRenderer(rendererOptions);
         
-        // Configuration pour la transparence
+        // Configuration pour la transparence et les ombres
         renderer.setClearColor(0x000000, 0); // Transparent
-        renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1); // Limiter pour les performances
+        renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
         
         // Utiliser une fonction animateLoop simple
