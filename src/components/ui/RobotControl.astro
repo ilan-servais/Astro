@@ -2,41 +2,84 @@
 // RobotControl.astro - Interface pour contrôler le robot 3D
 ---
 
-<div class="robot-control fixed top-20 right-4 z-40 w-64 rounded-xl bg-[#120D16] border border-[#E06330] shadow-lg p-4" x-data="{
-  activeTab: 'animations',
-  animationState: 'Walking',
-  animationMenuOpen: false,
-  expressions: {
-    Angry: 0,
-    Surprised: 0,
-    Sad: 0,
-    Happy: 0,
-    Relaxed: 0
-  },
-  toggleTab(tab) {
-    this.activeTab = tab;
-  },
-  toggleAnimationMenu() {
-    this.animationMenuOpen = !this.animationMenuOpen;
-  },
-  selectAnimation(animation) {
-    this.animationState = animation;
-    this.animationMenuOpen = false;
-    // La fonction fadeToAction sera appelée depuis le code three.js
-    if (window.fadeToAction) {
-      window.fadeToAction(animation, 0.5);
+<div 
+  class="robot-control fixed top-20 right-4 z-40 w-64 rounded-xl bg-[#120D16] border border-[#E06330] shadow-lg p-4" 
+  x-data="{
+    activeTab: 'animations',
+    animationState: 'Walking',
+    animationMenuOpen: false,
+    expressions: {
+      Angry: 0,
+      Surprised: 0,
+      Sad: 0,
+      Happy: 0,
+      Relaxed: 0
+    },
+    x: 0,
+    y: 0,
+    dragging: false,
+    startX: 0,
+    startY: 0,
+    toggleTab(tab) {
+      this.activeTab = tab;
+    },
+    toggleAnimationMenu() {
+      this.animationMenuOpen = !this.animationMenuOpen;
+    },
+    selectAnimation(animation) {
+      this.animationState = animation;
+      this.animationMenuOpen = false;
+      // La fonction fadeToAction sera appelée depuis le code three.js
+      if (window.fadeToAction) {
+        window.fadeToAction(animation, 0.5);
+      }
+    },
+    updateExpression(expression, value) {
+      this.expressions[expression] = value;
+      // Mise à jour des morph targets depuis le code three.js
+      if (window.updateMorphTarget) {
+        window.updateMorphTarget(expression, value);
+      }
+    },
+    start(event) {
+      this.dragging = true;
+      // coordonnées du pointeur au début
+      this.startX = (event.touches ? event.touches[0].clientX : event.clientX) - this.x;
+      this.startY = (event.touches ? event.touches[0].clientY : event.clientY) - this.y;
+    },
+    move(event) {
+      if (!this.dragging) return;
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+      this.x = clientX - this.startX;
+      this.y = clientY - this.startY;
+    },
+    end() {
+      this.dragging = false;
+    },
+    initDrag() {
+      document.addEventListener('mousemove', e => this.move(e));
+      document.addEventListener('mouseup', () => this.end());
+      document.addEventListener('touchmove', e => this.move(e), { passive: false });
+      document.addEventListener('touchend', () => this.end());
     }
-  },
-  updateExpression(expression, value) {
-    this.expressions[expression] = value;
-    // Mise à jour des morph targets depuis le code three.js
-    if (window.updateMorphTarget) {
-      window.updateMorphTarget(expression, value);
-    }
-  }
-}">
-  <div class="flex justify-between items-center mb-4">
+  }"
+  x-init="initDrag()"
+  :style="`transform: translate(${x}px, ${y}px);`"
+>
+  <!-- Handle de drag -->
+  <div 
+    class="cursor-move flex justify-between items-center mb-4 pb-2 border-b border-gray-700"
+    @mousedown.prevent="start($event)" 
+    @touchstart.prevent="start($event)"
+  >
     <h3 class="font-bold text-white">Robot Control</h3>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E06330]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+    </svg>
+  </div>
+
+  <div class="flex justify-center mb-4">
     <div class="flex space-x-1">
       <button 
         @click="toggleTab('animations')" 
