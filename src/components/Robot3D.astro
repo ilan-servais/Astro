@@ -2,7 +2,7 @@
 import RobotControl from "./ui/RobotControl.astro";
 ---
 
-<div class="robot-container relative w-full h-screen">
+<div class="robot-container relative w-full h-screen overflow-hidden">
   <RobotControl />
   
   <div id="robot-scene" class="w-full h-full">
@@ -196,6 +196,14 @@ import RobotControl from "./ui/RobotControl.astro";
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      
+      // Adapter la position de la caméra sur mobile
+      if (window.innerWidth < 640) {
+        camera.position.set(-4, 4, 12); // Position plus éloignée sur mobile
+      } else {
+        camera.position.set(-5, 3, 10); // Position standard sur desktop
+      }
+      camera.lookAt(0, 2, 0);
     }
     
     function animate() {

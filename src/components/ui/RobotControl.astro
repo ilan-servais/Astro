@@ -46,9 +46,20 @@
       // coordonnées du pointeur au début
       this.startX = (event.touches ? event.touches[0].clientX : event.clientX) - this.x;
       this.startY = (event.touches ? event.touches[0].clientY : event.clientY) - this.y;
+      
+      // Empêcher le scroll sur mobile pendant le drag
+      if (event.touches) {
+        event.preventDefault();
+      }
     },
     move(event) {
       if (!this.dragging) return;
+      
+      // Empêcher le scroll sur mobile pendant le drag
+      if (event.touches) {
+        event.preventDefault();
+      }
+      
       const clientX = event.touches ? event.touches[0].clientX : event.clientX;
       const clientY = event.touches ? event.touches[0].clientY : event.clientY;
       this.x = clientX - this.startX;
@@ -67,9 +78,9 @@
   x-init="initDrag()"
   :style="`transform: translate(${x}px, ${y}px);`"
 >
-  <!-- Handle de drag -->
+  <!-- Handle de drag avec curseur approprié -->
   <div 
-    class="cursor-move flex justify-between items-center mb-4 pb-2 border-b border-gray-700"
+    class="cursor-grab active:cursor-grabbing flex justify-between items-center mb-4 pb-2 border-b border-gray-700 touch-none"
     @mousedown.prevent="start($event)" 
     @touchstart.prevent="start($event)"
   >
