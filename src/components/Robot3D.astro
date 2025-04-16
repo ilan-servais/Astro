@@ -6,11 +6,11 @@ import RobotControl from "./ui/RobotControl.astro";
   <!-- Section d'introduction -->
   <div class="max-w-4xl mx-auto mb-10 text-center">
     <h1 class="text-4xl font-bold mb-4 text-[#E06330]">Astro Robot</h1>
-    <p class="text-xl mb-6">
+    <p class="text-xl mb-6 text-black dark:text-white">
       Hi, my name is Astro! I'm an interactive 3D robot that you can control.
       Try changing my animations and facial expressions with the control panel.
     </p>
-    <p class="text-lg mb-6">
+    <p class="text-lg mb-6 text-black dark:text-white">
       You can drag the control panel anywhere on the screen, select different animations, 
       or adjust my facial expressions to make me happy, sad, angry, surprised, or relaxed!
     </p>
@@ -148,11 +148,8 @@ import RobotControl from "./ui/RobotControl.astro";
             if (child instanceof THREE.Light) {
               child.intensity = isDark ? 2 : 3;
             }
-            // Ajuster la couleur du sol en fonction du mode
-            if (child instanceof THREE.Mesh && child.userData.isFloor) {
-              const material = child.material as THREE.MeshPhongMaterial;
-              material.color.set(isDark ? 0x1a1a1a : 0xcbcbcb);
-            }
+            // Ne plus ajuster la couleur du sol en fonction du mode
+            // car nous utilisons maintenant une couleur orange fixe
           });
         }
       };
@@ -182,10 +179,10 @@ import RobotControl from "./ui/RobotControl.astro";
       const floor = new THREE.Mesh(
         new THREE.PlaneGeometry(20, 20),
         new THREE.MeshPhongMaterial({ 
-          color: window.matchMedia('(prefers-color-scheme: dark)').matches ? 0x1a1a1a : 0xcbcbcb, 
+          color: 0xDD612F, // Couleur orange #DD612F
           depthWrite: false,
           transparent: true,
-          opacity: 0.75
+          opacity: 0.67 // 67% d'opacité
         })
       );
       floor.rotation.x = -Math.PI / 2; // Horizontal
