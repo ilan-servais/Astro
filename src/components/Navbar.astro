@@ -22,6 +22,8 @@ const menuitems = [
 	{
 		title: 'About',
 		path: isHomePage ? '#about' : '/#about',
+		showOnlyOnHome: true,
+		hideOnNonHome: true
 	},
 	{
 		title: 'Projects',
@@ -49,6 +51,8 @@ const menuitems = [
 const filteredItems = menuitems.filter(item => {
 	if (!isHomePage && item.hideOnHome) return true;
 	if (isHomePage && item.showOnlyOnNonHome) return false;
+	if (!isHomePage && item.hideOnNonHome) return false; // Nouvelle condition pour masquer sur les pages autres que Home
+	if (isHomePage && item.showOnlyOnHome) return true;  // Explicite mais non nécessaire
 	return true;
 });
 ---
