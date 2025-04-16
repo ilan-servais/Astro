@@ -2,9 +2,10 @@
 // RobotControl.astro - Interface pour contrôler le robot 3D
 ---
 
-<div class="robot-control fixed top-4 right-4 z-50 w-64 rounded-xl bg-[#120D16] border border-[#E06330] shadow-lg p-4" x-data="{
+<div class="robot-control fixed top-20 right-4 z-40 w-64 rounded-xl bg-[#120D16] border border-[#E06330] shadow-lg p-4" x-data="{
   activeTab: 'animations',
   animationState: 'Walking',
+  animationMenuOpen: false,
   expressions: {
     Angry: 0,
     Surprised: 0,
@@ -15,8 +16,12 @@
   toggleTab(tab) {
     this.activeTab = tab;
   },
-  changeAnimation(animation) {
+  toggleAnimationMenu() {
+    this.animationMenuOpen = !this.animationMenuOpen;
+  },
+  selectAnimation(animation) {
     this.animationState = animation;
+    this.animationMenuOpen = false;
     // La fonction fadeToAction sera appelée depuis le code three.js
     if (window.fadeToAction) {
       window.fadeToAction(animation, 0.5);
@@ -54,24 +59,89 @@
       <label for="animation-select" class="block mb-1 text-sm font-medium text-white">
         Animation
       </label>
+      
+      <!-- Menu déroulant personnalisé avec flèche animée -->
       <div class="relative">
-        <select
-          id="animation-select"
-          x-model="animationState"
-          @change="changeAnimation($event.target.value)"
-          class="block w-full rounded-lg bg-gray-700 border border-gray-600 text-white py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#E06330]">
-          <option value="Idle">Idle</option>
-          <option value="Walking">Walking</option>
-          <option value="Running">Running</option>
-          <option value="Dance">Dance</option>
-          <option value="Death">Death</option>
-          <option value="Sitting">Sitting</option>
-          <option value="Standing">Standing</option>
-        </select>
-        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <button 
+          @click="toggleAnimationMenu"
+          class="flex items-center justify-between w-full rounded-lg bg-[#E06330] border border-gray-600 text-white py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E06330]"
+        >
+          <span x-text="animationState">Walking</span>
+          <svg 
+            class="w-4 h-4 text-white transition-transform duration-200"
+            :class="animationMenuOpen ? 'transform rotate-180' : ''"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
+        </button>
+        
+        <!-- Options du menu déroulant -->
+        <div 
+          x-show="animationMenuOpen"
+          @click.outside="animationMenuOpen = false"
+          x-transition:enter="transition ease-out duration-100"
+          x-transition:enter-start="opacity-0 transform scale-95"
+          x-transition:enter-end="opacity-100 transform scale-100"
+          x-transition:leave="transition ease-in duration-75"
+          x-transition:leave-start="opacity-100 transform scale-100"
+          x-transition:leave-end="opacity-0 transform scale-95"
+          class="absolute z-10 w-full mt-1 rounded-lg bg-[#120D16] border border-[#E06330] shadow-lg overflow-hidden"
+        >
+          <div class="max-h-60 overflow-y-auto py-1">
+            <button
+              @click="selectAnimation('Idle')"
+              :class="animationState === 'Idle' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Idle
+            </button>
+            <button
+              @click="selectAnimation('Walking')"
+              :class="animationState === 'Walking' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Walking
+            </button>
+            <button
+              @click="selectAnimation('Running')"
+              :class="animationState === 'Running' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Running
+            </button>
+            <button
+              @click="selectAnimation('Dance')"
+              :class="animationState === 'Dance' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Dance
+            </button>
+            <button
+              @click="selectAnimation('Death')"
+              :class="animationState === 'Death' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Death
+            </button>
+            <button
+              @click="selectAnimation('Sitting')"
+              :class="animationState === 'Sitting' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Sitting
+            </button>
+            <button
+              @click="selectAnimation('Standing')"
+              :class="animationState === 'Standing' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Standing
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -80,32 +150,32 @@
       <h4 class="text-sm font-medium text-white">Actions</h4>
       <div class="flex flex-wrap gap-1">
         <button 
-          @click="changeAnimation('Jump')"
+          @click="selectAnimation('Jump')"
           class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
           Jump
         </button>
         <button 
-          @click="changeAnimation('Yes')"
+          @click="selectAnimation('Yes')"
           class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
           Yes
         </button>
         <button 
-          @click="changeAnimation('No')"
+          @click="selectAnimation('No')"
           class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
           No
         </button>
         <button 
-          @click="changeAnimation('Wave')"
+          @click="selectAnimation('Wave')"
           class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
           Wave
         </button>
         <button 
-          @click="changeAnimation('Punch')"
+          @click="selectAnimation('Punch')"
           class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
           Punch
         </button>
         <button 
-          @click="changeAnimation('ThumbsUp')"
+          @click="selectAnimation('ThumbsUp')"
           class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
           Thumbs Up
         </button>
