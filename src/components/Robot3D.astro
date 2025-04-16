@@ -30,8 +30,11 @@ import RobotControl from "./ui/RobotControl.astro";
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import Stats from 'three/addons/libs/stats.module.js';
 
-    let container, stats, clock, mixer, actions, activeAction, previousAction;
-    let camera, scene, renderer, model, face;
+    let container: HTMLElement | null = null;
+    let stats: Stats, clock: THREE.Clock, mixer: THREE.AnimationMixer, actions: {[key: string]: THREE.AnimationAction}, 
+        activeAction: THREE.AnimationAction, previousAction: THREE.AnimationAction;
+    let camera: THREE.PerspectiveCamera, scene: THREE.Scene, renderer: THREE.WebGLRenderer, 
+        model: THREE.Object3D, face: THREE.Mesh & {morphTargetDictionary?: {[key: string]: number}, morphTargetInfluences?: number[]};
     let lowPerformanceMode = false;
     let frameCount = 0;
     let lastTime = 0;
@@ -50,62 +53,65 @@ import RobotControl from "./ui/RobotControl.astro";
         
         // Si le FPS est très bas après quelques secondes, proposer une alternative
         if (currentFPS < 15 && !lowPerformanceMode) {
-          document.getElementById('webgl-error').classList.remove('hidden');
+          const errorElement = document.getElementById('webgl-error');
+          if (errorElement) errorElement.classList.remove('hidden');
         }
       }
     }
     
     // Gestion du message d'erreur
-    document.getElementById('close-error').addEventListener('click', () => {
-      document.getElementById('webgl-error').classList.add('hidden');
-    });
-    
-    document.getElementById('try-fallback').addEventListener('click', () => {
-      lowPerformanceMode = true;
-      document.getElementById('webgl-error').classList.add('hidden');
-      
-      // Réinitialiser le renderer avec des paramètres simplifiés
-      if (renderer) {
-        renderer.dispose();
-        container.removeChild(renderer.domElement);
-      }
-      
-      // Recréer un renderer avec des options de performance basiques
-      renderer = new THREE.WebGLRenderer({
-        antialias: false,
-        powerPreference: 'default',
-        alpha: false
+    const closeErrorBtn = document.getElementById('close-error');
+    if (closeErrorBtn) {
+      closeErrorBtn.addEventListener('click', () => {
+        const errorElement = document.getElementById('webgl-error');
+        if (errorElement) errorElement.classList.add('hidden');
       });
-      renderer.setPixelRatio(1); // Force à 1 pour économiser les ressources
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      container.appendChild(renderer.domElement);
-      
-      // Réduire la complexité de la scène
-      if (scene) {
-        // Supprimer la grille
-        scene.children.forEach(child => {
-          if (child instanceof THREE.GridHelper) {
-            scene.remove(child);
-          }
-        });
+    }
+    
+    const tryFallbackBtn = document.getElementById('try-fallback');
+    if (tryFallbackBtn) {
+      tryFallbackBtn.addEventListener('click', () => {
+        lowPerformanceMode = true;
+        const errorElement = document.getElementById('webgl-error');
+        if (errorElement) errorElement.classList.add('hidden');
         
-        // Réduire la portée du brouillard
-        if (scene.fog) {
-          scene.fog.near = 10;
-          scene.fog.far = 50;
+        // Réinitialiser le renderer avec des paramètres simplifiés
+        if (renderer && container) {
+          renderer.dispose();
+          container.removeChild(renderer.domElement);
+          
+          // Recréer un renderer avec des options de performance basiques
+          renderer = new THREE.WebGLRenderer({
+            antialias: false,
+            powerPreference: 'default',
+            alpha: true
+          });
+          renderer.setPixelRatio(1); // Force à 1 pour économiser les ressources
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          container.appendChild(renderer.domElement);
+          
+          // Réduire la complexité de la scène
+          if (scene) {
+            // Réduire la portée du brouillard pour un meilleur rendu sans arrière-plan
+            if (scene.fog) {
+              scene.fog.near = 10;
+              scene.fog.far = 50;
+            }
+          }
+          
+          // Simplifier la caméra
+          camera.far = 50;
+          camera.updateProjectionMatrix();
         }
-      }
-      
-      // Simplifier la caméra
-      camera.far = 50;
-      camera.updateProjectionMatrix();
-    });
+      });
+    }
     
     // Initialiser
     init();
     
     function init() {
       container = document.getElementById('robot-scene');
+      if (!container) return;
       
       // Configuration de la caméra
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 100);
@@ -114,14 +120,20 @@ import RobotControl from "./ui/RobotControl.astro";
       
       // Configuration de la scène
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf5f5f5);
-      scene.fog = new THREE.Fog(0xf5f5f5, 20, 100);
+      // Utiliser un fond transparent sans grille ni sol
+      scene.background = null;
+      scene.fog = null;
       
-      // Mode sombre
-      const setDarkMode = (isDark) => {
-        const bgColor = isDark ? 0x121212 : 0xf5f5f5;
-        scene.background = new THREE.Color(bgColor);
-        scene.fog = new THREE.Fog(bgColor, 20, 100);
+      // Mode sombre - modifie uniquement l'éclairage, pas l'arrière-plan
+      const setDarkMode = (isDark: boolean) => {
+        // Ajuster l'intensité de la lumière en fonction du mode
+        if (scene.children) {
+          scene.children.forEach(child => {
+            if (child instanceof THREE.Light) {
+              child.intensity = isDark ? 2 : 3;
+            }
+          });
+        }
       };
       
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -134,10 +146,16 @@ import RobotControl from "./ui/RobotControl.astro";
       
       clock = new THREE.Clock();
       
-      // Éclairage simplifié
+      // Éclairage optimisé
       const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
       hemiLight.position.set(0, 20, 0);
       scene.add(hemiLight);
+      
+      // Ajouter une lumière directionnelle pour de meilleures ombres
+      const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+      dirLight.position.set(-5, 10, 7);
+      dirLight.castShadow = true;
+      scene.add(dirLight);
       
       // Charge le modèle
       const loader = new GLTFLoader();
@@ -149,21 +167,25 @@ import RobotControl from "./ui/RobotControl.astro";
         console.error(e);
       });
       
-      // Options du renderer pour maximiser la compatibilité
+      // Options du renderer pour la transparence
       const rendererOptions = {
         canvas: document.createElement('canvas'),
-        antialias: false, // Désactiver pour les performances
-        powerPreference: 'default', // Utiliser default au lieu de high-performance
-        failIfMajorPerformanceCaveat: false // Ne pas échouer en cas de problèmes
+        antialias: true,
+        powerPreference: 'default',
+        alpha: true, // Activer la transparence
+        premultipliedAlpha: true,
+        failIfMajorPerformanceCaveat: false
       };
       
       try {
         // Créer le renderer
         renderer = new THREE.WebGLRenderer(rendererOptions);
         
-        // Configuration de base
-        renderer.setPixelRatio(1); // Forcer à 1 pour les performances
+        // Configuration pour la transparence
+        renderer.setClearColor(0x000000, 0); // Transparent
+        renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1); // Limiter pour les performances
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.outputEncoding = THREE.sRGBEncoding;
         container.appendChild(renderer.domElement);
         
         // Utiliser une fonction animateLoop simple
@@ -184,7 +206,7 @@ import RobotControl from "./ui/RobotControl.astro";
       container.appendChild(stats.dom);
     }
     
-    function setupAnimations(model, animations) {
+    function setupAnimations(model: THREE.Object3D, animations: THREE.AnimationClip[]) {
       // Configurer le mixer d'animation
       mixer = new THREE.AnimationMixer(model);
       actions = {};
@@ -210,13 +232,9 @@ import RobotControl from "./ui/RobotControl.astro";
       // Démarrer avec l'animation par défaut
       activeAction = actions['Walking'];
       activeAction.play();
-      
-      // Exposer les fonctions au niveau global pour l'interface
-      window.fadeToAction = fadeToAction;
-      window.updateMorphTarget = updateMorphTarget;
     }
     
-    function fadeToAction(name, duration) {
+    function fadeToAction(name: string, duration: number) {
       previousAction = activeAction;
       activeAction = actions[name];
       
@@ -251,11 +269,11 @@ import RobotControl from "./ui/RobotControl.astro";
       }
     }
     
-    function updateMorphTarget(expressionName, value) {
-      if (!face || !face.morphTargetDictionary) return;
+    function updateMorphTarget(expressionName: string, value: string | number) {
+      if (!face || !face.morphTargetDictionary || !face.morphTargetInfluences) return;
       
       // Correspondance entre noms d'expressions et indices du dictionnaire
-      const expressionMap = {
+      const expressionMap: {[key: string]: number | undefined} = {
         'Angry': face.morphTargetDictionary['Angry'],
         'Surprised': face.morphTargetDictionary['Surprised'], 
         'Sad': face.morphTargetDictionary['Sad'],
@@ -266,11 +284,13 @@ import RobotControl from "./ui/RobotControl.astro";
       // Mettre à jour l'influence du morph target
       const index = expressionMap[expressionName];
       if (index !== undefined) {
-        face.morphTargetInfluences[index] = parseFloat(value);
+        face.morphTargetInfluences[index] = parseFloat(value.toString());
       }
     }
     
     function onWindowResize() {
+      if (!renderer) return;
+      
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -287,11 +307,23 @@ import RobotControl from "./ui/RobotControl.astro";
       if (mixer) mixer.update(dt);
       
       // Rendu avec des options adaptées aux performances
-      if (scene && camera) {
+      if (scene && camera && renderer) {
         renderer.render(scene, camera);
       }
       
       stats.update();
     }
+
+    // Déclarer l'interface pour les types globaux
+    declare global {
+      interface Window {
+        fadeToAction: (name: string, duration: number) => void;
+        updateMorphTarget: (expressionName: string, value: string | number) => void;
+      }
+    }
+
+    // Exposer les fonctions au niveau global
+    window.fadeToAction = fadeToAction;
+    window.updateMorphTarget = updateMorphTarget;
   </script>
 </div>
