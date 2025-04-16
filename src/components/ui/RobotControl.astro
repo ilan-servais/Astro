@@ -1,0 +1,324 @@
+---
+// RobotControl.astro - Interface pour contrôler le robot 3D
+---
+
+<div 
+  class="robot-control fixed top-20 right-4 z-40 w-64 rounded-xl bg-[#120D16] border border-[#E06330] shadow-lg p-4" 
+  x-data="{
+    activeTab: 'animations',
+    animationState: 'Walking',
+    animationMenuOpen: false,
+    expressions: {
+      Angry: 0,
+      Surprised: 0,
+      Sad: 0,
+      Happy: 0,
+      Relaxed: 0
+    },
+    x: 0,
+    y: 0,
+    dragging: false,
+    startX: 0,
+    startY: 0,
+    toggleTab(tab) {
+      this.activeTab = tab;
+    },
+    toggleAnimationMenu() {
+      this.animationMenuOpen = !this.animationMenuOpen;
+    },
+    selectAnimation(animation) {
+      this.animationState = animation;
+      this.animationMenuOpen = false;
+      // La fonction fadeToAction sera appelée depuis le code three.js
+      if (window.fadeToAction) {
+        window.fadeToAction(animation, 0.5);
+      }
+    },
+    updateExpression(expression, value) {
+      this.expressions[expression] = value;
+      // Mise à jour des morph targets depuis le code three.js
+      if (window.updateMorphTarget) {
+        window.updateMorphTarget(expression, value);
+      }
+    },
+    start(event) {
+      this.dragging = true;
+      // coordonnées du pointeur au début
+      this.startX = (event.touches ? event.touches[0].clientX : event.clientX) - this.x;
+      this.startY = (event.touches ? event.touches[0].clientY : event.clientY) - this.y;
+      
+      // Empêcher le scroll sur mobile pendant le drag
+      if (event.touches) {
+        event.preventDefault();
+      }
+    },
+    move(event) {
+      if (!this.dragging) return;
+      
+      // Empêcher le scroll sur mobile pendant le drag
+      if (event.touches) {
+        event.preventDefault();
+      }
+      
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+      this.x = clientX - this.startX;
+      this.y = clientY - this.startY;
+    },
+    end() {
+      this.dragging = false;
+    },
+    initDrag() {
+      document.addEventListener('mousemove', e => this.move(e));
+      document.addEventListener('mouseup', () => this.end());
+      document.addEventListener('touchmove', e => this.move(e), { passive: false });
+      document.addEventListener('touchend', () => this.end());
+    }
+  }"
+  x-init="initDrag()"
+  :style="`transform: translate(${x}px, ${y}px);`"
+>
+  <!-- Handle de drag avec curseur approprié -->
+  <div 
+    class="cursor-grab active:cursor-grabbing flex justify-between items-center mb-4 pb-2 border-b border-gray-700 touch-none"
+    @mousedown.prevent="start($event)" 
+    @touchstart.prevent="start($event)"
+  >
+    <h3 class="font-bold text-white">Robot Control</h3>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#E06330]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+    </svg>
+  </div>
+
+  <div class="flex justify-center mb-4">
+    <div class="flex space-x-1">
+      <button 
+        @click="toggleTab('animations')" 
+        :class="activeTab === 'animations' ? 'bg-[#E06330] text-white' : 'bg-gray-700 text-gray-300'"
+        class="px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200">
+        Animations
+      </button>
+      <button 
+        @click="toggleTab('expressions')" 
+        :class="activeTab === 'expressions' ? 'bg-[#E06330] text-white' : 'bg-gray-700 text-gray-300'"
+        class="px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200">
+        Visage
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel des animations -->
+  <div x-show="activeTab === 'animations'" x-transition class="space-y-2">
+    <div class="w-full">
+      <label for="animation-select" class="block mb-1 text-sm font-medium text-white">
+        Animation
+      </label>
+      
+      <!-- Menu déroulant personnalisé avec flèche animée -->
+      <div class="relative">
+        <button 
+          @click="toggleAnimationMenu"
+          class="flex items-center justify-between w-full rounded-lg bg-[#E06330] border border-gray-600 text-white py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E06330]"
+        >
+          <span x-text="animationState">Walking</span>
+          <svg 
+            class="w-4 h-4 text-white transition-transform duration-200"
+            :class="animationMenuOpen ? 'transform rotate-180' : ''"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        
+        <!-- Options du menu déroulant -->
+        <div 
+          x-show="animationMenuOpen"
+          @click.outside="animationMenuOpen = false"
+          x-transition:enter="transition ease-out duration-100"
+          x-transition:enter-start="opacity-0 transform scale-95"
+          x-transition:enter-end="opacity-100 transform scale-100"
+          x-transition:leave="transition ease-in duration-75"
+          x-transition:leave-start="opacity-100 transform scale-100"
+          x-transition:leave-end="opacity-0 transform scale-95"
+          class="absolute z-10 w-full mt-1 rounded-lg bg-[#120D16] border border-[#E06330] shadow-lg overflow-hidden"
+        >
+          <div class="max-h-60 overflow-y-auto py-1">
+            <button
+              @click="selectAnimation('Idle')"
+              :class="animationState === 'Idle' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Idle
+            </button>
+            <button
+              @click="selectAnimation('Walking')"
+              :class="animationState === 'Walking' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Walking
+            </button>
+            <button
+              @click="selectAnimation('Running')"
+              :class="animationState === 'Running' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Running
+            </button>
+            <button
+              @click="selectAnimation('Dance')"
+              :class="animationState === 'Dance' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Dance
+            </button>
+            <button
+              @click="selectAnimation('Death')"
+              :class="animationState === 'Death' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Death
+            </button>
+            <button
+              @click="selectAnimation('Sitting')"
+              :class="animationState === 'Sitting' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Sitting
+            </button>
+            <button
+              @click="selectAnimation('Standing')"
+              :class="animationState === 'Standing' ? 'bg-[#E06330]' : ''"
+              class="block w-full text-left px-3 py-2 text-white text-sm hover:bg-[#E06330] transition-colors duration-150"
+            >
+              Standing
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <h4 class="text-sm font-medium text-white">Actions</h4>
+      <div class="flex flex-wrap gap-1">
+        <button 
+          @click="selectAnimation('Jump')"
+          class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
+          Jump
+        </button>
+        <button 
+          @click="selectAnimation('Yes')"
+          class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
+          Yes
+        </button>
+        <button 
+          @click="selectAnimation('No')"
+          class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
+          No
+        </button>
+        <button 
+          @click="selectAnimation('Wave')"
+          class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
+          Wave
+        </button>
+        <button 
+          @click="selectAnimation('Punch')"
+          class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
+          Punch
+        </button>
+        <button 
+          @click="selectAnimation('ThumbsUp')"
+          class="bg-[#E06330] hover:bg-orange-600 text-white text-xs px-2 py-1 rounded-md transition-colors">
+          Thumbs Up
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel des expressions faciales -->
+  <div x-show="activeTab === 'expressions'" x-transition class="space-y-3">
+    <div class="space-y-2">
+      <div>
+        <label for="expression-angry" class="flex justify-between text-xs font-medium text-white">
+          <span>Angry</span>
+          <span x-text="Math.round(expressions.Angry * 100) + '%'"></span>
+        </label>
+        <input 
+          id="expression-angry"
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.01"
+          x-model="expressions.Angry"
+          @input="updateExpression('Angry', $event.target.value)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
+      </div>
+      
+      <div>
+        <label for="expression-surprised" class="flex justify-between text-xs font-medium text-white">
+          <span>Surprised</span>
+          <span x-text="Math.round(expressions.Surprised * 100) + '%'"></span>
+        </label>
+        <input 
+          id="expression-surprised"
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.01"
+          x-model="expressions.Surprised"
+          @input="updateExpression('Surprised', $event.target.value)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
+      </div>
+      
+      <div>
+        <label for="expression-sad" class="flex justify-between text-xs font-medium text-white">
+          <span>Sad</span>
+          <span x-text="Math.round(expressions.Sad * 100) + '%'"></span>
+        </label>
+        <input 
+          id="expression-sad"
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.01"
+          x-model="expressions.Sad"
+          @input="updateExpression('Sad', $event.target.value)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
+      </div>
+      
+      <div>
+        <label for="expression-happy" class="flex justify-between text-xs font-medium text-white">
+          <span>Happy</span>
+          <span x-text="Math.round(expressions.Happy * 100) + '%'"></span>
+        </label>
+        <input 
+          id="expression-happy"
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.01"
+          x-model="expressions.Happy"
+          @input="updateExpression('Happy', $event.target.value)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
+      </div>
+      
+      <div>
+        <label for="expression-relaxed" class="flex justify-between text-xs font-medium text-white">
+          <span>Relaxed</span>
+          <span x-text="Math.round(expressions.Relaxed * 100) + '%'"></span>
+        </label>
+        <input 
+          id="expression-relaxed"
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.01"
+          x-model="expressions.Relaxed"
+          @input="updateExpression('Relaxed', $event.target.value)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
+      </div>
+    </div>
+  </div>
+</div>
