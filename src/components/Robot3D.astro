@@ -21,8 +21,11 @@ import RobotControl from "./ui/RobotControl.astro";
 
   <RobotControl />
   
-  <div id="robot-scene" class="w-full h-[70vh] mt-4">
-    <!-- Le conteneur pour la scène 3D -->
+  <!-- Je limite la largeur et centre le conteneur -->
+  <div class="max-w-4xl mx-auto">
+    <div id="robot-scene" class="w-full h-[70vh] mt-4">
+      <!-- Le conteneur pour la scène 3D -->
+    </div>
   </div>
   
   <div id="webgl-error" class="hidden absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
@@ -103,7 +106,9 @@ import RobotControl from "./ui/RobotControl.astro";
             alpha: true
           });
           renderer.setPixelRatio(1); // Force à 1 pour économiser les ressources
-          renderer.setSize(window.innerWidth, window.innerHeight);
+          
+          // Utiliser les dimensions du conteneur, pas de la fenêtre
+          renderer.setSize(container.clientWidth, container.clientHeight);
           container.appendChild(renderer.domElement);
           
           // Réduire la complexité de la scène
@@ -115,9 +120,16 @@ import RobotControl from "./ui/RobotControl.astro";
             }
           }
           
-          // Simplifier la caméra
+          // Repositionner la caméra pour conserver le centrage
+          camera.position.set(0, 3, 10);
+          camera.lookAt(0, 1, 0);
           camera.far = 50;
           camera.updateProjectionMatrix();
+          
+          // S'assurer que le modèle reste centré
+          if (model) {
+            model.position.set(0, 0, 0);
+          }
         }
       });
     }
@@ -130,9 +142,9 @@ import RobotControl from "./ui/RobotControl.astro";
       if (!container) return;
       
       // Configuration de la caméra
-      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 100);
-      camera.position.set(-5, 3, 10);
-      camera.lookAt(0, 2, 0);
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.25, 100);
+      camera.position.set(0, 3, 10); // Position à 0 sur l'axe X pour être directement en face
+      camera.lookAt(0, 1, 0); // Regarder le centre du robot
       
       // Configuration de la scène
       scene = new THREE.Scene();
@@ -195,6 +207,10 @@ import RobotControl from "./ui/RobotControl.astro";
       const loader = new GLTFLoader();
       loader.load('/models/gltf/RobotExpressive/RobotExpressive.glb', function(gltf) {
         model = gltf.scene;
+        
+        // Positionner le modèle au centre exact
+        model.position.set(0, 0, 0);
+        
         // Activer les ombres pour le modèle
         model.traverse((object) => {
           if (object instanceof THREE.Mesh) {
@@ -225,7 +241,9 @@ import RobotControl from "./ui/RobotControl.astro";
         // Configuration pour la transparence et les ombres
         renderer.setClearColor(0x000000, 0); // Transparent
         renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        // Utiliser les dimensions du conteneur, pas de la fenêtre
+        renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -332,11 +350,18 @@ import RobotControl from "./ui/RobotControl.astro";
     }
     
     function onWindowResize() {
-      if (!renderer) return;
+      if (!renderer || !container) return;
       
-      camera.aspect = window.innerWidth / window.innerHeight;
+      // Utiliser les dimensions du conteneur
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(width, height);
+      
+      // S'assurer que la caméra pointe toujours au centre
+      camera.lookAt(0, 1, 0);
     }
     
     function animateLoop() {
