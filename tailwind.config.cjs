@@ -13,7 +13,7 @@ module.exports = {
 			xl: '1280px',
 		},
 		colors: {
-			black: '#000',
+			black: '#120D16', // Modification directe de la valeur de noir
 			white: '#fff',
 			orange: '#E06330',
 			darkBg: '#120D16',
