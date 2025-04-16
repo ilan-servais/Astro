@@ -9,6 +9,21 @@ import RobotControl from "./ui/RobotControl.astro";
     <!-- Le conteneur pour la scène 3D -->
   </div>
   
+  <div id="webgl-error" class="hidden absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
+    <div class="bg-[#120D16] border border-[#E06330] p-6 rounded-lg max-w-md text-center">
+      <h3 class="text-xl font-bold text-white mb-3">Problème de performance 3D</h3>
+      <p class="text-gray-300 mb-4">La visualisation 3D ne fonctionne pas correctement sur votre navigateur.</p>
+      <div class="flex space-x-4 justify-center">
+        <button id="try-fallback" class="bg-[#E06330] hover:bg-orange-600 text-white px-4 py-2 rounded-md transition-colors">
+          Mode simplifié
+        </button>
+        <button id="close-error" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors">
+          Continuer quand même
+        </button>
+      </div>
+    </div>
+  </div>
+  
   <script>
     // Exposer les fonctions pour l'interface de contrôle
     import * as THREE from 'three';
@@ -17,6 +32,74 @@ import RobotControl from "./ui/RobotControl.astro";
 
     let container, stats, clock, mixer, actions, activeAction, previousAction;
     let camera, scene, renderer, model, face;
+    let lowPerformanceMode = false;
+    let frameCount = 0;
+    let lastTime = 0;
+    let currentFPS = 0;
+    
+    // Fonction pour détecter les problèmes de performance
+    function checkPerformance() {
+      const now = performance.now();
+      frameCount++;
+      
+      // Calculer le FPS toutes les secondes
+      if (now - lastTime >= 1000) {
+        currentFPS = frameCount;
+        frameCount = 0;
+        lastTime = now;
+        
+        // Si le FPS est très bas après quelques secondes, proposer une alternative
+        if (currentFPS < 15 && !lowPerformanceMode) {
+          document.getElementById('webgl-error').classList.remove('hidden');
+        }
+      }
+    }
+    
+    // Gestion du message d'erreur
+    document.getElementById('close-error').addEventListener('click', () => {
+      document.getElementById('webgl-error').classList.add('hidden');
+    });
+    
+    document.getElementById('try-fallback').addEventListener('click', () => {
+      lowPerformanceMode = true;
+      document.getElementById('webgl-error').classList.add('hidden');
+      
+      // Réinitialiser le renderer avec des paramètres simplifiés
+      if (renderer) {
+        renderer.dispose();
+        container.removeChild(renderer.domElement);
+      }
+      
+      // Recréer un renderer avec des options de performance basiques
+      renderer = new THREE.WebGLRenderer({
+        antialias: false,
+        powerPreference: 'default',
+        alpha: false
+      });
+      renderer.setPixelRatio(1); // Force à 1 pour économiser les ressources
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+      
+      // Réduire la complexité de la scène
+      if (scene) {
+        // Supprimer la grille
+        scene.children.forEach(child => {
+          if (child instanceof THREE.GridHelper) {
+            scene.remove(child);
+          }
+        });
+        
+        // Réduire la portée du brouillard
+        if (scene.fog) {
+          scene.fog.near = 10;
+          scene.fog.far = 50;
+        }
+      }
+      
+      // Simplifier la caméra
+      camera.far = 50;
+      camera.updateProjectionMatrix();
+    });
     
     // Initialiser
     init();
@@ -41,64 +124,59 @@ import RobotControl from "./ui/RobotControl.astro";
         scene.fog = new THREE.Fog(bgColor, 20, 100);
       };
       
-      // Vérifier si le mode sombre est actif
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         setDarkMode(true);
       }
       
-      // Écouter les changements de mode
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         setDarkMode(e.matches);
       });
       
       clock = new THREE.Clock();
       
-      // Éclairage
+      // Éclairage simplifié
       const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
       hemiLight.position.set(0, 20, 0);
       scene.add(hemiLight);
       
-      const dirLight = new THREE.DirectionalLight(0xffffff, 3);
-      dirLight.position.set(0, 20, 10);
-      scene.add(dirLight);
-      
-      // Sol
-      const mesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(2000, 2000),
-        new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
-      );
-      mesh.rotation.x = -Math.PI / 2;
-      scene.add(mesh);
-      
-      // Grille
-      const grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
-      grid.material.opacity = 0.2;
-      grid.material.transparent = true;
-      scene.add(grid);
-      
-      // Chargement du modèle
+      // Charge le modèle
       const loader = new GLTFLoader();
       loader.load('/models/gltf/RobotExpressive/RobotExpressive.glb', function(gltf) {
         model = gltf.scene;
         scene.add(model);
-        
         setupAnimations(model, gltf.animations);
-        
       }, undefined, function(e) {
         console.error(e);
       });
       
-      // Rendu
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setAnimationLoop(animate);
-      container.appendChild(renderer.domElement);
+      // Options du renderer pour maximiser la compatibilité
+      const rendererOptions = {
+        canvas: document.createElement('canvas'),
+        antialias: false, // Désactiver pour les performances
+        powerPreference: 'default', // Utiliser default au lieu de high-performance
+        failIfMajorPerformanceCaveat: false // Ne pas échouer en cas de problèmes
+      };
+      
+      try {
+        // Créer le renderer
+        renderer = new THREE.WebGLRenderer(rendererOptions);
+        
+        // Configuration de base
+        renderer.setPixelRatio(1); // Forcer à 1 pour les performances
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+        
+        // Utiliser une fonction animateLoop simple
+        lastTime = performance.now();
+        animateLoop();
+      } catch (error) {
+        console.error("Erreur WebGL:", error);
+      }
       
       // Responsive
       window.addEventListener('resize', onWindowResize);
       
-      // Stats (optionnel)
+      // Stats pour debug
       stats = new Stats();
       stats.dom.style.position = 'absolute';
       stats.dom.style.bottom = '0px';
@@ -196,20 +274,23 @@ import RobotControl from "./ui/RobotControl.astro";
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      
-      // Adapter la position de la caméra sur mobile
-      if (window.innerWidth < 640) {
-        camera.position.set(-4, 4, 12); // Position plus éloignée sur mobile
-      } else {
-        camera.position.set(-5, 3, 10); // Position standard sur desktop
-      }
-      camera.lookAt(0, 2, 0);
     }
     
-    function animate() {
+    function animateLoop() {
+      requestAnimationFrame(animateLoop);
+      
+      // Surveiller les performances
+      checkPerformance();
+      
+      // Animation simplifiée pour les mauvaises performances
       const dt = clock.getDelta();
       if (mixer) mixer.update(dt);
-      renderer.render(scene, camera);
+      
+      // Rendu avec des options adaptées aux performances
+      if (scene && camera) {
+        renderer.render(scene, camera);
+      }
+      
       stats.update();
     }
   </script>
