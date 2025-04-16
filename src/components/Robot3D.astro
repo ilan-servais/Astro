@@ -1,0 +1,208 @@
+---
+import RobotControl from "./ui/RobotControl.astro";
+---
+
+<div class="robot-container relative w-full h-screen">
+  <RobotControl />
+  
+  <div id="robot-scene" class="w-full h-full">
+    <!-- Le conteneur pour la scène 3D -->
+  </div>
+  
+  <script>
+    // Exposer les fonctions pour l'interface de contrôle
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import Stats from 'three/addons/libs/stats.module.js';
+
+    let container, stats, clock, mixer, actions, activeAction, previousAction;
+    let camera, scene, renderer, model, face;
+    
+    // Initialiser
+    init();
+    
+    function init() {
+      container = document.getElementById('robot-scene');
+      
+      // Configuration de la caméra
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 100);
+      camera.position.set(-5, 3, 10);
+      camera.lookAt(0, 2, 0);
+      
+      // Configuration de la scène
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf5f5f5);
+      scene.fog = new THREE.Fog(0xf5f5f5, 20, 100);
+      
+      // Mode sombre
+      const setDarkMode = (isDark) => {
+        const bgColor = isDark ? 0x121212 : 0xf5f5f5;
+        scene.background = new THREE.Color(bgColor);
+        scene.fog = new THREE.Fog(bgColor, 20, 100);
+      };
+      
+      // Vérifier si le mode sombre est actif
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setDarkMode(true);
+      }
+      
+      // Écouter les changements de mode
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        setDarkMode(e.matches);
+      });
+      
+      clock = new THREE.Clock();
+      
+      // Éclairage
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+      hemiLight.position.set(0, 20, 0);
+      scene.add(hemiLight);
+      
+      const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+      dirLight.position.set(0, 20, 10);
+      scene.add(dirLight);
+      
+      // Sol
+      const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(2000, 2000),
+        new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+      );
+      mesh.rotation.x = -Math.PI / 2;
+      scene.add(mesh);
+      
+      // Grille
+      const grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
+      grid.material.opacity = 0.2;
+      grid.material.transparent = true;
+      scene.add(grid);
+      
+      // Chargement du modèle
+      const loader = new GLTFLoader();
+      loader.load('/models/gltf/RobotExpressive/RobotExpressive.glb', function(gltf) {
+        model = gltf.scene;
+        scene.add(model);
+        
+        setupAnimations(model, gltf.animations);
+        
+      }, undefined, function(e) {
+        console.error(e);
+      });
+      
+      // Rendu
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setAnimationLoop(animate);
+      container.appendChild(renderer.domElement);
+      
+      // Responsive
+      window.addEventListener('resize', onWindowResize);
+      
+      // Stats (optionnel)
+      stats = new Stats();
+      stats.dom.style.position = 'absolute';
+      stats.dom.style.bottom = '0px';
+      stats.dom.style.top = 'auto';
+      container.appendChild(stats.dom);
+    }
+    
+    function setupAnimations(model, animations) {
+      // Configurer le mixer d'animation
+      mixer = new THREE.AnimationMixer(model);
+      actions = {};
+      
+      const states = ['Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing'];
+      const emotes = ['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'];
+      
+      // Créer les actions pour chaque animation
+      animations.forEach(clip => {
+        const action = mixer.clipAction(clip);
+        actions[clip.name] = action;
+        
+        // Configuration pour les animations ponctuelles
+        if (emotes.indexOf(clip.name) >= 0 || states.indexOf(clip.name) >= 4) {
+          action.clampWhenFinished = true;
+          action.loop = THREE.LoopOnce;
+        }
+      });
+      
+      // Accéder au modèle de la tête pour les expressions faciales
+      face = model.getObjectByName('Head_4');
+      
+      // Démarrer avec l'animation par défaut
+      activeAction = actions['Walking'];
+      activeAction.play();
+      
+      // Exposer les fonctions au niveau global pour l'interface
+      window.fadeToAction = fadeToAction;
+      window.updateMorphTarget = updateMorphTarget;
+    }
+    
+    function fadeToAction(name, duration) {
+      previousAction = activeAction;
+      activeAction = actions[name];
+      
+      if (previousAction !== activeAction) {
+        previousAction.fadeOut(duration);
+      }
+      
+      activeAction
+        .reset()
+        .setEffectiveTimeScale(1)
+        .setEffectiveWeight(1)
+        .fadeIn(duration)
+        .play();
+      
+      // Pour les animations ponctuelles, revenir à l'état précédent
+      if (['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'].includes(name)) {
+        mixer.addEventListener('finished', function onFinished() {
+          mixer.removeEventListener('finished', onFinished);
+          
+          // Revenir à l'animation d'état précédente
+          const controlElement = document.querySelector('.robot-control');
+          if (controlElement) {
+            // Cast to AlpineElement to access __x safely
+            const alpineElement = controlElement as unknown as AlpineElement;
+            const defaultState = alpineElement.__x?.$data.animationState || 'Walking';
+            fadeToAction(defaultState, 0.2);
+          } else {
+            // Fallback si l'élément n'est pas trouvé
+            fadeToAction('Walking', 0.2);
+          }
+        });
+      }
+    }
+    
+    function updateMorphTarget(expressionName, value) {
+      if (!face || !face.morphTargetDictionary) return;
+      
+      // Correspondance entre noms d'expressions et indices du dictionnaire
+      const expressionMap = {
+        'Angry': face.morphTargetDictionary['Angry'],
+        'Surprised': face.morphTargetDictionary['Surprised'], 
+        'Sad': face.morphTargetDictionary['Sad'],
+        'Happy': face.morphTargetDictionary['Happy'],
+        'Relaxed': face.morphTargetDictionary['Relaxed']
+      };
+      
+      // Mettre à jour l'influence du morph target
+      const index = expressionMap[expressionName];
+      if (index !== undefined) {
+        face.morphTargetInfluences[index] = parseFloat(value);
+      }
+    }
+    
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    function animate() {
+      const dt = clock.getDelta();
+      if (mixer) mixer.update(dt);
+      renderer.render(scene, camera);
+      stats.update();
+    }
+  </script>
+</div>
