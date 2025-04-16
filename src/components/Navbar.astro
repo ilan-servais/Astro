@@ -9,6 +9,7 @@ const isHomePage = currentPath === '/' || currentPath === '';
 const isCareerPage = currentPath.includes('/career');
 const isProjectsPage = currentPath.includes('/projects') || currentPath.includes('/project/');
 const isGamePage = currentPath.includes('/memory-game');
+const isRobotPage = currentPath.includes('/robot');
 
 // Adapter les liens en fonction de la page actuelle
 const menuitems = [
@@ -33,6 +34,10 @@ const menuitems = [
 	{
 		title: 'Game',
 		path: '/memory-game',
+	},
+	{
+		title: '3D',
+		path: '/robot',
 	},
 	{
 		title: 'Contact',
