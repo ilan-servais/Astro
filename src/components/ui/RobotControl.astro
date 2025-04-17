@@ -11,9 +11,7 @@
     expressions: {
       Angry: 0,
       Surprised: 0,
-      Sad: 0,
-      Happy: 0,
-      Relaxed: 0
+      Sad: 0
     },
     x: 0,
     y: 0,
@@ -285,38 +283,6 @@
           step="0.01"
           x-model="expressions.Sad"
           @input="updateExpression('Sad', $event.target.value)"
-          class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
-      </div>
-      
-      <div>
-        <label for="expression-happy" class="flex justify-between text-xs font-medium text-white">
-          <span>Happy</span>
-          <span x-text="Math.round(expressions.Happy * 100) + '%'"></span>
-        </label>
-        <input 
-          id="expression-happy"
-          type="range" 
-          min="0" 
-          max="1" 
-          step="0.01"
-          x-model="expressions.Happy"
-          @input="updateExpression('Happy', $event.target.value)"
-          class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
-      </div>
-      
-      <div>
-        <label for="expression-relaxed" class="flex justify-between text-xs font-medium text-white">
-          <span>Relaxed</span>
-          <span x-text="Math.round(expressions.Relaxed * 100) + '%'"></span>
-        </label>
-        <input 
-          id="expression-relaxed"
-          type="range" 
-          min="0" 
-          max="1" 
-          step="0.01"
-          x-model="expressions.Relaxed"
-          @input="updateExpression('Relaxed', $event.target.value)"
           class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 accent-[#E06330]">
       </div>
     </div>

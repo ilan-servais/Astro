@@ -8,11 +8,11 @@ import RobotControl from "./ui/RobotControl.astro";
     <h1 class="text-4xl font-bold mb-4 text-[#E06330]">Astro the robot</h1>
     <p class="text-xl mb-6 text-black dark:text-white">
       Hi, my name is Astro! I'm an interactive 3D robot that you can control.
-      Try changing my animations and facial expressions with the control panel.
     </p>
     <p class="text-lg mb-6 text-black dark:text-white">
       You can drag the control panel anywhere on the screen, select different animations, 
-      or adjust my facial expressions to make me happy, sad, angry, surprised, or relaxed!
+      or adjust my facial expressions to make me sad, angry or surprised!
+      Don’t look for joy though — I’m just a robot, not a poet.
     </p>
     <!-- Ajout d'instructions pour la navigation de caméra -->
     <div class="inline-block bg-[#120D16] border border-[#E06330] text-white text-sm px-4 py-2 rounded-lg mb-2">
@@ -292,6 +292,64 @@ import RobotControl from "./ui/RobotControl.astro";
       container.appendChild(stats.dom);
     }
     
+    // Fonction pour gérer les transitions d'animations et corriger l'animation 'Punch'
+    function fadeToAction(name: string, duration: number): void {
+      if (!actions || !mixer) return;
+      
+      // Correction pour l'animation Punch - vérifier si l'animation existe
+      if (name === 'Punch' && !actions[name]) {
+        console.warn("Animation 'Punch' non disponible, utilisation de 'ThumbsUp' comme fallback");
+        name = 'ThumbsUp'; // Utiliser une animation alternative
+      }
+      
+      previousAction = activeAction;
+      activeAction = actions[name];
+      
+      // Vérifier si l'action existe avant de continuer
+      if (!activeAction) {
+        console.error(`Animation '${name}' non trouvée dans les actions disponibles`);
+        return;
+      }
+      
+      if (previousAction !== activeAction) {
+        previousAction.fadeOut(duration);
+      }
+      
+      // Réinitialiser et configurer l'action
+      activeAction
+        .reset()
+        .setEffectiveTimeScale(1)
+        .setEffectiveWeight(1)
+        .fadeIn(duration)
+        .play();
+      
+      // Pour les animations ponctuelles, revenir à l'état précédent
+      if (['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'].includes(name)) {
+        // Correction: supprimer tout écouteur précédent pour éviter les doublons
+        mixer.removeEventListener('finished', onAnimationFinished);
+        
+        // Ajouter le nouvel écouteur
+        mixer.addEventListener('finished', onAnimationFinished);
+      }
+      
+      function onAnimationFinished() {
+        mixer.removeEventListener('finished', onAnimationFinished);
+        
+        // Revenir à l'animation d'état précédente
+        const controlElement = document.querySelector('.robot-control');
+        if (controlElement) {
+          // Cast to AlpineElement to access __x safely
+          const alpineElement = controlElement as unknown as AlpineElement;
+          const defaultState = alpineElement.__x?.$data.animationState || 'Walking';
+          fadeToAction(defaultState, 0.2);
+        } else {
+          // Fallback si l'élément n'est pas trouvé
+          fadeToAction('Walking', 0.2);
+        }
+      }
+    }
+    
+    // Fonction pour configurer les animations du modèle, avec vérification des animations disponibles
     function setupAnimations(model: THREE.Object3D, animationClips: THREE.AnimationClip[]) {
       // Configurer le mixer d'animation
       mixer = new THREE.AnimationMixer(model);
@@ -299,6 +357,9 @@ import RobotControl from "./ui/RobotControl.astro";
       
       const states = ['Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing'];
       const emotes = ['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'];
+      
+      // Journaliser les clips disponibles pour le débogage
+      console.log("Animations disponibles:", animationClips.map(clip => clip.name));
       
       // Créer les actions pour chaque animation
       animationClips.forEach(clip => {
@@ -312,46 +373,27 @@ import RobotControl from "./ui/RobotControl.astro";
         }
       });
       
+      // Vérifier quelles animations sont réellement disponibles
+      console.log("État des animations:");
+      [...states, ...emotes].forEach(name => {
+        console.log(`${name}: ${actions[name] ? 'disponible' : 'MANQUANTE'}`);
+      });
+      
       // Accéder au modèle de la tête pour les expressions faciales
       face = model.getObjectByName('Head_4') as THREE.Mesh | null;
       
-      // Démarrer avec l'animation par défaut
-      activeAction = actions['Walking'];
-      activeAction.play();
-    }
-    
-    function fadeToAction(name: string, duration: number) {
-      previousAction = activeAction;
-      activeAction = actions[name];
-      
-      if (previousAction !== activeAction) {
-        previousAction.fadeOut(duration);
-      }
-      
-      activeAction
-        .reset()
-        .setEffectiveTimeScale(1)
-        .setEffectiveWeight(1)
-        .fadeIn(duration)
-        .play();
-      
-      // Pour les animations ponctuelles, revenir à l'état précédent
-      if (['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'].includes(name)) {
-        mixer.addEventListener('finished', function onFinished() {
-          mixer.removeEventListener('finished', onFinished);
-          
-          // Revenir à l'animation d'état précédente
-          const controlElement = document.querySelector('.robot-control');
-          if (controlElement) {
-            // Cast to AlpineElement to access __x safely
-            const alpineElement = controlElement as unknown as AlpineElement;
-            const defaultState = alpineElement.__x?.$data.animationState || 'Walking';
-            fadeToAction(defaultState, 0.2);
-          } else {
-            // Fallback si l'élément n'est pas trouvé
-            fadeToAction('Walking', 0.2);
-          }
-        });
+      // Démarrer avec l'animation par défaut, en vérifiant qu'elle existe
+      if (actions['Walking']) {
+        activeAction = actions['Walking'];
+        activeAction.play();
+      } else {
+        // Choisir la première animation disponible comme fallback
+        const firstAvailableAction = Object.values(actions)[0];
+        if (firstAvailableAction) {
+          activeAction = firstAvailableAction;
+          activeAction.play();
+          console.warn("Animation 'Walking' non disponible, utilisation d'une alternative");
+        }
       }
     }
     
