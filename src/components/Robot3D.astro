@@ -5,7 +5,7 @@ import RobotControl from "./ui/RobotControl.astro";
 <div class="robot-container relative w-full min-h-screen overflow-hidden py-8 px-4 sm:px-6">
   <!-- Section d'introduction -->
   <div class="max-w-4xl mx-auto mb-10 text-center">
-    <h1 class="text-4xl font-bold mb-4 text-[#E06330]">Astro Robot</h1>
+    <h1 class="text-4xl font-bold mb-4 text-[#E06330]">Astro the robot</h1>
     <p class="text-xl mb-6 text-black dark:text-white">
       Hi, my name is Astro! I'm an interactive 3D robot that you can control.
       Try changing my animations and facial expressions with the control panel.
@@ -14,6 +14,11 @@ import RobotControl from "./ui/RobotControl.astro";
       You can drag the control panel anywhere on the screen, select different animations, 
       or adjust my facial expressions to make me happy, sad, angry, surprised, or relaxed!
     </p>
+    <!-- Ajout d'instructions pour la navigation de caméra -->
+    <div class="inline-block bg-[#120D16] border border-[#E06330] text-white text-sm px-4 py-2 rounded-lg mb-2">
+      <span class="font-medium">Camera Controls:</span> Click and drag to rotate, scroll to zoom in/out.
+    </div>
+    
     <div class="inline-block bg-[#120D16] border border-[#E06330] text-white text-sm px-4 py-2 rounded-lg">
       <span class="font-medium">Tip:</span> If you experience performance issues, try the "Simplified mode" option when prompted.
     </div>
@@ -47,17 +52,34 @@ import RobotControl from "./ui/RobotControl.astro";
     // Exposer les fonctions pour l'interface de contrôle
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import Stats from 'three/addons/libs/stats.module.js';
 
     let container: HTMLElement | null = null;
-    let stats: Stats, clock: THREE.Clock, mixer: THREE.AnimationMixer, actions: {[key: string]: THREE.AnimationAction}, 
-        activeAction: THREE.AnimationAction, previousAction: THREE.AnimationAction;
-    let camera: THREE.PerspectiveCamera, scene: THREE.Scene, renderer: THREE.WebGLRenderer, 
-        model: THREE.Object3D, face: THREE.Mesh & {morphTargetDictionary?: {[key: string]: number}, morphTargetInfluences?: number[]};
-    let lowPerformanceMode = false;
-    let frameCount = 0;
-    let lastTime = 0;
-    let currentFPS = 0;
+    let camera: THREE.PerspectiveCamera;
+    let scene: THREE.Scene;
+    let renderer: THREE.WebGLRenderer;
+    let model: THREE.Object3D;
+    let clock: THREE.Clock;
+    let mixer: THREE.AnimationMixer;
+    let animations: { [key: string]: THREE.AnimationAction } = {};
+    let actions: { [key: string]: THREE.AnimationAction } = {}; // Fix: Add actions object
+    let activeAction: THREE.AnimationAction;
+    let previousAction: THREE.AnimationAction; // Fix: Add previousAction
+    let lastAction: THREE.AnimationAction;
+    let stats: Stats;
+    let controls: OrbitControls;
+    let lastTime: number;
+    let face: THREE.Mesh | null = null; // Fix: Add face property for morphing
+    
+    // Performance monitoring variables
+    let frameCount = 0; // Fix: Add frameCount
+    let currentFPS = 60; // Fix: Add currentFPS
+    let lowPerformanceMode = false; // Fix: Add lowPerformanceMode
+    
+    // Préparation des options générales optimisées
+    let useSimplifiedMode = false;
+    let hasShownFallbackOption = false;
     
     // Fonction pour détecter les problèmes de performance
     function checkPerformance() {
@@ -142,9 +164,9 @@ import RobotControl from "./ui/RobotControl.astro";
       if (!container) return;
       
       // Configuration de la caméra
-      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.25, 100);
-      camera.position.set(0, 3, 10); // Position à 0 sur l'axe X pour être directement en face
-      camera.lookAt(0, 1, 0); // Regarder le centre du robot
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.set(0, 3, 10);
+      camera.lookAt(0, 1, 0);
       
       // Configuration de la scène
       scene = new THREE.Scene();
@@ -249,6 +271,9 @@ import RobotControl from "./ui/RobotControl.astro";
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
         
+        // Initialisation des OrbitControls
+        setupOrbitControls();
+        
         // Utiliser une fonction animateLoop simple
         lastTime = performance.now();
         animateLoop();
@@ -267,16 +292,16 @@ import RobotControl from "./ui/RobotControl.astro";
       container.appendChild(stats.dom);
     }
     
-    function setupAnimations(model: THREE.Object3D, animations: THREE.AnimationClip[]) {
+    function setupAnimations(model: THREE.Object3D, animationClips: THREE.AnimationClip[]) {
       // Configurer le mixer d'animation
       mixer = new THREE.AnimationMixer(model);
-      actions = {};
+      actions = {}; // Initialize actions object
       
       const states = ['Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing'];
       const emotes = ['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'];
       
       // Créer les actions pour chaque animation
-      animations.forEach(clip => {
+      animationClips.forEach(clip => {
         const action = mixer.clipAction(clip);
         actions[clip.name] = action;
         
@@ -288,7 +313,7 @@ import RobotControl from "./ui/RobotControl.astro";
       });
       
       // Accéder au modèle de la tête pour les expressions faciales
-      face = model.getObjectByName('Head_4');
+      face = model.getObjectByName('Head_4') as THREE.Mesh | null;
       
       // Démarrer avec l'animation par défaut
       activeAction = actions['Walking'];
@@ -349,6 +374,38 @@ import RobotControl from "./ui/RobotControl.astro";
       }
     }
     
+    // Fonction dédiée pour configurer les contrôles de caméra
+    function setupOrbitControls() {
+      // Initialiser les contrôles avec la caméra et l'élément DOM du renderer
+      controls = new OrbitControls(camera, renderer.domElement);
+      
+      // Configuration de la rotation
+      controls.enableRotate = true; // Activer la rotation (par défaut)
+      controls.rotateSpeed = 0.8; // Vitesse de rotation - ajustez selon vos préférences
+      
+      // Configuration du zoom
+      controls.enableZoom = true; // Activer le zoom (par défaut)
+      controls.zoomSpeed = 1.0; // Vitesse de zoom
+      controls.minDistance = 3; // Distance minimale de zoom (évite de traverser le modèle)
+      controls.maxDistance = 20; // Distance maximale de zoom
+      
+      // Configuration du pan (translation)
+      controls.enablePan = true; // Activer le pan
+      controls.panSpeed = 0.5; // Vitesse de pan
+      controls.screenSpacePanning = true; // Pan plus naturel (perpendiculaire à la vue)
+      
+      // Amortissement pour des mouvements plus fluides
+      controls.enableDamping = true; // Activer l'amortissement
+      controls.dampingFactor = 0.05; // Facteur d'amortissement (plus petit = plus fluide mais plus lent)
+      
+      // Centrer les contrôles sur le robot (position Y du centre)
+      controls.target.set(0, 1.5, 0); // Ajustez la valeur Y selon la hauteur du centre de votre robot
+      
+      // Mise à jour initiale des contrôles
+      controls.update();
+    }
+    
+    // Fonction de réponse au redimensionnement
     function onWindowResize() {
       if (!renderer || !container) return;
       
@@ -360,25 +417,30 @@ import RobotControl from "./ui/RobotControl.astro";
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
       
-      // S'assurer que la caméra pointe toujours au centre
-      camera.lookAt(0, 1, 0);
+      // Mise à jour des controls lors du redimensionnement
+      if (controls) {
+        controls.update();
+      }
     }
     
+    // Boucle d'animation
     function animateLoop() {
       requestAnimationFrame(animateLoop);
       
-      // Surveiller les performances
-      checkPerformance();
+      const currentTime = performance.now();
+      const delta = (currentTime - lastTime) * 0.001;
+      lastTime = currentTime;
       
-      // Animation simplifiée pour les mauvaises performances
-      const dt = clock.getDelta();
-      if (mixer) mixer.update(dt);
-      
-      // Rendu avec des options adaptées aux performances
-      if (scene && camera && renderer) {
-        renderer.render(scene, camera);
+      if (mixer) {
+        mixer.update(delta);
       }
       
+      // Mise à jour des controls avec amortissement
+      if (controls) {
+        controls.update(); // Mise à jour des contrôles à chaque frame pour l'effet d'amortissement
+      }
+      
+      renderer.render(scene, camera);
       stats.update();
     }
 
